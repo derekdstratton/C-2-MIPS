@@ -1,5 +1,5 @@
 CXX = g++
-CXX_FLAGS = -c
+CXX_FLAGS = -c -std=c++11
 OBJ_FILES = driver.o SymbolTable.o
 
 all:$(OBJ_FILES)

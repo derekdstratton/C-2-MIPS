@@ -5,27 +5,26 @@
 #ifndef BEST_C_COMPILER_SYMBOLTABLE_H
 #define BEST_C_COMPILER_SYMBOLTABLE_H
 
-#include <stack>
+#include <list>
 #include <map>
 #include <utility>
 #include <string>
 
 using namespace std;
 
-struct contents{
-
-};
-
 class SymbolTable {
   public:
     SymbolTable();
-    void insert(const pair<string, contents> item);
-    contents search(const string key);
+    void insert(const pair<string, int> item);
+    int search(const string key);
     void writeToFile();
     void pushLevel();
     void popLevel();
+    void printTable();
   private:
-    stack<map<string, contents>> table;
+    //the actual symbol table
+    list<map<string, int>> table;
+    //the top of the stack is given by table.back()
 };
 
 #endif //BEST_C_COMPILER_SYMBOLTABLE_H
