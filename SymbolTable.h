@@ -15,16 +15,16 @@ using namespace std;
 class SymbolTable {
   public:
     SymbolTable();
-    void insert(const pair<string, int> item);
-    int search(const string key);
-    void writeToFile();
+    void insert(const pair<string, int>& item);
+    int search(const string& key);
+    void writeToFile(const string &filepath);
     void pushLevel();
     void popLevel();
     void printTable();
   private:
     //the actual symbol table
     list<map<string, int>> table;
-    //the top of the stack is given by table.back()
+    //the top of the stack is given by table.front()
 };
 
 #endif //BEST_C_COMPILER_SYMBOLTABLE_H
