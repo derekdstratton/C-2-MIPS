@@ -1,21 +1,36 @@
+
+%{
+#include "stdio.h"
+#include <ctype.h>
+
+
+extern int line; //to keep track of line number for error
+%}
+
+%union {
+    int ival; //for ints and keywords returned as an int
+    double dval; //for floats and doubles? is this how this works?
+    char* sval; //for stringies
+}
+
 %token IDENTIFIER
 %token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
-%token STRING_LITERAL
-%token SIZEOF
-%token PTR_OP
-%token INC_OP DEC_OP
-%token LEFT_OP RIGHT_OP
-%token LE_OP GE_OP EQ_OP NE_OP
-%token AND_OP OR_OP
-%token MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN
-%token LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
+%token <sval> STRING_LITERAL
+%token <ival> SIZEOF
+%token <ival> PTR_OP
+%token <ival> INC_OP DEC_OP
+%token <ival> LEFT_OP RIGHT_OP
+%token <ival> LE_OP GE_OP EQ_OP NE_OP
+%token <ival> AND_OP OR_OP
+%token <ival> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN
+%token <ival> LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF_NAME
 
-%token TYPEDEF EXTERN STATIC AUTO REGISTER
-%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
-%token STRUCT UNION ENUM ELIPSIS RANGE
+%token <ival> TYPEDEF EXTERN STATIC AUTO REGISTER
+%token <ival> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token <ival> STRUCT UNION ENUM ELIPSIS RANGE
 
-%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token <ival> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
 %start translation_unit
 %%
@@ -447,8 +462,13 @@ identifier
 extern char yytext[];
 extern int column;
 
-yyerror(s)
-char *s;
+char *s = "syntax error, I am going to die now.";
+//error function called when parsing fails, prints error to stderr stream thingy
+void yyerror (char const *s, int line)
+{
+    fprintf(stderr, "%s\n", s);
+}
+
 {
 	fflush(stdout);
 	printf("\n%*s\n%*s\n", column, "^", column, s);

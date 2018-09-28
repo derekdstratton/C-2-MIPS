@@ -7,16 +7,25 @@
 %}
 
 //White space
+//does this need to be restructured so that
+// we can have \n by itself to increment line #?
 delim	[ \t\n]
 ws	{delim}+
 
 //Numbers
 digit	[0-9]
 integer	{digit}+
+floot   [-+]?{digit}*\.{digit}+
+
+//Letters
+letter  [a-zA-Z_]
+
+identifier  {letter}({letter | digit}*)
 
 %%
 
 {ws}
+
 
 //Reserved words and the tokens returned
 \typedef { return ( TYPEDEF );}
@@ -39,22 +48,22 @@ integer	{digit}+
 \union { return ( UNION );}
 \enum { return ( ENUM );}
 
-\ { return ( CASE );}
-\ { return ( DEFAULT );}
-\ { return ( IF );}
-\ { return ( ELSE );}
-\ { return ( SWITCH );}
-\ { return ( WHILE );}
-\ { return ( DO );}
-\ { return ( FOR );}
-\ { return ( GOTO );}
-\ { return ( CONTINUE );}
-\ { return ( BREAK );}
-\ { return ( RETURN );}
+\case { return ( CASE );}
+\default { return ( DEFAULT );}
+\if { return ( IF );}
+\else { return ( ELSE );}
+\switch { return ( SWITCH );}
+\while { return ( WHILE );}
+\do { return ( DO );}
+\for { return ( FOR );}
+\goto { return ( GOTO );}
+\continue { return ( CONTINUE );}
+\break { return ( BREAK );}
+\return { return ( RETURN );}
 
 //these were with other keywords in the yacc file
 //but I dont know what they are
-\ { return ( ELIPSIS );}
+"..." { return ( ELIPSIS );}
 \ { return ( RANGE );}
 
 
@@ -64,28 +73,28 @@ FLOATING_CONSTANT
 CHARACTER_CONSTANT
 ENUMERATION_CONSTANT
 STRING_LITERAL
-SIZEOF
-PTR_OP
-INC_OP
-DEC_OP
-LEFT_OP
-RIGHT_OP
-LE_OP
-GE_OP
-EQ_OP
-NE_OP
-AND_OP
-OR_OP
-MUL_ASSIGN
-DIV_ASSIGN
-MOD_ASSIGN
-ADD_ASSIGN
-SUB_ASSIGN
-LEFT_ASSIGN
-RIGHT_ASSIGN
-AND_ASSIGN
-XOR_ASSIGN
-OR_ASSIGN
+"sizeof"    { return ( SIZEOF );}
+"->"    { return ( PTR_OP );}
+"++"    { return ( INC_OP );}
+"--"    { return ( DEC_OP );}
+"<<"    { return ( LEFT_OP );}
+">>"    { return ( RIGHT_OP );}
+"<="    { return ( LE_OP );}
+">="    { return ( GE_OP );}
+"=="    { return ( EQ_OP );}
+"!="    { return ( NE_OP );}
+"&&"    { return ( AND_OP );}
+"||"    { return ( OR_OP );}
+"*="    { return ( MUL_ASSIGN );}
+"/="    { return ( DIV_ASSIGN );}
+"%="    { return ( MOD_ASSIGN );}
+"+="    { return ( ADD_ASSIGN );}
+"-="    { return ( SUB_ASSIGN );}
+"<<="   { return ( LEFT_ASSIGN );}
+">>="   { return ( RIGHT_ASSIGN );}
+"&="    { return ( AND_ASSIGN );}
+"^="    { return ( XOR_ASSIGN );}
+"|="    { return ( NE_OP );}
 TYPEDEF_NAME
 
 

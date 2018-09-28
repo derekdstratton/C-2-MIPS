@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.8)
 project(Project)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11)
 
-add_executable(Driver driver.cpp SymbolTable.cpp)
+set(SOURCE_FILES driver.cpp SymbolTable.cpp SymbolTable.h)
+add_executable(project ${SOURCE_FILES})
