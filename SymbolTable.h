@@ -9,21 +9,22 @@
 #include <map>
 #include <utility>
 #include <string>
+#include "Node.h"
 
 using namespace std;
 
 class SymbolTable {
   public:
     SymbolTable();
-    void insert(const pair<string, int>& item);
-    int search(const string& key);
+    bool insert(const pair<string, Node>& item);
+    tuple<map<string, Node>::iterator, string> search(const string& key, bool topLevelOnly=false);
     void writeToFile(const string &filepath);
     void pushLevel();
     void popLevel();
     void printTable();
   private:
+    list<map<string, Node>> table;
     //the actual symbol table
-    list<map<string, int>> table;
     //the top of the stack is given by table.front()
 };
 
