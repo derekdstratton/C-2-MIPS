@@ -1,23 +1,25 @@
 %{
 #include <string.h>
-
+#include <iostream>
+#include <fstream>
+#include <string>
 //Function declarations
-
-
 %}
 
-//White space
-//does this need to be restructured so that
-// we can have \n by itself to increment line #?
+%option c++
+
+/*White space*/
+/*does this need to be restructured so that
+/* we can have \n by itself to increment line #?*/
 delim	[ \t\n]
 ws	{delim}+
 
-//Numbers
+/*Numbers*/
 digit	[0-9]
 integer	{digit}+
 floot   [-+]?{digit}*\.{digit}+
 
-//Letters
+/*Letters*/
 letter  [a-zA-Z_]
 
 identifier  {letter}({letter | digit}*)
@@ -26,45 +28,40 @@ identifier  {letter}({letter | digit}*)
 
 {ws}
 
+"typedef" { return ( TYPEDEF );}
+"extern" { return ( EXTERN );}
+"static" { return ( STATIC );}
+"auto" { return ( AUTO );}
+"register" { return ( REGISTER );}
+"char" { return ( CHAR );}
+"short" { return ( SHORT );}
+"int" { return ( INT );}
+"long" { return ( LONG );}
+"signed" { return ( SIGNED );}
+"unsigned" { return ( UNSIGNED );}
+"float" { return ( FLOAT );}
+"double" { return ( DOUBLE );}
+"const" { return ( CONST );}
+"volatile" { return ( VOLATILE );}
+"void" { return ( VOID );}
+"struct" { return ( STRUCT );}
+"union" { return ( UNION );}
+"enum" { return ( ENUM );}
 
-//Reserved words and the tokens returned
-\typedef { return ( TYPEDEF );}
-\extern { return ( EXTERN );}
-\static { return ( STATIC );}
-\auto { return ( AUTO );}
-\register { return ( REGISTER );}
-\char { return ( CHAR );}
-\short { return ( SHORT );}
-\int { return ( INT );}
-\long { return ( LONG );}
-\signed { return ( SIGNED );}
-\unsigned { return ( UNSIGNED );}
-\float { return ( FLOAT );}
-\double { return ( DOUBLE );}
-\const { return ( CONST );}
-\volatile { return ( VOLATILE );}
-\void { return ( VOID );}
-\struct { return ( STRUCT );}
-\union { return ( UNION );}
-\enum { return ( ENUM );}
+"case" { return ( CASE );}
+"default" { return ( DEFAULT );}
+"if" { return ( IF );}
+"else" { return ( ELSE );}
+"switch" { return ( SWITCH );}
+"while" { return ( WHILE );}
+"do" { return ( DO );}
+"for" { return ( FOR );}
+"goto" { return ( GOTO );}
+"continue" { return ( CONTINUE );}
+"break" { return ( BREAK );}
+"return" { return ( RETURN );}
 
-\case { return ( CASE );}
-\default { return ( DEFAULT );}
-\if { return ( IF );}
-\else { return ( ELSE );}
-\switch { return ( SWITCH );}
-\while { return ( WHILE );}
-\do { return ( DO );}
-\for { return ( FOR );}
-\goto { return ( GOTO );}
-\continue { return ( CONTINUE );}
-\break { return ( BREAK );}
-\return { return ( RETURN );}
-
-//these were with other keywords in the yacc file
-//but I dont know what they are
 "..." { return ( ELIPSIS );}
-\ { return ( RANGE );}
 
 
 IDENTIFIER
@@ -101,6 +98,21 @@ TYPEDEF_NAME
 
 %%
 
-int writeInt(){
+/*int writeInt(){
   yylval.ival = atoi(yytext);
+}*/
+
+int main() {
+    /*int token;
+    token = yylex();
+
+    ofstream file;
+    file.open("tokenfile.txt", "r");
+
+    file << token;
+    std::cout << token;
+
+    file.close();*/
+
+    return 0;
 }
