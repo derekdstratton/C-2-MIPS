@@ -1,78 +1,87 @@
 %{
-#include <string.h>
-
-//Function declarations
+#include <string>
+#include <iostream>
+#include "parse.tab.h"
+#include "FlexLexer.h"
+/*Function declarations*/
 
 
 %}
 
-//White space
-//does this need to be restructured so that
-// we can have \n by itself to increment line #?
+/*White space*/
 delim	[ \t\n]
 ws	{delim}+
 
-//Numbers
+/*Numbers*/
 digit	[0-9]
 integer	{digit}+
-floot   [-+]?{digit}*\.{digit}+
-
-//Letters
-letter  [a-zA-Z_]
-
-identifier  {letter}({letter | digit}*)
 
 %%
 
 {ws}
 
+typedef { return ( TYPEDEF );}
+extern { return ( EXTERN );}
+static { return ( STATIC );}
+auto { return ( AUTO );}
+register { return ( REGISTER );}
+char { return ( CHAR );}
+short { return ( SHORT );}
+int { return ( INT );}
+long { return ( LONG );}
+signed { return ( SIGNED );}
+unsigned { return ( UNSIGNED );}
+float { return ( FLOAT );}
+double { return ( DOUBLE );}
+const { return ( CONST );}
+volatile { return ( VOLATILE );}
+void { return ( VOID );}
+struct { return ( STRUCT );}
+union { return ( UNION );}
+enum { return ( ENUM );}
 
-//Reserved words and the tokens returned
-\typedef { return ( TYPEDEF );}
-\extern { return ( EXTERN );}
-\static { return ( STATIC );}
-\auto { return ( AUTO );}
-\register { return ( REGISTER );}
-\char { return ( CHAR );}
-\short { return ( SHORT );}
-\int { return ( INT );}
-\long { return ( LONG );}
-\signed { return ( SIGNED );}
-\unsigned { return ( UNSIGNED );}
-\float { return ( FLOAT );}
-\double { return ( DOUBLE );}
-\const { return ( CONST );}
-\volatile { return ( VOLATILE );}
-\void { return ( VOID );}
-\struct { return ( STRUCT );}
-\union { return ( UNION );}
-\enum { return ( ENUM );}
+case { return ( CASE );}
+default { return ( DEFAULT );}
+if { return ( IF );}
+else { return ( ELSE );}
+switch { return ( SWITCH );}
+while { return ( WHILE );}
+do { return ( DO );}
+for { return ( FOR );}
+goto { return ( GOTO );}
+continue { return ( CONTINUE );}
+break { return ( BREAK );}
+return { return ( RETURN );}
 
-\case { return ( CASE );}
-\default { return ( DEFAULT );}
-\if { return ( IF );}
-\else { return ( ELSE );}
-\switch { return ( SWITCH );}
-\while { return ( WHILE );}
-\do { return ( DO );}
-\for { return ( FOR );}
-\goto { return ( GOTO );}
-\continue { return ( CONTINUE );}
-\break { return ( BREAK );}
-\return { return ( RETURN );}
 
-//these were with other keywords in the yacc file
-//but I dont know what they are
+";" { return (SEMI);}
+"{" { return (OPENCUR);}
+"}" { return (CLOSCUR);}
+"," { return (COMMA);}
+"=" { return (ASSIGN);}
+":" { return (COLON);}
+"[" { return (OPENSQ);}
+"]" { return (CLOSSQ);}
+"*" { return (STAR);}
+"(" { return (OPENPAR);}
+")" { return (CLOSEPAR);}
+"?" { return (TERNARY);}
+"|" { return (BAR);}
+"^" { return (XOR);}
+"&" { return (AND);}
+"<" { return (LESSTH);}
+">" { return (GREATH);}
+"+" { return (PLUS);}
+"-" { return (MINUS);}
+"/" { return (SLASH);}
+"%" { return (MODULO);}
+"~" { return (TILDE);}
+"!" { return (BANG);}
+"." { return (PERIOD);}
+
+
 "..." { return ( ELIPSIS );}
-\ { return ( RANGE );}
 
-
-IDENTIFIER
-INTEGER_CONSTANT
-FLOATING_CONSTANT
-CHARACTER_CONSTANT
-ENUMERATION_CONSTANT
-STRING_LITERAL
 "sizeof"    { return ( SIZEOF );}
 "->"    { return ( PTR_OP );}
 "++"    { return ( INC_OP );}
@@ -95,12 +104,12 @@ STRING_LITERAL
 "&="    { return ( AND_ASSIGN );}
 "^="    { return ( XOR_ASSIGN );}
 "|="    { return ( NE_OP );}
-TYPEDEF_NAME
-
-
 
 %%
 
-int writeInt(){
-  yylval.ival = atoi(yytext);
-}
+/*
+int main(){
+    //FlexLexer* lexer = new yyFlexLexer;
+    yylex();
+    return 0;
+}*/

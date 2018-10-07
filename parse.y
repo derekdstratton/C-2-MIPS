@@ -1,36 +1,55 @@
 
 %{
-#include "stdio.h"
-#include <ctype.h>
+#include <iostream>
+#include <cctype>
+#include <string>
+#include <sstream>
 
+//TODO continue parsing after error happens, use 'error' token or yyerrok
 
+using namespace std;
 extern int line; //to keep track of line number for error
+void yyerror (char const *s);
+int yylex();
 %}
 
 %union {
-    int ival; //for ints and keywords returned as an int
-    double dval; //for floats and doubles? is this how this works?
-    char* sval; //for stringies
+    int ival;
 }
 
 %token IDENTIFIER
 %token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
-%token <sval> STRING_LITERAL
-%token <ival> SIZEOF
-%token <ival> PTR_OP
-%token <ival> INC_OP DEC_OP
-%token <ival> LEFT_OP RIGHT_OP
-%token <ival> LE_OP GE_OP EQ_OP NE_OP
-%token <ival> AND_OP OR_OP
-%token <ival> MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN
-%token <ival> LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
+%token STRING_LITERAL
+%token SIZEOF
+%token PTR_OP
+%token INC_OP DEC_OP
+%token LEFT_OP RIGHT_OP
+%token LE_OP GE_OP EQ_OP NE_OP
+%token AND_OP OR_OP
+%token MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN
+%token LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
 %token TYPEDEF_NAME
 
-%token <ival> TYPEDEF EXTERN STATIC AUTO REGISTER
-%token <ival> CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
-%token <ival> STRUCT UNION ENUM ELIPSIS RANGE
+%token TYPEDEF EXTERN STATIC AUTO REGISTER
+%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token STRUCT UNION ENUM ELIPSIS RANGE
 
-%token <ival> CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+//user defined tokens
+/*
+IDENTIFIER
+INTEGER_CONSTANT
+FLOATING_CONSTANT
+CHARACTER_CONSTANT
+ENUMERATION_CONSTANT
+STRING_LITERAL
+OR_ASSIGN
+TYPEDEF_NAME
+*/
+
+%token SEMI OPENCUR CLOSCUR COMMA ASSIGN COLON OPENSQ CLOSSQ STAR OPENPAR CLOSEPAR TERNARY
+%token BAR XOR AND LESSTH GREATH PLUS MINUS SLASH MODULO TILDE BANG PERIOD
 
 %start translation_unit
 %%
@@ -53,8 +72,8 @@ function_definition
 	;
 
 declaration
-	: declaration_specifiers ';'
-	| declaration_specifiers init_declarator_list ';'
+	: declaration_specifiers SEMI
+	| declaration_specifiers init_declarator_list SEMI
 	;
 
 declaration_list
@@ -100,8 +119,8 @@ type_qualifier
 	;
 
 struct_or_union_specifier
-	: struct_or_union identifier '{' struct_declaration_list '}'
-	| struct_or_union '{' struct_declaration_list '}'
+	: struct_or_union identifier OPENCUR struct_declaration_list CLOSCUR
+	| struct_or_union OPENCUR struct_declaration_list CLOSCUR
 	| struct_or_union identifier
 	;
 
@@ -117,16 +136,16 @@ struct_declaration_list
 
 init_declarator_list
 	: init_declarator
-	| init_declarator_list ',' init_declarator
+	| init_declarator_list COMMA init_declarator
 	;
 
 init_declarator
 	: declarator
-	| declarator '=' initializer
+	| declarator ASSIGN initializer
 	;
 
 struct_declaration
-	: specifier_qualifier_list struct_declarator_list ';'
+	: specifier_qualifier_list struct_declarator_list SEMI
 	;
 
 specifier_qualifier_list
@@ -138,29 +157,29 @@ specifier_qualifier_list
 
 struct_declarator_list
 	: struct_declarator
-	| struct_declarator_list ',' struct_declarator
+	| struct_declarator_list COMMA struct_declarator
 	;
 
 struct_declarator
 	: declarator
-	| ':' constant_expression
-	| declarator ':' constant_expression
+	| COLON constant_expression
+	| declarator COLON constant_expression
 	;
 
 enum_specifier
-	: ENUM '{' enumerator_list '}'
-	| ENUM identifier '{' enumerator_list '}'
+	: ENUM OPENCUR enumerator_list CLOSCUR
+	| ENUM identifier OPENCUR enumerator_list CLOSCUR
 	| ENUM identifier
 	;
 
 enumerator_list
 	: enumerator
-	| enumerator_list ',' enumerator
+	| enumerator_list COMMA enumerator
 	;
 
 enumerator
 	: identifier
-	| identifier '=' constant_expression
+	| identifier ASSIGN constant_expression
 	;
 
 declarator
@@ -170,19 +189,19 @@ declarator
 
 direct_declarator
 	: identifier
-	| '(' declarator ')'
-	| direct_declarator '[' ']'
-	| direct_declarator '[' constant_expression ']'
-	| direct_declarator '(' ')'
-	| direct_declarator '(' parameter_type_list ')'
-	| direct_declarator '(' identifier_list ')'
+	| OPENPAR declarator CLOSEPAR
+	| direct_declarator OPENSQ CLOSSQ
+	| direct_declarator OPENSQ constant_expression CLOSSQ
+	| direct_declarator OPENPAR CLOSEPAR
+	| direct_declarator OPENPAR parameter_type_list CLOSEPAR
+	| direct_declarator OPENPAR identifier_list CLOSEPAR
 	;
 
 pointer
-	: '*'
-	| '*' type_qualifier_list
-	| '*' pointer
-	| '*' type_qualifier_list pointer
+	: STAR
+	| STAR type_qualifier_list
+	| STAR pointer
+	| STAR type_qualifier_list pointer
 	;
 
 type_qualifier_list
@@ -192,12 +211,12 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list
-	| parameter_list ',' ELIPSIS
+	| parameter_list COMMA ELIPSIS
 	;
 
 parameter_list
 	: parameter_declaration
-	| parameter_list ',' parameter_declaration
+	| parameter_list COMMA parameter_declaration
 	;
 
 parameter_declaration
@@ -208,18 +227,18 @@ parameter_declaration
 
 identifier_list
 	: identifier
-	| identifier_list ',' identifier
+	| identifier_list COMMA identifier
 	;
 
 initializer
 	: assignment_expression
-	| '{' initializer_list '}'
-	| '{' initializer_list ',' '}'
+	| OPENCUR initializer_list CLOSCUR
+	| OPENCUR initializer_list COMMA CLOSCUR
 	;
 
 initializer_list
 	: initializer
-	| initializer_list ',' initializer
+	| initializer_list COMMA initializer
 	;
 
 type_name
@@ -234,15 +253,15 @@ abstract_declarator
 	;
 
 direct_abstract_declarator
-	: '(' abstract_declarator ')'
-	| '[' ']'
-	| '[' constant_expression ']'
-	| direct_abstract_declarator '[' ']'
-	| direct_abstract_declarator '[' constant_expression ']'
-	| '(' ')'
-	| '(' parameter_type_list ')'
-	| direct_abstract_declarator '(' ')'
-	| direct_abstract_declarator '(' parameter_type_list ')'
+	: OPENPAR abstract_declarator CLOSEPAR
+	| OPENSQ CLOSSQ
+	| OPENSQ constant_expression CLOSSQ
+	| direct_abstract_declarator OPENSQ CLOSSQ
+	| direct_abstract_declarator OPENSQ constant_expression CLOSSQ
+	| OPENPAR CLOSEPAR
+	| OPENPAR parameter_type_list CLOSEPAR
+	| direct_abstract_declarator OPENPAR CLOSEPAR
+	| direct_abstract_declarator OPENPAR parameter_type_list CLOSEPAR
 	;
 
 statement
@@ -255,21 +274,21 @@ statement
 	;
 
 labeled_statement
-	: identifier ':' statement
-	| CASE constant_expression ':' statement
-	| DEFAULT ':' statement
+	: identifier COLON statement
+	| CASE constant_expression COLON statement
+	| DEFAULT COLON statement
 	;
 
 expression_statement
-	: ';'
-	| expression ';'
+	: SEMI
+	| expression SEMI
 	;
 
 compound_statement
-	: '{' '}'
-	| '{' statement_list '}'
-	| '{' declaration_list '}'
-	| '{' declaration_list statement_list '}'
+	: OPENCUR CLOSCUR
+	| OPENCUR statement_list CLOSCUR
+	| OPENCUR declaration_list CLOSCUR
+	| OPENCUR declaration_list statement_list CLOSCUR
 	;
 
 statement_list
@@ -278,35 +297,35 @@ statement_list
 	;
 
 selection_statement
-	: IF '(' expression ')' statement
-	| IF '(' expression ')' statement ELSE statement
-	| SWITCH '(' expression ')' statement
+	: IF OPENPAR expression CLOSEPAR statement
+	| IF OPENPAR expression CLOSEPAR statement ELSE statement
+	| SWITCH OPENPAR expression CLOSEPAR statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement
-	| DO statement WHILE '(' expression ')' ';'
-	| FOR '(' ';' ';' ')' statement
-	| FOR '(' ';' ';' expression ')' statement
-	| FOR '(' ';' expression ';' ')' statement
-	| FOR '(' ';' expression ';' expression ')' statement
-	| FOR '(' expression ';' ';' ')' statement
-	| FOR '(' expression ';' ';' expression ')' statement
-	| FOR '(' expression ';' expression ';' ')' statement
-	| FOR '(' expression ';' expression ';' expression ')' statement
+	: WHILE OPENPAR expression CLOSEPAR statement
+	| DO statement WHILE OPENPAR expression CLOSEPAR SEMI
+	| FOR OPENPAR SEMI SEMI CLOSEPAR statement
+	| FOR OPENPAR SEMI SEMI expression CLOSEPAR statement
+	| FOR OPENPAR SEMI expression SEMI CLOSEPAR statement
+	| FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement
+	| FOR OPENPAR expression SEMI SEMI CLOSEPAR statement
+	| FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement
+	| FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement
+	| FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement
 	;
 
 jump_statement
-	: GOTO identifier ';'
-	| CONTINUE ';'
-	| BREAK ';'
-	| RETURN ';'
-	| RETURN expression ';'
+	: GOTO identifier SEMI
+	| CONTINUE SEMI
+	| BREAK SEMI
+	| RETURN SEMI
+	| RETURN expression SEMI
 	;
 
 expression
 	: assignment_expression
-	| expression ',' assignment_expression
+	| expression COMMA assignment_expression
 	;
 
 assignment_expression
@@ -315,7 +334,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '='
+	: ASSIGN
 	| MUL_ASSIGN
 	| DIV_ASSIGN
 	| MOD_ASSIGN
@@ -330,7 +349,7 @@ assignment_operator
 
 conditional_expression
 	: logical_or_expression
-	| logical_or_expression '?' expression ':' conditional_expression
+	| logical_or_expression TERNARY expression COLON conditional_expression
 	;
 
 constant_expression
@@ -349,17 +368,17 @@ logical_and_expression
 
 inclusive_or_expression
 	: exclusive_or_expression
-	| inclusive_or_expression '|' exclusive_or_expression
+	| inclusive_or_expression BAR exclusive_or_expression
 	;
 
 exclusive_or_expression
 	: and_expression
-	| exclusive_or_expression '^' and_expression
+	| exclusive_or_expression XOR and_expression
 	;
 
 and_expression
 	: equality_expression
-	| and_expression '&' equality_expression
+	| and_expression AND equality_expression
 	;
 
 equality_expression
@@ -370,8 +389,8 @@ equality_expression
 
 relational_expression
 	: shift_expression
-	| relational_expression '<' shift_expression
-	| relational_expression '>' shift_expression
+	| relational_expression LESSTH shift_expression
+	| relational_expression GREATH shift_expression
 	| relational_expression LE_OP shift_expression
 	| relational_expression GE_OP shift_expression
 	;
@@ -384,20 +403,20 @@ shift_expression
 
 additive_expression
 	: multiplicative_expression
-	| additive_expression '+' multiplicative_expression
-	| additive_expression '-' multiplicative_expression
+	| additive_expression PLUS multiplicative_expression
+	| additive_expression MINUS multiplicative_expression
 	;
 
 multiplicative_expression
 	: cast_expression
-	| multiplicative_expression '*' cast_expression
-	| multiplicative_expression '/' cast_expression
-	| multiplicative_expression '%' cast_expression
+	| multiplicative_expression STAR cast_expression
+	| multiplicative_expression SLASH cast_expression
+	| multiplicative_expression MODULO cast_expression
 	;
 
 cast_expression
 	: unary_expression
-	| '(' type_name ')' cast_expression
+	| OPENPAR type_name CLOSEPAR cast_expression
 	;
 
 unary_expression
@@ -406,24 +425,24 @@ unary_expression
 	| DEC_OP unary_expression
 	| unary_operator cast_expression
 	| SIZEOF unary_expression
-	| SIZEOF '(' type_name ')'
+	| SIZEOF OPENPAR type_name CLOSEPAR
 	;
 
 unary_operator
-	: '&'
-	| '*'
-	| '+'
-	| '-'
-	| '~'
-	| '!'
+	: AND
+	| STAR
+	| PLUS
+	| MINUS
+	| TILDE
+	| BANG
 	;
 
 postfix_expression
 	: primary_expression
-	| postfix_expression '[' expression ']'
-	| postfix_expression '(' ')'
-	| postfix_expression '(' argument_expression_list ')'
-	| postfix_expression '.' identifier
+	| postfix_expression OPENSQ expression CLOSSQ
+	| postfix_expression OPENPAR CLOSEPAR
+	| postfix_expression OPENPAR argument_expression_list CLOSEPAR
+	| postfix_expression PERIOD identifier
 	| postfix_expression PTR_OP identifier
 	| postfix_expression INC_OP
 	| postfix_expression DEC_OP
@@ -433,12 +452,12 @@ primary_expression
 	: identifier
 	| constant
 	| string
-	| '(' expression ')'
+	| OPENPAR expression CLOSEPAR
 	;
 
 argument_expression_list
 	: assignment_expression
-	| argument_expression_list ',' assignment_expression
+	| argument_expression_list COMMA assignment_expression
 	;
 
 constant
@@ -457,19 +476,26 @@ identifier
 	;
 %%
 
-#include <stdio.h>
-
-extern char yytext[];
+//extern char yytext[];
 extern int column;
 
 char *s = "syntax error, I am going to die now.";
 //error function called when parsing fails, prints error to stderr stream thingy
-void yyerror (char const *s, int line)
+void yyerror (char const *s)
 {
-    fprintf(stderr, "%s\n", s);
+    cout << s << endl;
+	return;
 }
 
+int main()
+{
+	yyparse();
+	return 0;
+}
+
+/*
 {
 	fflush(stdout);
 	printf("\n%*s\n%*s\n", column, "^", column, s);
 }
+ */
