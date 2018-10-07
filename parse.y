@@ -17,10 +17,16 @@ stringstream prodStream;
 
 %union {
     int ival;
+    float fval;
+    char cval;
+    char * sval;
 }
 
 %token IDENTIFIER
-%token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
+%token<ival> INTEGER_CONSTANT
+%token<fval> FLOATING_CONSTANT
+%token<cval> CHARACTER_CONSTANT
+%token ENUMERATION_CONSTANT
 %token STRING_LITERAL
 %token SIZEOF
 %token PTR_OP

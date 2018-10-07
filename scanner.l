@@ -4,6 +4,7 @@
 #include <utility>
 #include "SymbolTable.h"
 
+
 #include "Node.h"
     SymbolTable symbolTable;
 #include "parse.tab.h"
@@ -129,10 +130,51 @@ return { return ( RETURN );}
 "|="    { return ( NE_OP );}
 
 {character_constant} {
-    //yylval.ival = 3;
-    //todo integrate with yylval from yytext, based on parse.tab.h. c++ weird
+    //passing escape characters
+    cout << yytext[1] << endl;
+    if (yytext[1] == '\\') {
+        switch(yytext[2]) {
+            case 'n':
+                yylval.cval = '\n';
+                break;
+            case 'a':
+                yylval.cval = '\a';
+                break;
+            case 'b':
+                yylval.cval = '\b';
+                break;
+            case 'f':
+                yylval.cval = '\f';
+                break;
+            case 'r':
+                yylval.cval = '\r';
+                break;
+            case 't':
+                yylval.cval = '\t';
+                break;
+            case 'v':
+                yylval.cval = '\v';
+                break;
+                //todo deal with octal, hex, weird stuff
+            default:
+                yylval.cval = yytext[2];
+                break;
+        }
+    }
+    else {
+        yylval.cval = yytext[1];
+    }
+
+    cout << yylval.cval;
     return (CHARACTER_CONSTANT); }
-{string_literal} { return (STRING_LITERAL); }
+{string_literal} {
+    char * strstart = yytext+1;
+    int len = strlen(strstart);
+    strstart[len-1] = '\0';
+    cout << len << endl;
+    yylval.sval = strstart;
+    cout << yylval.sval << endl;
+    return (STRING_LITERAL); }
 {real} { return (FLOATING_CONSTANT); }
 {integer} { return (INTEGER_CONSTANT); }
 {identifier} {
