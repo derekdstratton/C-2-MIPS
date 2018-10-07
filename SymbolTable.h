@@ -18,10 +18,9 @@ class SymbolTable {
     SymbolTable();
     bool insert(const pair<string, Node>& item);
     tuple<map<string, Node>::iterator, string> search(const string& key, bool topLevelOnly=false);
-    void writeToFile(const string &filepath);
     void pushLevel();
     void popLevel();
-    void printTable();
+    friend ostream& operator<<(ostream& os, const SymbolTable& symbolTable);
   private:
     list<map<string, Node>> table;
     //the actual symbol table

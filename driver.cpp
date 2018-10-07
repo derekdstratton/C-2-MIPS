@@ -11,18 +11,20 @@ using namespace std;
 
 int main() {
     SymbolTable s; //Empty symbol table
-    s.printTable();
+    cout << s;
     pair<string, Node> item = make_pair("Hello", Node(4));
     pair<string, Node> item2 = make_pair("Hey", Node(7));
     s.pushLevel();
-    s.printTable();
+    cout << s;
 
     s.insert(item);
-    s.printTable();
+    cout << s;
+    //s.printTable();
     s.pushLevel();
     s.insert(item2);
-    s.printTable();
-    s.writeToFile("output.txt");
+    cout << s;
+
+    //todo write to file
 
     s.pushLevel();
     s.popLevel();
