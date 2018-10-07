@@ -3,6 +3,7 @@
 #include <iostream>
 #include "parse.tab.h"
 /*Function declarations*/
+using namespace std;
 
 %}
 %option c++
@@ -15,6 +16,12 @@ ws	{delim}+
 /*Numbers*/
 digit	[0-9]
 integer	{digit}+
+identifier [a-zA-Z_][a-zA-Z_{digit}]*
+string_literal \"[^\"]*\"
+
+escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9][0-9][0-9]))
+
+character_constant \'([^']|{escape_sequence})\'
 
 %%
 
@@ -105,8 +112,14 @@ return { return ( RETURN );}
 "^="    { return ( XOR_ASSIGN );}
 "|="    { return ( NE_OP );}
 
+{character_constant} { return (CHARACTER_CONSTANT); }
+{string_literal} { return (STRING_LITERAL); }
+{identifier} { return ( IDENTIFIER );}
+
+. { cout << "unrecognized!" << endl;
+    return (-1);}
+
 %%
-using namespace std;
 
 int main(){
     FlexLexer* lexer = new yyFlexLexer;
