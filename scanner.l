@@ -1,75 +1,110 @@
 %{
-#include <string.h>
-#include <iostream>
-#include <fstream>
 #include <string>
-//Function declarations
+#include <iostream>
+#include <utility>
+#include "SymbolTable.h"
+
+#include "Node.h"
+    SymbolTable symbolTable;
+#include "parse.tab.h"
+/*Function declarations*/
+using namespace std;
+    //note: i'm shoving all my comments up here for lack of better space
+    //enumeration constant? i don't think that's even used.
+
 %}
 
-%option c++
+%option noyywrap
 
 /*White space*/
-/*does this need to be restructured so that
-/* we can have \n by itself to increment line #?*/
 delim	[ \t\n]
 ws	{delim}+
 
 /*Numbers*/
 digit	[0-9]
 integer	{digit}+
-floot   [-+]?{digit}*\.{digit}+
+plain_real {integer}"."{integer}
+expreal {integer}"."{integer}[Ee][+-]?{integer}
+real {plain_real}|{expreal}
 
-/*Letters*/
-letter  [a-zA-Z_]
 
-identifier  {letter}({letter | digit}*)
+identifier [a-zA-Z_][a-zA-Z_{digit}]*
+string_literal \"[^\"]*\"
+
+escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9][0-9][0-9])|(x[0-9][0-9]))
+
+character_constant \'([^']|{escape_sequence})\'
 
 %%
 
 {ws}
 
-"typedef" { return ( TYPEDEF );}
-"extern" { return ( EXTERN );}
-"static" { return ( STATIC );}
-"auto" { return ( AUTO );}
-"register" { return ( REGISTER );}
-"char" { return ( CHAR );}
-"short" { return ( SHORT );}
-"int" { return ( INT );}
-"long" { return ( LONG );}
-"signed" { return ( SIGNED );}
-"unsigned" { return ( UNSIGNED );}
-"float" { return ( FLOAT );}
-"double" { return ( DOUBLE );}
-"const" { return ( CONST );}
-"volatile" { return ( VOLATILE );}
-"void" { return ( VOID );}
-"struct" { return ( STRUCT );}
-"union" { return ( UNION );}
-"enum" { return ( ENUM );}
+"!!S" { cout << symbolTable;}
 
-"case" { return ( CASE );}
-"default" { return ( DEFAULT );}
-"if" { return ( IF );}
-"else" { return ( ELSE );}
-"switch" { return ( SWITCH );}
-"while" { return ( WHILE );}
-"do" { return ( DO );}
-"for" { return ( FOR );}
-"goto" { return ( GOTO );}
-"continue" { return ( CONTINUE );}
-"break" { return ( BREAK );}
-"return" { return ( RETURN );}
+typedef { return ( TYPEDEF );}
+extern { return ( EXTERN );}
+static { return ( STATIC );}
+auto { return ( AUTO );}
+register { return ( REGISTER );}
+char { return ( CHAR );}
+short { return ( SHORT );}
+int { return ( INT );}
+long { return ( LONG );}
+signed { return ( SIGNED );}
+unsigned { return ( UNSIGNED );}
+float { return ( FLOAT );}
+double { return ( DOUBLE );}
+const { return ( CONST );}
+volatile { return ( VOLATILE );}
+void { return ( VOID );}
+struct { return ( STRUCT );}
+union { return ( UNION );}
+enum { return ( ENUM );}
+
+case { return ( CASE );}
+default { return ( DEFAULT );}
+if { return ( IF );}
+else { return ( ELSE );}
+switch { return ( SWITCH );}
+while { return ( WHILE );}
+do { return ( DO );}
+for { return ( FOR );}
+goto { return ( GOTO );}
+continue { return ( CONTINUE );}
+break { return ( BREAK );}
+return { return ( RETURN );}
+
+
+";" { return (SEMI);}
+"{" {
+    return (OPENCUR);}
+"}" {
+    return (CLOSCUR);}
+"," { return (COMMA);}
+"=" { return (ASSIGN);}
+":" { return (COLON);}
+"[" { return (OPENSQ);}
+"]" { return (CLOSSQ);}
+"*" { return (STAR);}
+"(" { return (OPENPAR);}
+")" { return (CLOSEPAR);}
+"?" { return (TERNARY);}
+"|" { return (BAR);}
+"^" { return (XOR);}
+"&" { return (AND);}
+"<" { return (LESSTH);}
+">" { return (GREATH);}
+"+" { return (PLUS);}
+"-" { return (MINUS);}
+"/" { return (SLASH);}
+"%" { return (MODULO);}
+"~" { return (TILDE);}
+"!" { return (BANG);}
+"." { return (PERIOD);}
+
 
 "..." { return ( ELIPSIS );}
 
-
-IDENTIFIER
-INTEGER_CONSTANT
-FLOATING_CONSTANT
-CHARACTER_CONSTANT
-ENUMERATION_CONSTANT
-STRING_LITERAL
 "sizeof"    { return ( SIZEOF );}
 "->"    { return ( PTR_OP );}
 "++"    { return ( INC_OP );}
@@ -92,27 +127,35 @@ STRING_LITERAL
 "&="    { return ( AND_ASSIGN );}
 "^="    { return ( XOR_ASSIGN );}
 "|="    { return ( NE_OP );}
-TYPEDEF_NAME
 
+{character_constant} {
+    //yylval.ival = 3;
+    //todo integrate with yylval from yytext, based on parse.tab.h. c++ weird
+    return (CHARACTER_CONSTANT); }
+{string_literal} { return (STRING_LITERAL); }
+{real} { return (FLOATING_CONSTANT); }
+{integer} { return (INTEGER_CONSTANT); }
+{identifier} {
+    if (yyleng > 31) {
+        //throw warning
+        cout << "too long buddy" << endl;
+    }
+    string s = yytext;
+    Node x = Node(4);
+    pair<string, Node> entry = make_pair(s,x);
+    symbolTable.insert(entry);
+    cout << symbolTable << endl;
+    return ( IDENTIFIER );}
 
+. { cout << "unrecognized!" << endl;
+    return (-1);}
 
 %%
-
-/*int writeInt(){
-  yylval.ival = atoi(yytext);
-}*/
-
-int main() {
-    /*int token;
-    token = yylex();
-
-    ofstream file;
-    file.open("tokenfile.txt", "r");
-
-    file << token;
-    std::cout << token;
-
-    file.close();*/
-
+/*
+int main(){
+    FlexLexer* lexer = new yyFlexLexer;
+    symbolTable.pushLevel(); //make sure to start with this first level or crash!
+    int token = lexer->yylex();
+    cout << token;
     return 0;
-}
+}*/

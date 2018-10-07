@@ -8,7 +8,9 @@ using namespace std;
 /**
  * Default Constructor
  */
-SymbolTable::SymbolTable() = default;
+SymbolTable::SymbolTable() {
+    this->pushLevel();
+}
 
 /** Insert an item into symbol table
  *
@@ -18,6 +20,8 @@ SymbolTable::SymbolTable() = default;
 bool SymbolTable::insert(const pair<string, Node>& item) {
     auto ret = table.front().insert(item);
     return ret.second == false;
+    //todo to test if shadowing, you have to go thru all the scopes to the global
+    //todo if it already exists in the top scope, that should be an error
 }
 
 /** Search for an item in the symbol table
@@ -75,28 +79,6 @@ tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key
     return make_tuple(node_iterator, status);
 }
 
-/** Writes the contents of the Symbol Table to a file
- *
- * @param filepath The path the file is written to
- */
-void SymbolTable::writeToFile(const string &filepath) {
-    ofstream file;
-    file.open(filepath);
-
-    file << "Symbol Table:" << endl << "Stack size: " << table.size() << endl;
-    file << "Maps: (Level 0 top of stack)" << endl;
-    int i = 0;
-    for (auto& map : table) {
-        file << "Map at level " << i << " (size: " << map.size() << ")" << endl;
-        for (auto& mappair : map) {
-            file << "Key: " << mappair.first << ", Value: " << mappair.second << endl;
-        }
-        i++;
-    }
-    file << endl;
-    file.close();
-}
-
 /**
  * Pushes a new level on the stack
  */
@@ -113,18 +95,22 @@ void SymbolTable::popLevel() {
 }
 
 /**
- * Prints the Symbol Table to stdout
+ *
+ * @param os
+ * @param symbolTable
+ * @return
  */
-void SymbolTable::printTable() {
-    cout << "Symbol Table:" << endl << "Stack size: " << table.size() << endl;
-    cout << "Maps: (Level 0 top of stack)" << endl;
+ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
+    os << "Symbol Table: (Stack size: " << symbolTable.table.size() << ")" << endl;
+    os << "Maps (From top to bottom):" << endl;
     int i = 0;
-    for (auto& map : table) {
-        cout << "Map at level " << i << " (size: " << map.size() << ")" << endl;
+    for (auto& map : symbolTable.table) {
+        os << "\t" << "Map at level " << i << " (size: " << map.size() << ")" << endl;
         for (auto& mappair : map) {
-            cout << "Key: " << mappair.first << ", Value: " << mappair.second << endl;
+            os << "\t\t" << "Key: " << mappair.first << ", Value: " << mappair.second << endl;
         }
         i++;
     }
     cout << endl;
+    return os;
 }
