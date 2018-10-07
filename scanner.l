@@ -2,11 +2,11 @@
 #include <string>
 #include <iostream>
 #include "parse.tab.h"
-#include "FlexLexer.h"
 /*Function declarations*/
 
-
 %}
+%option c++
+%option noyywrap
 
 /*White space*/
 delim	[ \t\n]
@@ -106,10 +106,11 @@ return { return ( RETURN );}
 "|="    { return ( NE_OP );}
 
 %%
+using namespace std;
 
-/*
 int main(){
-    //FlexLexer* lexer = new yyFlexLexer;
-    yylex();
+    FlexLexer* lexer = new yyFlexLexer;
+    int token = lexer->yylex();
+    cout << token;
     return 0;
-}*/
+}
