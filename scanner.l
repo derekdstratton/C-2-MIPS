@@ -1,9 +1,16 @@
 %{
 #include <string>
 #include <iostream>
+#include <utility>
+#include "SymbolTable.h"
+
+#include "Node.h"
+    SymbolTable symbolTable;
 #include "parse.tab.h"
 /*Function declarations*/
 using namespace std;
+    //note: i'm shoving all my comments up here for lack of better space
+    //enumeration constant? i don't think that's even used.
 
 %}
 %option c++
@@ -16,10 +23,15 @@ ws	{delim}+
 /*Numbers*/
 digit	[0-9]
 integer	{digit}+
+plain_real {integer}"."{integer}
+expreal {integer}"."{integer}[Ee][+-]?{integer}
+real {plain_real}|{expreal}
+
+
 identifier [a-zA-Z_][a-zA-Z_{digit}]*
 string_literal \"[^\"]*\"
 
-escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9][0-9][0-9]))
+escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9][0-9][0-9])|(x[0-9][0-9]))
 
 character_constant \'([^']|{escape_sequence})\'
 
@@ -62,8 +74,12 @@ return { return ( RETURN );}
 
 
 ";" { return (SEMI);}
-"{" { return (OPENCUR);}
-"}" { return (CLOSCUR);}
+"{" {
+    symbolTable.pushLevel();
+    return (OPENCUR);}
+"}" {
+    symbolTable.popLevel();
+    return (CLOSCUR);}
 "," { return (COMMA);}
 "=" { return (ASSIGN);}
 ":" { return (COLON);}
@@ -112,9 +128,19 @@ return { return ( RETURN );}
 "^="    { return ( XOR_ASSIGN );}
 "|="    { return ( NE_OP );}
 
-{character_constant} { return (CHARACTER_CONSTANT); }
+{character_constant} {
+    //todo integrate with yylval from yytext, based on parse.tab.h
+    return (CHARACTER_CONSTANT); }
 {string_literal} { return (STRING_LITERAL); }
-{identifier} { return ( IDENTIFIER );}
+{real} { return (FLOATING_CONSTANT); }
+{integer} { return (INTEGER_CONSTANT); }
+{identifier} {
+    string s = yytext;
+    Node x = Node(4);
+    pair<string, Node> entry = make_pair(s,x);
+    symbolTable.insert(entry);
+    cout << symbolTable << endl;
+    return ( IDENTIFIER );}
 
 . { cout << "unrecognized!" << endl;
     return (-1);}
@@ -123,6 +149,7 @@ return { return ( RETURN );}
 
 int main(){
     FlexLexer* lexer = new yyFlexLexer;
+    symbolTable.pushLevel(); //make sure to start with this first level or crash!
     int token = lexer->yylex();
     cout << token;
     return 0;
