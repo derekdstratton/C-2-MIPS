@@ -3,7 +3,7 @@
 #include <iostream>
 #include <utility>
 #include "SymbolTable.h"
-
+#include <stdlib.h>
 
 #include "Node.h"
     SymbolTable symbolTable;
@@ -175,8 +175,13 @@ return { return ( RETURN );}
     yylval.sval = strstart;
     cout << yylval.sval << endl;
     return (STRING_LITERAL); }
-{real} { return (FLOATING_CONSTANT); }
-{integer} { return (INTEGER_CONSTANT); }
+{real} {
+    yylval.fval = atof(yytext);
+    cout << yylval.fval;
+    return (FLOATING_CONSTANT); }
+{integer} {
+    yylval.ival = atoi(yytext);
+    return (INTEGER_CONSTANT); }
 {identifier} {
     if (yyleng > 31) {
         //throw warning
