@@ -75,10 +75,8 @@ return { return ( RETURN );}
 
 ";" { return (SEMI);}
 "{" {
-    symbolTable.pushLevel();
     return (OPENCUR);}
 "}" {
-    symbolTable.popLevel();
     return (CLOSCUR);}
 "," { return (COMMA);}
 "=" { return (ASSIGN);}
