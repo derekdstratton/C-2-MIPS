@@ -11,6 +11,7 @@ using namespace std;
 extern int line; //to keep track of line number for error
 void yyerror (char const *s);
 int yylex();
+
 %}
 
 %union {
@@ -18,7 +19,7 @@ int yylex();
 }
 
 %token IDENTIFIER
-%token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
+%token<ival> INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
 %token STRING_LITERAL
 %token SIZEOF
 %token PTR_OP
@@ -490,6 +491,7 @@ void yyerror (char const *s)
 int main()
 {
 	yyparse();
+	cout << "done";
 	return 0;
 }
 

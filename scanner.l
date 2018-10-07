@@ -13,7 +13,7 @@ using namespace std;
     //enumeration constant? i don't think that's even used.
 
 %}
-%option c++
+
 %option noyywrap
 
 /*White space*/
@@ -38,6 +38,8 @@ character_constant \'([^']|{escape_sequence})\'
 %%
 
 {ws}
+
+"!!S" { cout << symbolTable;}
 
 typedef { return ( TYPEDEF );}
 extern { return ( EXTERN );}
@@ -127,12 +129,17 @@ return { return ( RETURN );}
 "|="    { return ( NE_OP );}
 
 {character_constant} {
-    //todo integrate with yylval from yytext, based on parse.tab.h
+    //yylval.ival = 3;
+    //todo integrate with yylval from yytext, based on parse.tab.h. c++ weird
     return (CHARACTER_CONSTANT); }
 {string_literal} { return (STRING_LITERAL); }
 {real} { return (FLOATING_CONSTANT); }
 {integer} { return (INTEGER_CONSTANT); }
 {identifier} {
+    if (yyleng > 31) {
+        //throw warning
+        cout << "too long buddy" << endl;
+    }
     string s = yytext;
     Node x = Node(4);
     pair<string, Node> entry = make_pair(s,x);
@@ -144,11 +151,11 @@ return { return ( RETURN );}
     return (-1);}
 
 %%
-
+/*
 int main(){
     FlexLexer* lexer = new yyFlexLexer;
     symbolTable.pushLevel(); //make sure to start with this first level or crash!
     int token = lexer->yylex();
     cout << token;
     return 0;
-}
+}*/

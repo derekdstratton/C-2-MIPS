@@ -8,7 +8,9 @@ using namespace std;
 /**
  * Default Constructor
  */
-SymbolTable::SymbolTable() = default;
+SymbolTable::SymbolTable() {
+    this->pushLevel();
+}
 
 /** Insert an item into symbol table
  *
