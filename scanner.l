@@ -9,7 +9,9 @@
 
 #include "Node.h"
     SymbolTable symbolTable;
-#include "parse.tab.h"
+//#include "parse.tab.h"
+
+#include "parser.hpp"
 /*Function declarations*/
 using namespace std;
     //note: i'm shoving all my comments up here for lack of better space
