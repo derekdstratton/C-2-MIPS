@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.7)
 project(Project)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -16,7 +16,7 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
-add_executable(Foo SymbolTable.cpp SymbolTable.h Node.cpp Node.h
+add_executable(ScannerParser SymbolTable.cpp SymbolTable.h Node.cpp Node.h
 ${BISON_MyParser_OUTPUTS}
 ${FLEX_MyScanner_OUTPUTS}
 )
