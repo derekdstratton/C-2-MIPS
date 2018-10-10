@@ -2,22 +2,28 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include "parse.tab.h"
 #include "SymbolTable.h"
 
 #include "Node.h"
-    SymbolTable symbolTable;
-#include "parse.tab.h"
+
+SymbolTable symbolTable;
 /*Function declarations*/
 using namespace std;
     //note: i'm shoving all my comments up here for lack of better space
-    //enumeration constant? i don't think that's even used.
+    //enumeration constant? i don't think that's even used;
+
+int lineNumber = 1;
 
 %}
 
 %option noyywrap
+%option yylineno
+
 
 /*White space*/
-delim	[ \t\n]
+newLine [\n]
+delim	[ \t]
 ws	{delim}+
 
 /*Numbers*/
@@ -38,6 +44,8 @@ character_constant \'([^']|{escape_sequence})\'
 %%
 
 {ws}
+{newLine} {lineNumber++; yylloc.first_line++;/* return (NEWLINE)*/}
+
 
 "!!S" { cout << symbolTable;}
 
@@ -147,7 +155,7 @@ return { return ( RETURN );}
     cout << symbolTable << endl;
     return ( IDENTIFIER );}
 
-. { cout << "unrecognized!" << endl;
+. { cout << "unrecognized token at line number " << yylineno << endl;
     return (-1);}
 
 %%
