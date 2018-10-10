@@ -3,10 +3,12 @@ project(Project)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SYMBOL_TABLE driver.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
-add_executable(symbol ${SYMBOL_TABLE})
+# Symbol Table
 
-# https://cmake.org/cmake/help/v3.0/module/FindFLEX.html
+set(SYMBOL_TABLE driver.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+add_executable(SymbolTable ${SYMBOL_TABLE})
+
+# Scanner/Parser
 
 find_package(BISON)
 find_package(FLEX)

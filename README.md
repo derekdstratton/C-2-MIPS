@@ -1,16 +1,29 @@
 # Best-C-Compiler
-Ever.
 
-flex scanner.l
-bison parse.y -d
-bison parse.y
-g++ -std=c++11 parse.tab.c lex.yy.c SymbolTable.cpp Node.cpp
+### Description:
+
+It compiles C code.
+
+### Team:
+
+- Derek Stratton
+- Chris "Danger" Koh
+
+### Installation: 
+
+Installing on an ECC Machine:
+```
+git clone https://github.com/derekdstratton/Best-C-Compiler
+cmake Best-C-Compiler
+make
+```
+
+### Usage:
+
+- To run the Scanner/Parser, type `./ScannerParser`
+- To run the Symbol Table driver, type `./SymbolTable`
+
+### Wiki:
 
 https://github.com/derekdstratton/Best-C-Compiler/wiki
 
-todo add docs for running with cmake
-
-git clone *name*
-cmake *Best-C-Compiler*
-make
-./ScannerParser
