@@ -37,7 +37,7 @@ real {plain_real}|{expreal}
 identifier [a-zA-Z_][a-zA-Z_{digit}]*
 string_literal \"[^\"]*\"
 
-escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9][0-9][0-9])|(x[0-9][0-9]))
+escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9]?[0-9]?[0-9]?)|(x[0-9]?[0-9]?))
 
 character_constant \'([^']|{escape_sequence})\'
 
@@ -289,8 +289,9 @@ return {
     return ( NE_OP );}
 
 {character_constant} {
+    to_token_file(CHARACTER_CONSTANT);
     //passing escape characters
-    cout << yytext[1] << endl;
+    //cout << yytext[1] << endl;
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
             case 'n':
@@ -325,27 +326,68 @@ return {
     }
 
     cout << yylval.cval;
-    to_token_file(CHARACTER_CONSTANT);
     return (CHARACTER_CONSTANT); }
 {string_literal} {
-    char * strstart = yytext+1;
-    int len = strlen(strstart);
-    strstart[len-1] = '\0';
-    cout << len << endl;
-    yylval.sval = strstart;
-    cout << yylval.sval << endl;
     to_token_file(STRING_LITERAL);
+    char * strstart = yytext+1;
+    int initial_len = strlen(strstart);
+    strstart[initial_len-1] = '\0';
+    char * lead = strstart;
+    char * lag = strstart;
+    while (*lead != '\0') {
+        if (*lead == '\\') {
+            lead++;
+            switch(*lead) {
+                case 'n':
+                    *lag = '\n';
+                    break;
+                case 'a':
+                    *lag = '\a';
+                    break;
+                case 'b':
+                    *lag = '\b';
+                    break;
+                case 'f':
+                    *lag = '\f';
+                    break;
+                case 'r':
+                    *lag = '\r';
+                    break;
+                case 't':
+                    *lag = '\t';
+                    break;
+                case 'v':
+                    *lag = '\v';
+                    break;
+                //todo deal with octal, hex, weird stuff
+                default:
+                    *lag = *lead;
+                    break;
+            }
+        } else {
+            *lag = *lead;
+        }
+        //cout << "Lead: " << *lead << ", Lag: " << *lag << endl;
+        lead++;
+        lag++;
+    }
+    *lag = '\0';
+    // len = strlen(strstart);
+    //cout << len << endl;
+    yylval.sval = strstart;
+    //cout << yylval.sval << endl;
     return (STRING_LITERAL); }
 {real} {
+    to_token_file(FLOATING_CONSTANT);
     yylval.fval = atof(yytext);
     cout << yylval.fval;
-    to_token_file(FLOATING_CONSTANT);
     return (FLOATING_CONSTANT); }
 {integer} {
-    yylval.ival = atoi(yytext);
     to_token_file(INTEGER_CONSTANT);
+    yylval.ival = atoi(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
+    to_token_file(IDENTIFIER);
     if (yyleng > 31) {
         //throw warning
         cout << "too long buddy" << endl;
@@ -354,7 +396,6 @@ return {
     Node x = Node(4);
     pair<string, Node> entry = make_pair(s,x);
     symbolTable.insert(entry);
-    to_token_file(IDENTIFIER);
     cout << symbolTable << endl;
     return ( IDENTIFIER );}
 
@@ -365,15 +406,8 @@ return {
 
 void to_token_file(int token) {
     ofstream tokenfile;
+    //cout << "this happened" << endl;
     tokenfile.open("tokens.out", ios::app);
-    tokenfile << token << "\n";
+    tokenfile << yytext << "\n";
     tokenfile.close();
 }
-/*
-int main(){
-    FlexLexer* lexer = new yyFlexLexer;
-    symbolTable.pushLevel(); //make sure to start with this first level or crash!
-    int token = lexer->yylex();
-    cout << token;
-    return 0;
-}*/

@@ -4,6 +4,8 @@
 #include <cctype>
 #include <string>
 #include <sstream>
+
+#include <fstream>
 #include <string>
 //TODO continue parsing after error happens, use 'error' token or yyerrok
 //TODO add in debug option to turn off/on all productions
@@ -497,6 +499,9 @@ void yyerror (char const *s)
 
 int main()
 {
+    ofstream ofs;
+    ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
 	yyparse();
 	cout << "Dumping prodStream\n";
 	string s = prodStream.str();
