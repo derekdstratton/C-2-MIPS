@@ -1,7 +1,3 @@
-//
-// Created by Derek Stratton on 9/24/2018.
-//
-
 #ifndef BEST_C_COMPILER_SYMBOLTABLE_H
 #define BEST_C_COMPILER_SYMBOLTABLE_H
 
