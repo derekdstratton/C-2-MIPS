@@ -16,26 +16,27 @@ SymbolTable::SymbolTable() {
 }
 
 /** Insert an item into symbol table
- * todo determine what to do about shadowing. return info that the parser can output errors/warnings
+ *
  * change return value to a tuple
  *
  * @param item The item being inserted into the Symbol Table
- * @return True if the item is successfully inserted (even if shadowing), false if not
- * tuple<bool,
+ * @return First bool: true if successfully inserted, false otherwise.
+ *      Second bool: True if no error/warning, False if shadowing
  */
-bool SymbolTable::insert(const pair<string, Node>& item) {
+tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
 
     tuple<map<string, Node>::iterator, string> tup = this->search(item.first);
     string retval = get<1>(tup);
     if (retval == "top") {
         cout << "error already defined" << endl;
-        return false;
+        return make_tuple(false, false);
     } else if (retval == "other") {
         cout << "warning for shadowing" << endl;
+        return make_tuple(true, false);
     }
 
     table.front().insert(item);
-    return true;
+    return make_tuple(true, true);
 }
 
 /** Search for an item in the symbol table

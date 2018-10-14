@@ -12,7 +12,7 @@ using namespace std;
 class SymbolTable {
   public:
     SymbolTable();
-    bool insert(const pair<string, Node>& item);
+    tuple<bool, bool> insert(const pair<string, Node>& item);
     tuple<map<string, Node>::iterator, string> search(const string& key, bool topLevelOnly=false);
     void pushLevel();
     void popLevel();
