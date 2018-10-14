@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['poplevel',['popLevel',['../class_symbol_table.docs#a2b7d90f3fa8a1d79f2cbeef555f1375f',1,'SymbolTable']]],
-  ['pushlevel',['pushLevel',['../class_symbol_table.docs#a4ae4c247e136cd9d13224ba952fccb88',1,'SymbolTable']]]
+  ['failtofind',['failToFind',['../driver_8cpp.html#a915caf6bbcfb400c3c6ab6c069f0e100',1,'driver.cpp']]],
+  ['failtopoplastlevel',['failToPopLastLevel',['../driver_8cpp.html#aac84b257ea2dc36c85d73b080da9d430',1,'driver.cpp']]],
+  ['findonlowerscope',['findOnLowerScope',['../driver_8cpp.html#a97870f36b687a3496b30ceb135e2c817',1,'driver.cpp']]],
+  ['findontopscope',['findOnTopScope',['../driver_8cpp.html#a2750bf20970010141b8bb86082f01837',1,'driver.cpp']]]
 ];
