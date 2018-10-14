@@ -25,5 +25,4 @@ make
 
 ### Wiki:
 
-https://github.com/derekdstratton/Best-C-Compiler/wiki
-
+https://derekdstratton.github.io/Best-C-Compiler/
