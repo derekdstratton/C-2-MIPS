@@ -1,7 +1,6 @@
-//
-// Created by Derek Stratton on 10/2/2018.
-//
-
+/**
+ *
+ */
 #include "Node.h"
 
 Node::Node(int var) {

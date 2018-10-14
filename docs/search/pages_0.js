@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['best_2dc_2dcompiler',['Best-C-Compiler',['../md__r_e_a_d_m_e.html',1,'']]]
+  ['a_20documentation_20page',['A documentation page',['../page1.html',1,'']]],
+  ['another_20page',['Another page',['../page2.html',1,'']]]
 ];
