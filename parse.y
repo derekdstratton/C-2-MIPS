@@ -62,8 +62,8 @@ TYPEDEF_NAME
 %%
 
 translation_unit
-	: TYPEDEF {cout << "SEES TYPEDEF AT : " << yylloc.first_line << endl;prodStream << "translation_unit -> TYPEDEF";}
-	| external_declaration {prodStream << "translation_unit -> external_declaration\n";}
+	/*: TYPEDEF {prodStream << "translation_unit -> TYPEDEF";}*/
+	: external_declaration {prodStream << "translation_unit -> external_declaration\n";}
 	| translation_unit external_declaration {prodStream << "translation_unit -> translation_unit external_declaration\n";}
 	;
 
