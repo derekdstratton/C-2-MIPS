@@ -9,6 +9,7 @@
 
 #include "Node.h"
     SymbolTable symbolTable;
+    SymbolTable * sym;
 //#include "parse.tab.h"
 
 #include "parser.hpp"
@@ -396,7 +397,9 @@ return {
     Node x = Node(4);
     pair<string, Node> entry = make_pair(s,x);
     symbolTable.insert(entry);
-    cout << symbolTable << endl;
+    apple();
+    getTable()->insert(entry);
+    cout << *getTable() << endl;
     return ( IDENTIFIER );}
 
 . { cout << "unrecognized!" << endl;
