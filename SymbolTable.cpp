@@ -131,3 +131,19 @@ ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
     }
     return os;
 }
+
+/**
+ *
+ * @param newMode
+ */
+void SymbolTable::setMode(const bool& newMode) {
+    insertMode = newMode;
+}
+
+/**
+ *
+ * @return
+ */
+bool SymbolTable::getMode() {
+    return insertMode;
+}

@@ -159,6 +159,13 @@ void dumpToFile() {
     outputFile << s;
 }
 
+/**
+ *
+ */
+void toggleInsertLookupMode() {
+    //todo
+}
+
 int main() {
     oneLevelTable();
     multiLevelTable();
@@ -170,6 +177,7 @@ int main() {
     findOnLowerScope();
     failToFind();
     dumpToFile();
+    toggleInsertLookupMode();
 
     return 0;
 }

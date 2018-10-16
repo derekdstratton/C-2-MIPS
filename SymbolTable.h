@@ -16,11 +16,14 @@ class SymbolTable {
     tuple<map<string, Node>::iterator, string> search(const string& key, bool topLevelOnly=false);
     void pushLevel();
     void popLevel();
+    bool getMode();
+    void setMode(const bool& newMode);
     friend ostream& operator<<(ostream& os, const SymbolTable& symbolTable);
   private:
     list<map<string, Node>> table;
     //the actual symbol table
     //the top of the stack is given by table.front()
+    bool insertMode; //if true, in insert mode. if false, in lookup mode.
 };
 
 #endif //BEST_C_COMPILER_SYMBOLTABLE_H
