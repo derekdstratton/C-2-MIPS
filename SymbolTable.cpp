@@ -13,6 +13,7 @@ using namespace std;
  */
 SymbolTable::SymbolTable() {
     this->pushLevel();
+    insertMode = true; //start for inserting in global scope
 }
 
 /** Insert an item into symbol table
@@ -130,4 +131,20 @@ ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
         i++;
     }
     return os;
+}
+
+/**
+ *
+ * @param newMode
+ */
+void SymbolTable::setMode(const bool& newMode) {
+    insertMode = newMode;
+}
+
+/**
+ *
+ * @return
+ */
+bool SymbolTable::getMode() {
+    return insertMode;
 }

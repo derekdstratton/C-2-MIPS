@@ -13,7 +13,12 @@
 #include <fstream>
 
 #include "Node.h"
-    SymbolTable symbolTable;
+SymbolTable * sym;
+bool isFunction; //true if function
+string type_specifier = "none";
+string type_qualifier = "none";
+string storage_class_specifier = "none";
+string signed_or_unsigned = "none";
 //#include "parse.tab.h"
 
 #include "parser.hpp"
@@ -36,6 +41,7 @@ void processToken() //updates column number and outputs source code to file for 
     currentLine += yytext;
 }
 
+static bool insertModeFlag = false;
 void to_token_file(int token) {
     first_column += yyleng;
     currentLine += yytext;
@@ -78,63 +84,135 @@ character_constant \'([^']|{escape_sequence})\'
 {ws} {processToken();}
 
 
-"!!S" { cout << symbolTable;}
+"!!S" { cout << *getTable();}
 
 typedef {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+    }
     to_token_file(TYPEDEF);
     return ( TYPEDEF );}
 extern {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+        storage_class_specifier = "extern";
+    }
     to_token_file(EXTERN);
     return ( EXTERN );}
 static {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+        storage_class_specifier = "static";
+    }
     to_token_file(STATIC);
     return ( STATIC );}
 auto {
+    if (getTable()->getMode()) {
+        storage_class_specifier = "auto";
+        insertModeFlag = true;
+    }
     to_token_file(AUTO);
     return ( AUTO );}
 register {
+    if (getTable()->getMode()) {
+        storage_class_specifier = "register";
+        insertModeFlag = true;
+    }
     to_token_file(REGISTER);
     return ( REGISTER );}
 char {
+    if (getTable()->getMode()) {
+        type_specifier = "char";
+        insertModeFlag = true;
+    }
     to_token_file(CHAR);
     return ( CHAR );}
 short {
+    if (getTable()->getMode()) {
+        type_specifier = "short";
+        insertModeFlag = true;
+    }
     to_token_file(SHORT);
     return ( SHORT );}
 int {
+    if (getTable()->getMode()) {
+        type_specifier = "int";
+        insertModeFlag = true;
+    }
     to_token_file(INT);
     return ( INT );}
 long {
+    if (getTable()->getMode()) {
+        type_specifier = "long";
+        insertModeFlag = true;
+    }
     to_token_file(LONG);
     return ( LONG );}
 signed {
+    if (getTable()->getMode()) {
+        signed_or_unsigned = "signed";
+        insertModeFlag = true;
+    }
     to_token_file(SIGNED);
     return ( SIGNED );}
 unsigned {
+    if (getTable()->getMode()) {
+        signed_or_unsigned = "unsigned";
+        insertModeFlag = true;
+    }
     to_token_file(UNSIGNED);
     return ( UNSIGNED );}
 float {
+    if (getTable()->getMode()) {
+        type_specifier = "float";
+        insertModeFlag = true;
+    }
     to_token_file(FLOAT);
     return ( FLOAT );}
 double {
+    if (getTable()->getMode()) {
+        type_specifier = "double";
+        insertModeFlag = true;
+    }
     to_token_file(DOUBLE);
     return ( DOUBLE );}
 const {
+    if (getTable()->getMode()) {
+        type_qualifier = "const";
+        insertModeFlag = true;
+    }
     to_token_file(CONST);
     return ( CONST );}
 volatile {
+    if (getTable()->getMode()) {
+        type_qualifier = "none";
+        insertModeFlag = true;
+    }
     to_token_file(VOLATILE);
     return ( VOLATILE );}
 void {
+    if (getTable()->getMode()) {
+        type_specifier = "void";
+        insertModeFlag = true;
+    }
     to_token_file(VOID);
     return ( VOID );}
 struct {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+    }
     to_token_file(STRUCT);
     return ( STRUCT );}
 union {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+    }
     to_token_file(UNION);
     return ( UNION );}
 enum {
+    if (getTable()->getMode()) {
+        insertModeFlag = true;
+    }
     to_token_file(ENUM);
     return ( ENUM );}
 
@@ -177,9 +255,21 @@ return {
 
 
 ";" {
+    if (!insertModeFlag) {
+        //move to lookup mode
+        getTable()->setMode(false);
+    } else {
+        //still in insert mode, reset all this
+        string type_specifier = "none";
+        string type_qualifier = "none";
+        string storage_class_specifier = "none";
+        string signed_or_unsigned = "none";
+    }
+    insertModeFlag = false;
     to_token_file(SEMI);
     return (SEMI);}
 "{" {
+    getTable()->setMode(true);
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
@@ -413,7 +503,7 @@ return {
 {real} {
     to_token_file(FLOATING_CONSTANT);
     yylval.fval = atof(yytext);
-    cout << yylval.fval;
+    //cout << yylval.fval;
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT);
@@ -421,15 +511,27 @@ return {
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER);
-    if (yyleng > 31) {
+    if (yyleng > 31) { //todo check this based on the known type
         //throw warning
         cout << "too long buddy" << endl;
     }
     string s = yytext;
-    Node x = Node(4);
-    pair<string, Node> entry = make_pair(s,x);
-    symbolTable.insert(entry);
-    cout << symbolTable << endl;
+    Node x = Node(4, type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned);
+    if (getTable()->getMode()) {
+        //currently in insert mode
+        if (!insertModeFlag) {
+            //this is a change from insert to lookup, UNLESS you're a typedef
+            //todo check to see if you're a typedef'd type
+            getTable()->setMode(false); //now you're in lookup mode
+        } else {
+            //this is a normal insert
+            pair<string, Node> entry = make_pair(s,x);
+            getTable()->insert(entry);
+        }
+    } else {
+        //currently in lookup mode
+        getTable()->search(s);
+    }
     return ( IDENTIFIER );}
 
 . { processToken();

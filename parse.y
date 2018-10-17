@@ -10,6 +10,8 @@
 #include <string>
 //TODO continue parsing after error happens, use 'error' token or yyerrok
 //TODO add in debug option to turn off/on all productions
+#include "SymbolTable.h"
+SymbolTable * table_ptr;
 
 using namespace std;
 //extern int line; //to keep track of line number for error
@@ -24,6 +26,18 @@ stringstream prodStream;
     char cval;
     char * sval;
 }
+
+%code provides {
+    //void apple();
+    SymbolTable * getTable();
+}
+
+%code {
+    //void apple() { cout << "APPLE SALAD BURRITO";}
+    SymbolTable * getTable() {
+        return table_ptr;
+    }
+};
 
 %token IDENTIFIER
 %token<ival> INTEGER_CONSTANT
@@ -503,6 +517,9 @@ void yyerror (char const* s)
 
 int main(int argc, char **argv)
 {
+    //todo yyin file pointers
+    SymbolTable symbolTable;
+    table_ptr = &symbolTable;
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
@@ -521,6 +538,9 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+//SymbolTable * getTable() {
+//    return &symb;
+//}
 /*
 {
 	fflush(stdout);
