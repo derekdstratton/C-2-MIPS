@@ -27,6 +27,21 @@
   Even more info.
 */
 
+/**
+ * Your Project Repository Wiki shoudl be created in such a way that it has all the information appropriate for a User Manual and a Technical Manual in it
+Table of Contents (first page with links to others)
+Overview of the document
+Your name, course, date, etc.
+Language features of the compiler
+Implementation (symbol tables, etc.)
+Assumptions Made (Line length,etc.)
+Restrictions (Number of errors before it quits,etc.)
+Directions to run your program, location of the files
+Description of each Module with source file links, test cases and their outputs, and other items you think are appropriate
+ */
+
 // https://www.stack.nl/~dimitri/doxygen/manual/commands.html
 
 //look into this as well to make this a .md file https://www.stack.nl/~dimitri/doxygen/manual/markdown.html
+
+//gcc test.c -o test -pedantic -std=c89

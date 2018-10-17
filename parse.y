@@ -27,12 +27,12 @@ stringstream prodStream;
 }
 
 %code provides {
-    void apple();
+    //void apple();
     SymbolTable * getTable();
 }
 
 %code {
-    void apple() { cout << "APPLE SALAD BURRITO";}
+    //void apple() { cout << "APPLE SALAD BURRITO";}
     SymbolTable * getTable() {
         return table_ptr;
     }
@@ -513,6 +513,7 @@ void yyerror (char const *s)
 
 int main()
 {
+    //todo yyin file pointers
     SymbolTable symbolTable;
     table_ptr = &symbolTable;
     ofstream ofs;

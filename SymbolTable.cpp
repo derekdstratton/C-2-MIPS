@@ -13,6 +13,7 @@ using namespace std;
  */
 SymbolTable::SymbolTable() {
     this->pushLevel();
+    insertMode = true; //start for inserting in global scope
 }
 
 /** Insert an item into symbol table
