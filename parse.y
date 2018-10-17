@@ -18,16 +18,12 @@ int yylex();
 stringstream prodStream;
 %}
 
-%locations
-
 %union {
     int ival;
     float fval;
     char cval;
     char * sval;
 }
-
-%define parse.error verbose
 
 %token IDENTIFIER
 %token<ival> INTEGER_CONSTANT
@@ -50,6 +46,8 @@ stringstream prodStream;
 %token STRUCT UNION ENUM ELIPSIS RANGE
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%locations
 
 //user defined tokens
 /*
@@ -508,6 +506,7 @@ int main(int argc, char **argv)
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
+    yylloc.first_column = 0;
 	yyparse();
 	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
