@@ -2,6 +2,9 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <sstream>
+#include <fstream>
+#include "parse.tab.h"
 #include "SymbolTable.h"
 #include <stdlib.h>
 
@@ -12,15 +15,27 @@
 //#include "parse.tab.h"
 
 #include "parser.hpp"
+
+//TODO: output source code and do column numbers
+stringstream sourceStream;
+string currentLine;
 /*Function declarations*/
 using namespace std;
     //note: i'm shoving all my comments up here for lack of better space
-    //enumeration constant? i don't think that's even used.
+    //enumeration constant? i don't think that's even used;
+
+void processToken() //updates column number and outputs source code to file for each token
+{
+    yylloc.first_column += yyleng;
+    currentLine += yytext;
+}
 
     void to_token_file(int token);
 %}
 
 %option noyywrap
+%option yylineno
+
 
 /*White space*/
 delim	[ \t\n]
@@ -43,7 +58,12 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{ws}
+{ws} {currentLine += yytext; yylloc.first_column += yyleng;}
+{newLine} {yylloc.first_line++;
+           yylloc.first_column = 0;
+           sourceStream << endl;
+           currentLine.clear();}
+
 
 "!!S" { cout << symbolTable;}
 
@@ -399,7 +419,12 @@ return {
     cout << symbolTable << endl;
     return ( IDENTIFIER );}
 
-. { cout << "unrecognized!" << endl;
+. { currentLine += yytext;
+    cout << "unrecognized token at line number " << yylineno << endl;
+    cout << currentLine << endl;
+    while(yylloc.first_column--)
+        cout << ' ';
+    cout << "^ Unexpected character\n";
     return (-1);}
 
 %%
