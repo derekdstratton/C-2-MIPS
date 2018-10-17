@@ -5,6 +5,8 @@
 #include <cctype>
 #include <string>
 #include <sstream>
+
+#include <fstream>
 #include <string>
 //TODO continue parsing after error happens, use 'error' token or yyerrok
 //TODO add in debug option to turn off/on all productions
@@ -20,12 +22,18 @@ stringstream prodStream;
 
 %union {
     int ival;
+    float fval;
+    char cval;
+    char * sval;
 }
 
 %define parse.error verbose
 
 %token IDENTIFIER
-%token INTEGER_CONSTANT FLOATING_CONSTANT CHARACTER_CONSTANT ENUMERATION_CONSTANT
+%token<ival> INTEGER_CONSTANT
+%token<fval> FLOATING_CONSTANT
+%token<cval> CHARACTER_CONSTANT
+%token ENUMERATION_CONSTANT
 %token STRING_LITERAL
 %token SIZEOF
 %token PTR_OP
@@ -497,6 +505,9 @@ void yyerror (char const* s)
 
 int main(int argc, char **argv)
 {
+    ofstream ofs;
+    ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
+    ofs.close();
 	yyparse();
 	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))

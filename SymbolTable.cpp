@@ -1,3 +1,6 @@
+/**
+ *
+ */
 #include <iostream>
 #include <fstream>
 #include <tuple>
@@ -6,7 +9,7 @@
 using namespace std;
 
 /**
- * Default Constructor
+ * Default Constructor. Pushes a level initially.
  */
 SymbolTable::SymbolTable() {
     this->pushLevel();
@@ -14,14 +17,26 @@ SymbolTable::SymbolTable() {
 
 /** Insert an item into symbol table
  *
+ * change return value to a tuple
+ *
  * @param item The item being inserted into the Symbol Table
- * @return True if the item inserted is shadowing another item, false otherwise
+ * @return First bool: true if successfully inserted, false otherwise.
+ *      Second bool: True if no error/warning, False if shadowing
  */
-bool SymbolTable::insert(const pair<string, Node>& item) {
-    auto ret = table.front().insert(item);
-    return ret.second == false;
-    //todo to test if shadowing, you have to go thru all the scopes to the global
-    //todo if it already exists in the top scope, that should be an error
+tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
+
+    tuple<map<string, Node>::iterator, string> tup = this->search(item.first);
+    string retval = get<1>(tup);
+    if (retval == "top") {
+        cout << "error already defined" << endl;
+        return make_tuple(false, false);
+    } else if (retval == "other") {
+        cout << "warning for shadowing" << endl;
+        return make_tuple(true, false);
+    }
+
+    table.front().insert(item);
+    return make_tuple(true, true);
 }
 
 /** Search for an item in the symbol table
@@ -38,7 +53,6 @@ bool SymbolTable::insert(const pair<string, Node>& item) {
  *          "not"- not found at all
  */
 tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key, bool topLevelOnly) {
-    //todo make sure to do error/bounds checking
     map<string, Node>::iterator node_iterator;
     string status;
     bool found = false;
@@ -91,6 +105,10 @@ void SymbolTable::pushLevel() {
  * Pops the top level from the stack
  */
 void SymbolTable::popLevel() {
+    if (table.size() == 1) {
+        cout << "popping the final level is bad, not gonna do it" << endl;
+        return;
+    }
     table.pop_front();
 }
 
@@ -111,6 +129,5 @@ ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
         }
         i++;
     }
-    cout << endl;
     return os;
 }

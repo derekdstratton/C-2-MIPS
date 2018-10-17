@@ -1,39 +1,175 @@
-//
-// Created by Derek Stratton on 9/23/2018.
-//
-
+/**
+ *
+ */
 #include <iostream>
+#include <fstream>
 
 #include "SymbolTable.h"
 #include "Node.h"
 
 using namespace std;
 
-int main() {
-    SymbolTable s; //Empty symbol table
-    cout << s;
-    pair<string, Node> item = make_pair("Hello", Node(4));
-    pair<string, Node> item2 = make_pair("Hey", Node(7));
-    s.pushLevel();
-    cout << s;
-
+/**
+ *
+ */
+void oneLevelTable() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
     s.insert(item);
-    cout << s;
-    //s.printTable();
-    s.pushLevel();
     s.insert(item2);
+    s.insert(item3);
     cout << s;
+}
 
-    //todo write to file
-
+/**
+ *
+ */
+void multiLevelTable() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
     s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    cout << s;
     s.popLevel();
+    cout << s;
+}
 
-    cout << "Key for Hello: " << get<0>(s.search("Hello"))->second << get<1>(s.search("Hello")) << endl;
-    cout << "Key for Hey: " << get<0>(s.search("Hey"))->second << get<1>(s.search("Hey")) << endl;
+/**
+ *
+ */
+void popTopLevel() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
+    s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    s.popLevel();
+    cout << s;
+}
 
-    cout << "This doesn't exist, says not: " << get<1>(s.search("Hoolu")) << endl;
-    cout << "done";
+/**
+ *
+ */
+void failToPopLastLevel() {
+    SymbolTable s;
+    s.popLevel();
+}
+
+/**
+ *
+ */
+void insertConflict() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    s.insert(item);
+    s.insert(item); //This causes an error
+}
+
+/**
+ *
+ */
+void insertShadowing() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    s.insert(item);
+    s.pushLevel();
+    s.insert(item); //This causes a shadowing warning
+}
+
+/**
+ *
+ */
+void findOnTopScope() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
+    s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    s.search("Item 3");
+}
+
+/**
+ *
+ */
+void findOnLowerScope() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
+    s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    s.search("Item 2");
+}
+
+/**
+ *
+ */
+void failToFind() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
+    s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    s.search("Item 5");
+}
+
+/**
+ *
+ */
+void dumpToFile() {
+    SymbolTable s;
+    pair<string, Node> item = make_pair("Item 1", Node(4));
+    pair<string, Node> item2 = make_pair("Item 2", Node(7));
+    pair<string, Node> item3 = make_pair("Item 3", Node(12));
+    pair<string, Node> item4 = make_pair("Item 4", Node(200));
+    s.insert(item);
+    s.insert(item2);
+    s.pushLevel();
+    s.insert(item3);
+    s.insert(item4);
+    ofstream outputFile;
+    outputFile.open("symbolTable.out");
+    outputFile << s;
+}
+
+int main() {
+    oneLevelTable();
+    multiLevelTable();
+    popTopLevel();
+    failToPopLastLevel();
+    insertConflict();
+    insertShadowing();
+    findOnTopScope();
+    findOnLowerScope();
+    failToFind();
+    dumpToFile();
 
     return 0;
 }

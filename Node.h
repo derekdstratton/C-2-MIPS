@@ -1,7 +1,3 @@
-//
-// Created by Derek Stratton on 10/2/2018.
-//
-
 #ifndef PROJECT_NODE_H
 #define PROJECT_NODE_H
 
