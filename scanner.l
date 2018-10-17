@@ -1,7 +1,12 @@
 %{
 #include <string>
+
+#include <string.h>
 #include <iostream>
 #include <utility>
+#include <sstream>
+#include <fstream>
+//#include "parse.tab.h"
 #include "SymbolTable.h"
 #include <stdlib.h>
 
@@ -17,19 +22,44 @@ string signed_or_unsigned = "none";
 //#include "parse.tab.h"
 
 #include "parser.hpp"
+
+//TODO: output source code and do column numbers
+stringstream sourceStream;
+string currentLine;
+int first_column = 0;
 /*Function declarations*/
 using namespace std;
     //note: i'm shoving all my comments up here for lack of better space
-    //enumeration constant? i don't think that's even used.
+    //enumeration constant? i don't think that's even used;
 
-void to_token_file(int token);
+void processToken() //updates column number and outputs source code to file for each token
+{
+    cout << "column right now is " << first_column << endl;
+    cout << "Adding " << yytext << " to currentline" << endl;
+    cout << "Adding " << yyleng << " spaces to first_column" << endl;
+    first_column += yyleng;
+    currentLine += yytext;
+}
 
 static bool insertModeFlag = false;
+void to_token_file(int token) {
+    first_column += yyleng;
+    currentLine += yytext;
+    ofstream tokenfile;
+    //cout << "this happened" << endl;
+    tokenfile.open("tokens.out", ios::app);
+    tokenfile << yytext << "\n";
+    tokenfile.close();
+}
+
 %}
 
 %option noyywrap
+%option yylineno
+
 
 /*White space*/
+newLine [\n]
 delim	[ \t\n]
 ws	{delim}+
 
@@ -50,7 +80,9 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{ws}
+{newLine} {cout << "clearing first_column and currentLine" << endl; first_column = 0; currentLine.clear();}
+{ws} {processToken();}
+
 
 "!!S" { cout << *getTable();}
 
@@ -502,15 +534,19 @@ return {
     }
     return ( IDENTIFIER );}
 
-. { cout << "unrecognized!" << endl;
+. { processToken();
+    while(string(yytext) != "\n")
+    {
+        cout << "yytext is " << string(yytext) << endl;
+        currentLine += yytext;
+        yylex();
+    }
+    cout << "unrecognized token at line number " << yylineno << endl;
+    cout << "first_column is " << first_column << endl;
+    cout << currentLine << endl;
+    while(first_column-- > 1)
+        cout << ' ';
+    cout << "^ Unexpected character\n";
     return (-1);}
 
 %%
-
-void to_token_file(int token) {
-    ofstream tokenfile;
-    //cout << "this happened" << endl;
-    tokenfile.open("tokens.out", ios::app);
-    tokenfile << yytext << "\n";
-    tokenfile.close();
-}

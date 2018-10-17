@@ -1,5 +1,7 @@
 # Best C Compiler
 
+For CS 460, Compiler Construction, Fall 2018
+
 ### Description:
 
 It compiles C code.

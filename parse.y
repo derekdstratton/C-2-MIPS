@@ -1,6 +1,7 @@
 
 %{
 #include <iostream>
+#include <fstream>
 #include <cctype>
 #include <string>
 #include <sstream>
@@ -13,7 +14,7 @@
 SymbolTable * table_ptr;
 
 using namespace std;
-extern int line; //to keep track of line number for error
+//extern int line; //to keep track of line number for error
 void yyerror (char const *s);
 int yylex();
 stringstream prodStream;
@@ -60,6 +61,8 @@ stringstream prodStream;
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%locations
+
 //user defined tokens
 /*
 IDENTIFIER
@@ -73,13 +76,13 @@ TYPEDEF_NAME
 */
 
 %token SEMI OPENCUR CLOSCUR COMMA ASSIGN COLON OPENSQ CLOSSQ STAR OPENPAR CLOSEPAR TERNARY
-%token BAR XOR AND LESSTH GREATH PLUS MINUS SLASH MODULO TILDE BANG PERIOD
+%token BAR XOR AND LESSTH GREATH PLUS MINUS SLASH MODULO TILDE BANG PERIOD NEWLINE
 
 %start translation_unit
 %%
 
 translation_unit
-	/*: SEMI {cout << "SEES SEMI";prodStream << "translation_unit -> SEMI";}*/
+	/*: TYPEDEF {prodStream << "translation_unit -> TYPEDEF";}*/
 	: external_declaration {prodStream << "translation_unit -> external_declaration\n";}
 	| translation_unit external_declaration {prodStream << "translation_unit -> translation_unit external_declaration\n";}
 	;
@@ -503,15 +506,16 @@ identifier
 //extern char yytext[];
 extern int column;
 
-char *s = "syntax error, I am going to die now.";
+//string s ("syntax error, I am going to die now.");
 //error function called when parsing fails, prints error to stderr stream thingy
-void yyerror (char const *s)
+void yyerror (char const* s)
 {
-    cout << s << endl;
+    //string s ("syntax error, I am going to die now.");
+    cout << s << " AT LINE NUMBER " << yylloc.first_line << endl;
 	return;
 }
 
-int main()
+int main(int argc, char **argv)
 {
     //todo yyin file pointers
     SymbolTable symbolTable;
@@ -519,10 +523,18 @@ int main()
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
+    yylloc.first_column = 0;
 	yyparse();
-	cout << "Dumping prodStream\n";
-	string s = prodStream.str();
-	cout << s << endl;
+	//cout << "argv[1] is :" << argv[1] << endl;
+	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
+	{
+	    ofstream myFile;
+	    myFile.open ("productions.txt");
+	    cout << "Dumping prodStream\n";
+	    string str = prodStream.str();
+	    myFile << str;
+	    myFile.close();
+	}
 	return 0;
 }
 
