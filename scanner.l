@@ -24,8 +24,6 @@ using namespace std;
 
 void to_token_file(int token);
 
-    //todo add functionality to check if an integer literal is too long
-
 static bool insertModeFlag = false;
 %}
 
@@ -226,7 +224,14 @@ return {
 
 ";" {
     if (!insertModeFlag) {
+        //move to lookup mode
         getTable()->setMode(false);
+    } else {
+        //still in insert mode, reset all this
+        string type_specifier = "none";
+        string type_qualifier = "none";
+        string storage_class_specifier = "none";
+        string signed_or_unsigned = "none";
     }
     insertModeFlag = false;
     to_token_file(SEMI);
@@ -474,7 +479,7 @@ return {
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER);
-    if (yyleng > 31) { //todo now that we know the type, we can make life g00d again
+    if (yyleng > 31) { //todo check this based on the known type
         //throw warning
         cout << "too long buddy" << endl;
     }
