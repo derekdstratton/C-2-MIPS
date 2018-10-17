@@ -9,7 +9,7 @@
 //#include "parse.tab.h"
 #include "SymbolTable.h"
 #include <stdlib.h>
-
+//TODO deal with comments
 #include <fstream>
 
 #include "Node.h"
@@ -20,7 +20,8 @@ string type_qualifier = "none";
 string storage_class_specifier = "none";
 string signed_or_unsigned = "none";
 //#include "parse.tab.h"
-
+void outputErrorWarningPosition(string errmsg);
+void outputErrorWarning(bool errtype, string errmsg);
 #include "parser.hpp"
 
 //TODO: output source code and do column numbers
@@ -34,9 +35,9 @@ using namespace std;
 
 void processToken() //updates column number and outputs source code to file for each token
 {
-    cout << "column right now is " << first_column << endl;
-    cout << "Adding " << yytext << " to currentline" << endl;
-    cout << "Adding " << yyleng << " spaces to first_column" << endl;
+    //cout << "column right now is " << first_column << endl;
+    //cout << "Adding " << yytext << " to currentline" << endl;
+    //cout << "Adding " << yyleng << " spaces to first_column" << endl;
     first_column += yyleng;
     currentLine += yytext;
 }
@@ -80,7 +81,7 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{newLine} {cout << "clearing first_column and currentLine" << endl; first_column = 0; currentLine.clear();}
+{newLine} {/*cout << "clearing first_column and currentLine" << endl; */first_column = 0; currentLine.clear();}
 {ws} {processToken();}
 
 
@@ -136,7 +137,11 @@ short {
     return ( SHORT );}
 int {
     if (getTable()->getMode()) {
-        type_specifier = "int";
+        if (type_specifier == "long" || type_specifier == "short") {
+            //don't store int, keep it as "long" or "short"
+        } else {
+            type_specifier = "int";
+        }
         insertModeFlag = true;
     }
     to_token_file(INT);
@@ -270,6 +275,11 @@ return {
     return (SEMI);}
 "{" {
     getTable()->setMode(true);
+    //flip to insert mode, make sure all this is reset
+    string type_specifier = "none";
+    string type_qualifier = "none";
+    string storage_class_specifier = "none";
+    string signed_or_unsigned = "none";
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
@@ -448,7 +458,7 @@ return {
         yylval.cval = yytext[1];
     }
 
-    cout << yylval.cval;
+    //cout << yylval.cval;
     return (CHARACTER_CONSTANT); }
 {string_literal} {
     to_token_file(STRING_LITERAL);
@@ -503,17 +513,23 @@ return {
 {real} {
     to_token_file(FLOATING_CONSTANT);
     yylval.fval = atof(yytext);
-    //cout << yylval.fval;
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT);
-    yylval.ival = atoi(yytext);
+    //test if the integer is too big, aka bigger than a long
+    char * max_int = "2147483647";
+    char * min_int = "2147483648";
+    //todo check size for a long, c string compare
+    yylval.ival = atol(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER);
-    if (yyleng > 31) { //todo check this based on the known type
+    if (yyleng > 31) {
         //throw warning
-        cout << "too long buddy" << endl;
+        //cerr << "too long buddy" << endl;
+        outputErrorWarningPosition("too long buddy");
+        outputErrorWarning(true, "Identifier name too long.");
+        //cerr << "Warning: Identifier name too long." << endl;
     }
     string s = yytext;
     Node x = Node(4, type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned);
@@ -523,30 +539,75 @@ return {
             //this is a change from insert to lookup, UNLESS you're a typedef
             //todo check to see if you're a typedef'd type
             getTable()->setMode(false); //now you're in lookup mode
+            //lookup mode operations
+            tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
+            map<string, Node>::iterator it;
+            string status;
+            tie(it, status) = result;
+            if (status == "not") {
+                outputErrorWarningPosition("Not found");
+                outputErrorWarning(false, "Identifier not defined.");
+            }
         } else {
             //this is a normal insert
             pair<string, Node> entry = make_pair(s,x);
-            getTable()->insert(entry);
+            tuple<bool, bool> result = getTable()->insert(entry);
+            bool insertSuccess, notShadowing;
+            tie(insertSuccess, notShadowing) = result;
+            if (!insertSuccess) {
+                outputErrorWarningPosition("Already exists");
+                outputErrorWarning(false, "Variable already exists on this scope.");
+            } else if (!notShadowing) {
+                outputErrorWarningPosition("Already exists");
+                outputErrorWarning(true, "Shadowing an identifier from an outer scope.");
+            }
         }
     } else {
         //currently in lookup mode
-        getTable()->search(s);
+        //lookup mode operations
+        tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
+        map<string, Node>::iterator it;
+        string status;
+        tie(it, status) = result;
+        if (status == "not") {
+            outputErrorWarningPosition("Not found");
+            outputErrorWarning(false, "Identifier not defined.");
+        }
+        //todo what are we supposed to do with the iterator, yylval?
     }
     return ( IDENTIFIER );}
 
 . { processToken();
-    while(string(yytext) != "\n")
+    /*while(string(yytext) != "\n")
     {
         cout << "yytext is " << string(yytext) << endl;
         currentLine += yytext;
         yylex();
-    }
-    cout << "unrecognized token at line number " << yylineno << endl;
-    cout << "first_column is " << first_column << endl;
-    cout << currentLine << endl;
+    }*/
+    //cout << "unrecognized token at line number " << yylineno << endl;
+    //cout << "first_column is " << first_column << endl;
+    //cout << currentLine << endl;
+    /*
     while(first_column-- > 1)
-        cout << ' ';
-    cout << "^ Unexpected character\n";
-    return (-1);}
+        cerr << ' ';
+
+    cerr << "^ Unexpected character\n";
+     */
+    outputErrorWarningPosition("Unexpected Character");
+    return (ERROR);}
 
 %%
+
+void outputErrorWarningPosition(string errmsg) {
+    int tmp = first_column;
+    while(tmp-- > 1)
+        cerr << ' ';
+    //todo handle tab characters
+    cerr << "^ " << errmsg << "\n";
+}
+
+//errtype true if its a warning, false if its an error
+void outputErrorWarning(bool errtype, string errmsg) {
+    string s = errtype ? "Warning" : "Error";
+    cerr << s << " on line " << yylineno << ": " << errmsg << endl;
+}

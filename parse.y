@@ -21,10 +21,12 @@ stringstream prodStream;
 %}
 
 %union {
-    int ival;
+    long ival;
     float fval;
     char cval;
     char * sval;
+    //
+    void * vval;
 }
 
 %code provides {
@@ -60,6 +62,8 @@ stringstream prodStream;
 %token STRUCT UNION ENUM ELIPSIS RANGE
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%token ERROR
 
 %locations
 
@@ -511,10 +515,10 @@ extern int column;
 void yyerror (char const* s)
 {
     //string s ("syntax error, I am going to die now.");
-    cout << s << " AT LINE NUMBER " << yylloc.first_line << endl;
+    cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
-
+extern FILE *yyin;
 int main(int argc, char **argv)
 {
     //todo yyin file pointers
@@ -524,7 +528,10 @@ int main(int argc, char **argv)
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
     yylloc.first_column = 0;
+
+    //yyin = fopen("invalid_character.c", "r");
 	yyparse();
+
 	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
 	{

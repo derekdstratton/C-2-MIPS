@@ -29,10 +29,10 @@ tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
     tuple<map<string, Node>::iterator, string> tup = this->search(item.first);
     string retval = get<1>(tup);
     if (retval == "top") {
-        cout << "error already defined" << endl;
+        //cout << "error already defined" << endl;
         return make_tuple(false, false);
     } else if (retval == "other") {
-        cout << "warning for shadowing" << endl;
+        //cout << "warning for shadowing" << endl;
         return make_tuple(true, false);
     }
 
@@ -107,7 +107,7 @@ void SymbolTable::pushLevel() {
  */
 void SymbolTable::popLevel() {
     if (table.size() == 1) {
-        cout << "popping the final level is bad, not gonna do it" << endl;
+        //cout << "popping the final level is bad, not gonna do it" << endl;
         return;
     }
     table.pop_front();

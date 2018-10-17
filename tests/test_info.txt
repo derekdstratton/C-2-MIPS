@@ -1,0 +1,2 @@
+Currently, you have to manually copy and paste the test files into cmake-build-debug. This should be automatic.
+It also needs to make sure that files read in are also spit back out properly for errors.
