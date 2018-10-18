@@ -1,63 +1,52 @@
 %{
-#include <string>
 
+//TODO deal with comments /* */
+//TODO: output source code and do column numbers
+
+/* Headers */
+
+#include <string>
 #include <string.h>
 #include <iostream>
 #include <utility>
 #include <sstream>
 #include <fstream>
-//#include "parse.tab.h"
-#include "SymbolTable.h"
 #include <stdlib.h>
-//TODO deal with comments
 #include <fstream>
 
+#include "SymbolTable.h"
 #include "Node.h"
+#include "parser.hpp"
+
+/* Global Variables*/
+
 SymbolTable * sym;
 bool isFunction; //true if function
 string type_specifier = "none";
 string type_qualifier = "none";
 string storage_class_specifier = "none";
 string signed_or_unsigned = "none";
-//#include "parse.tab.h"
-void outputErrorWarningPosition(string errmsg);
-void outputErrorWarning(bool errtype, string errmsg);
-#include "parser.hpp"
-extern FILE * yyin;
-//TODO: output source code and do column numbers
 stringstream sourceStream;
 string currentLine;
 int first_column = 0;
-/*Function declarations*/
-using namespace std;
-    //note: i'm shoving all my comments up here for lack of better space
-    //enumeration constant? i don't think that's even used;
-
-void processToken() //updates column number and outputs source code to file for each token
-{
-    //cout << "column right now is " << first_column << endl;
-    //cout << "Adding " << yytext << " to currentline" << endl;
-    //cout << "Adding " << yyleng << " spaces to first_column" << endl;
-    first_column += yyleng;
-    currentLine += yytext;
-}
-
 static bool insertModeFlag = false;
-void to_token_file(int token) {
-    first_column += yyleng;
-    currentLine += yytext;
-    ofstream tokenfile;
-    //cout << "this happened" << endl;
-    tokenfile.open("tokens.out", ios::app);
-    tokenfile << yytext << "\n";
-    tokenfile.close();
-}
+
+extern FILE * yyin;
+
+/* Function Declarations */
+//todo probably combine these three into one function
+void outputErrorWarningLine();
+void outputErrorWarningPosition(string errmsg);
+void outputErrorWarning(bool errtype, string errmsg);
+void processToken();
+void to_token_file(int token);
+
+using namespace std;
 
 %}
 
 %option noyywrap
 %option yylineno
-
 
 /*White space*/
 newLine [\n]
@@ -71,7 +60,6 @@ plain_real {integer}"."{integer}
 expreal {integer}"."{integer}[Ee][+-]?{integer}
 real {plain_real}|{expreal}
 
-
 identifier [a-zA-Z_][a-zA-Z_{digit}]*
 string_literal \"[^\"]*\"
 
@@ -81,13 +69,23 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{newLine} {/*cout << "clearing first_column and currentLine" << endl; */first_column = 0; currentLine.clear();yylloc.first_line++;}
-{ws} {processToken();}
+{newLine} {
+    first_column = 0; 
+    currentLine.clear();
+    yylloc.first_line++;
+    }
+{ws} {
+    processToken();
+    }
 
+"!!S" { 
+    cout << *getTable();
+    }
 
-"!!S" { cout << *getTable();}
-
-"!!M" { string s = getTable()->getMode() ? "Insert" : "Lookup"; cout << "Mode: " << s << endl;}
+"!!M" { 
+    string s = getTable()->getMode() ? "Insert" : "Lookup"; 
+    cout << "Mode: " << s << endl;
+    }
 
 typedef {
     if (getTable()->getMode()) {
@@ -426,7 +424,6 @@ return {
 {character_constant} {
     to_token_file(CHARACTER_CONSTANT);
     //passing escape characters
-    //cout << yytext[1] << endl;
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
             case 'n':
@@ -459,8 +456,6 @@ return {
     else {
         yylval.cval = yytext[1];
     }
-
-    //cout << yylval.cval;
     return (CHARACTER_CONSTANT); }
 {string_literal} {
     to_token_file(STRING_LITERAL);
@@ -502,15 +497,11 @@ return {
         } else {
             *lag = *lead;
         }
-        //cout << "Lead: " << *lead << ", Lag: " << *lag << endl;
         lead++;
         lag++;
     }
     *lag = '\0';
-    // len = strlen(strstart);
-    //cout << len << endl;
     yylval.sval = strstart;
-    //cout << yylval.sval << endl;
     return (STRING_LITERAL); }
 {real} {
     to_token_file(FLOATING_CONSTANT);
@@ -527,11 +518,8 @@ return {
 {identifier} {
     to_token_file(IDENTIFIER);
     if (yyleng > 31) {
-        //throw warning
-        //cerr << "too long buddy" << endl;
         outputErrorWarningPosition("too long buddy");
         outputErrorWarning(true, "Identifier name too long.");
-        //cerr << "Warning: Identifier name too long." << endl;
     }
     string s = yytext;
     Node x = Node(4, type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned);
@@ -580,25 +568,16 @@ return {
     return ( IDENTIFIER );}
 
 . { processToken();
-    /*while(string(yytext) != "\n")
-    {
-        cout << "yytext is " << string(yytext) << endl;
-        currentLine += yytext;
-        yylex();
-    }*/
-    //cout << "unrecognized token at line number " << yylineno << endl;
-    //cout << "first_column is " << first_column << endl;
-    cerr << currentLine << endl; //todo put this along with every error. except make a separate file pointer
-    /*
-    while(first_column-- > 1)
-        cerr << ' ';
-
-    cerr << "^ Unexpected character\n";
-     */
+    outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
     return (ERROR);}
 
 %%
+
+void outputErrorWarningLine() {
+    cerr << currentLine << endl;
+    //todo put this along with every error. except make a separate file pointer so it prints the whole line
+}
 
 void outputErrorWarningPosition(string errmsg) {
     int tmp = first_column;
@@ -612,4 +591,19 @@ void outputErrorWarningPosition(string errmsg) {
 void outputErrorWarning(bool errtype, string errmsg) {
     string s = errtype ? "Warning" : "Error";
     cerr << s << " on line " << yylineno << ": " << errmsg << endl;
+}
+
+void processToken() //updates column number and outputs source code to file for each token
+{
+    first_column += yyleng;
+    currentLine += yytext;
+}
+
+void to_token_file(int token) {
+    first_column += yyleng;
+    currentLine += yytext;
+    ofstream tokenfile;
+    tokenfile.open("tokens.out", ios::app);
+    tokenfile << yytext << "\n";
+    tokenfile.close();
 }
