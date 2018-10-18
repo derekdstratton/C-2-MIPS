@@ -18,6 +18,13 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
+
+# copy over the test files
+file(GLOB TEST_CASES
+        "tests/*.c"
+        )
+file(COPY ${TEST_CASES} DESTINATION ${PROJECT_BINARY_DIR}/tests)
+
 add_executable(ScannerParser SymbolTable.cpp SymbolTable.h Node.cpp Node.h
 ${BISON_MyParser_OUTPUTS}
 ${FLEX_MyScanner_OUTPUTS}

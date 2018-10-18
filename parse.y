@@ -23,10 +23,12 @@ stringstream prodStream;
 %}
 
 %union {
-    int ival;
+    long ival;
     float fval;
     char cval;
     char * sval;
+    //
+    void * vval;
 }
 
 %code provides {
@@ -62,6 +64,8 @@ stringstream prodStream;
 %token STRUCT UNION ENUM ELIPSIS RANGE
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%token ERROR
 
 %locations
 %error-verbose
@@ -514,10 +518,9 @@ extern int column;
 void yyerror (char const* s)
 {
     //string s ("syntax error, I am going to die now.");
-    cout << s << " AT LINE NUMBER " << yylloc.first_line << endl;
+    cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
-
 int main(int argc, char **argv)
 {
     //todo yyin file pointers
@@ -531,12 +534,13 @@ int main(int argc, char **argv)
         cout << "Opening file unsuccessful" << endl;
     //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
+
 	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
 	{
 	    ofstream myFile;
 	    myFile.open ("productions.txt");
-	    cout << "Dumping prodStream\n";
+	    //cout << "Dumping prodStream\n";
 	    string str = prodStream.str();
 	    myFile << str;
 	    myFile.close();

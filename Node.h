@@ -14,8 +14,9 @@ class Node {
     string type_qualifier;
     string storage_class_specifier;
     string signed_or_unsigned;
+    //todo single level SymbolTable for structs/unions, or a map
     int lineNum;
-    //todo struct or union or enums
+    //todo enums
     friend ostream& operator<<(ostream& os, const Node& node);
 };
 

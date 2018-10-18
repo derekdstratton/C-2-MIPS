@@ -23,7 +23,6 @@
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Best C Compiler
    </div>
-   <div id="projectbrief">The semester project for CS 460- Compiler Construction. Written by Chris Koh and Derek Stratton, Fall 2018.</div>
   </td>
  </tr>
  </tbody>
@@ -82,6 +81,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4ae4c247e136cd9d13224ba952fccb88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b7d90f3fa8a1d79f2cbeef555f1375f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a2b7d90f3fa8a1d79f2cbeef555f1375f">popLevel</a> ()</td></tr>
 <tr class="separator:a2b7d90f3fa8a1d79f2cbeef555f1375f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19c00aa8fc5c8bb3bccaa0ea50e0399"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#ac19c00aa8fc5c8bb3bccaa0ea50e0399">getMode</a> ()</td></tr>
+<tr class="separator:ac19c00aa8fc5c8bb3bccaa0ea50e0399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85dc0f5d1967eb533851fb80b38031ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a85dc0f5d1967eb533851fb80b38031ff">setMode</a> (const bool &amp;newMode)</td></tr>
+<tr class="separator:a85dc0f5d1967eb533851fb80b38031ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -108,6 +111,24 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac19c00aa8fc5c8bb3bccaa0ea50e0399"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac19c00aa8fc5c8bb3bccaa0ea50e0399">&#9670;&nbsp;</a></span>getMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SymbolTable::getMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
 <a id="afff93e49f2f86d85c33692bbf8f02583"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afff93e49f2f86d85c33692bbf8f02583">&#9670;&nbsp;</a></span>insert()</h2>
 
@@ -205,6 +226,30 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A tuple with two parts: First: a map pointer to the found node, or NULL if not found Second: a string indicating the status of if it is found, as such: "top"- found at the top level "other"- found at a level other than the top "not"- not found at all </dd></dl>
+
+</div>
+</div>
+<a id="a85dc0f5d1967eb533851fb80b38031ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85dc0f5d1967eb533851fb80b38031ff">&#9670;&nbsp;</a></span>setMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SymbolTable::setMode </td>
+          <td>(</td>
+          <td class="paramtype">const bool &amp;&#160;</td>
+          <td class="paramname"><em>newMode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">newMode</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
