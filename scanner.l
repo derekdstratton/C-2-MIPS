@@ -23,7 +23,7 @@ string signed_or_unsigned = "none";
 void outputErrorWarningPosition(string errmsg);
 void outputErrorWarning(bool errtype, string errmsg);
 #include "parser.hpp"
-
+extern FILE * yyin;
 //TODO: output source code and do column numbers
 stringstream sourceStream;
 string currentLine;
@@ -81,7 +81,7 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{newLine} {/*cout << "clearing first_column and currentLine" << endl; */first_column = 0; currentLine.clear();}
+{newLine} {/*cout << "clearing first_column and currentLine" << endl; */first_column = 0; currentLine.clear();yylloc.first_line++;}
 {ws} {processToken();}
 
 
@@ -588,7 +588,7 @@ return {
     }*/
     //cout << "unrecognized token at line number " << yylineno << endl;
     //cout << "first_column is " << first_column << endl;
-    //cout << currentLine << endl;
+    cerr << currentLine << endl; //todo put this along with every error. except make a separate file pointer
     /*
     while(first_column-- > 1)
         cerr << ' ';

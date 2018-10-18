@@ -14,6 +14,8 @@
 SymbolTable * table_ptr;
 
 using namespace std;
+
+extern FILE * yyin;
 //extern int line; //to keep track of line number for error
 void yyerror (char const *s);
 int yylex();
@@ -66,6 +68,7 @@ stringstream prodStream;
 %token ERROR
 
 %locations
+%error-verbose
 
 //user defined tokens
 /*
@@ -526,7 +529,10 @@ int main(int argc, char **argv)
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
-    yylloc.first_column = 0;
+    yyin = fopen(argv[2], "r");
+    if ( !yyin )
+        cout << "Opening file unsuccessful" << endl;
+    //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
 
 	//cout << "argv[1] is :" << argv[1] << endl;
@@ -534,7 +540,7 @@ int main(int argc, char **argv)
 	{
 	    ofstream myFile;
 	    myFile.open ("productions.txt");
-	    cout << "Dumping prodStream\n";
+	    //cout << "Dumping prodStream\n";
 	    string str = prodStream.str();
 	    myFile << str;
 	    myFile.close();
