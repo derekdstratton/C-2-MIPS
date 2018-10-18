@@ -104,13 +104,15 @@ void SymbolTable::pushLevel() {
 
 /**
  * Pops the top level from the stack
+ * @return Returns true if the level is successfully popped, false otherwise.
  */
-void SymbolTable::popLevel() {
+bool SymbolTable::popLevel() {
     if (table.size() == 1) {
         //cout << "popping the final level is bad, not gonna do it" << endl;
-        return;
+        return false;
     }
     table.pop_front();
+    return true;
 }
 
 /**

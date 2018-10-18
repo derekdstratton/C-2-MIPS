@@ -15,7 +15,7 @@ class SymbolTable {
     tuple<bool, bool> insert(const pair<string, Node>& item);
     tuple<map<string, Node>::iterator, string> search(const string& key, bool topLevelOnly=false);
     void pushLevel();
-    void popLevel();
+    bool popLevel();
     bool getMode();
     void setMode(const bool& newMode);
     friend ostream& operator<<(ostream& os, const SymbolTable& symbolTable);
