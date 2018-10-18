@@ -87,6 +87,8 @@ character_constant \'([^']|{escape_sequence})\'
 
 "!!S" { cout << *getTable();}
 
+"!!M" { string s = getTable()->getMode() ? "Insert" : "Lookup"; cout << "Mode: " << s << endl;}
+
 typedef {
     if (getTable()->getMode()) {
         insertModeFlag = true;

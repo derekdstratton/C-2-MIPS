@@ -518,7 +518,6 @@ void yyerror (char const* s)
     cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
-extern FILE *yyin;
 int main(int argc, char **argv)
 {
     //todo yyin file pointers
@@ -528,8 +527,6 @@ int main(int argc, char **argv)
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
     yylloc.first_column = 0;
-
-    //yyin = fopen("invalid_character.c", "r");
 	yyparse();
 
 	//cout << "argv[1] is :" << argv[1] << endl;
