@@ -17,7 +17,7 @@
 //#include "parse.tab.h"
 
 #include "parser.hpp"
-
+extern FILE * yyin;
 //TODO: output source code and do column numbers
 stringstream sourceStream;
 string currentLine;
@@ -74,7 +74,7 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{newLine} {cout << "clearing first_column and currentLine" << endl; first_column = 0; currentLine.clear();}
+{newLine} {cout << "clearing first_column and currentLine" << endl; first_column = 0; currentLine.clear(); yylloc.first_line++;}
 {ws} {processToken();}
 
 
@@ -433,12 +433,12 @@ return {
     return ( IDENTIFIER );}
 
 . { processToken();
-    while(string(yytext) != "\n")
+    /*while(string(yytext) != "\n")
     {
         cout << "yytext is " << string(yytext) << endl;
         currentLine += yytext;
         yylex();
-    }
+    }*/
     cout << "unrecognized token at line number " << yylineno << endl;
     cout << "first_column is " << first_column << endl;
     cout << currentLine << endl;
