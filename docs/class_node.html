@@ -23,7 +23,6 @@
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Best C Compiler
    </div>
-   <div id="projectbrief">The semester project for CS 460- Compiler Construction. Written by Chris Koh and Derek Stratton, Fall 2018.</div>
   </td>
  </tr>
  </tbody>
@@ -73,15 +72,25 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1d464f963fd32957c473ef5138cfff9b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a1d464f963fd32957c473ef5138cfff9b">Node</a> (int var)</td></tr>
-<tr class="separator:a1d464f963fd32957c473ef5138cfff9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abfad512bc51f55d9f082ca8db47a8c3e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#abfad512bc51f55d9f082ca8db47a8c3e">Node</a> (int var, string type_specifier_input, string type_qualifier_input, string storage_class_specifier_input, string signed_or_unsigned_input)</td></tr>
+<tr class="separator:abfad512bc51f55d9f082ca8db47a8c3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ac92c571228f56330b3e37ca1d43feb93"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#ac92c571228f56330b3e37ca1d43feb93">i</a></td></tr>
 <tr class="separator:ac92c571228f56330b3e37ca1d43feb93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aecd56f4c69b4b1a1fcdb985f92369541"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#aecd56f4c69b4b1a1fcdb985f92369541">thing</a></td></tr>
-<tr class="separator:aecd56f4c69b4b1a1fcdb985f92369541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d68f9d307f0496ac56a20faf79eef6b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a1d68f9d307f0496ac56a20faf79eef6b">isFunction</a></td></tr>
+<tr class="separator:a1d68f9d307f0496ac56a20faf79eef6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad01b789a6cbef299f7a202a213e171a3"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#ad01b789a6cbef299f7a202a213e171a3">type_specifier</a></td></tr>
+<tr class="separator:ad01b789a6cbef299f7a202a213e171a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3aca030b357c27bdffc489e20232d92"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#ad3aca030b357c27bdffc489e20232d92">type_qualifier</a></td></tr>
+<tr class="separator:ad3aca030b357c27bdffc489e20232d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d7d14c4747ccf9d9923919ecd09d50d"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a6d7d14c4747ccf9d9923919ecd09d50d">storage_class_specifier</a></td></tr>
+<tr class="separator:a6d7d14c4747ccf9d9923919ecd09d50d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a523eb084a76f95507ce69ec9911e8782"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#a523eb084a76f95507ce69ec9911e8782">signed_or_unsigned</a></td></tr>
+<tr class="separator:a523eb084a76f95507ce69ec9911e8782"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf52960f24b75141e67b9f8b61c0be1c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_node.html#acf52960f24b75141e67b9f8b61c0be1c">lineNum</a></td></tr>
+<tr class="separator:acf52960f24b75141e67b9f8b61c0be1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -89,8 +98,8 @@ Friends</h2></td></tr>
 <tr class="separator:afcca88ef670f8f35360d79dfb4563856"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a1d464f963fd32957c473ef5138cfff9b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1d464f963fd32957c473ef5138cfff9b">&#9670;&nbsp;</a></span>Node()</h2>
+<a id="abfad512bc51f55d9f082ca8db47a8c3e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abfad512bc51f55d9f082ca8db47a8c3e">&#9670;&nbsp;</a></span>Node()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -99,8 +108,36 @@ Friends</h2></td></tr>
           <td class="memname">Node::Node </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>var</em></td><td>)</td>
+          <td class="paramname"><em>var</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>type_specifier_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>type_qualifier_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>storage_class_specifier_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string&#160;</td>
+          <td class="paramname"><em>signed_or_unsigned_input</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -159,14 +196,84 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="aecd56f4c69b4b1a1fcdb985f92369541"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aecd56f4c69b4b1a1fcdb985f92369541">&#9670;&nbsp;</a></span>thing</h2>
+<a id="a1d68f9d307f0496ac56a20faf79eef6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d68f9d307f0496ac56a20faf79eef6b">&#9670;&nbsp;</a></span>isFunction</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void* Node::thing</td>
+          <td class="memname">bool Node::isFunction</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="acf52960f24b75141e67b9f8b61c0be1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf52960f24b75141e67b9f8b61c0be1c">&#9670;&nbsp;</a></span>lineNum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int Node::lineNum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a523eb084a76f95507ce69ec9911e8782"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a523eb084a76f95507ce69ec9911e8782">&#9670;&nbsp;</a></span>signed_or_unsigned</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string Node::signed_or_unsigned</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a6d7d14c4747ccf9d9923919ecd09d50d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6d7d14c4747ccf9d9923919ecd09d50d">&#9670;&nbsp;</a></span>storage_class_specifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string Node::storage_class_specifier</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad3aca030b357c27bdffc489e20232d92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3aca030b357c27bdffc489e20232d92">&#9670;&nbsp;</a></span>type_qualifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string Node::type_qualifier</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ad01b789a6cbef299f7a202a213e171a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad01b789a6cbef299f7a202a213e171a3">&#9670;&nbsp;</a></span>type_specifier</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string Node::type_specifier</td>
         </tr>
       </table>
 </div><div class="memdoc">

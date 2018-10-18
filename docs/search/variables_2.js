@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['bang',['BANG',['../parse_8y.html#af313ac871aeff0a4385aca83a73025b2',1,'parse.y']]],
-  ['break',['BREAK',['../parse_8y.html#a81bed5726796fba31edc333fbe5d4c36',1,'parse.y']]]
+  ['signed_5for_5funsigned',['signed_or_unsigned',['../class_node.html#a523eb084a76f95507ce69ec9911e8782',1,'Node']]],
+  ['storage_5fclass_5fspecifier',['storage_class_specifier',['../class_node.html#a6d7d14c4747ccf9d9923919ecd09d50d',1,'Node']]]
 ];

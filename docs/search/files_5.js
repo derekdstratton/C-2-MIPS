@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['test_2edox',['test.dox',['../test_8dox.html',1,'']]]
+  ['wiki_2edox',['wiki.dox',['../wiki_8dox.html',1,'']]]
 ];

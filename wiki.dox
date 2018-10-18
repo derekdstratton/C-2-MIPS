@@ -1,47 +1,63 @@
-/*! \mainpage My Personal Index Page
+//Main Page:
+ * /*! \mainpage Index
  *
- * \section intro_sec Introduction
+ * This is the formal documentation for the C Compiler project. [more overview details]
  *
- * This is the introduction.
+ * \section contents Table of Contents
  *
- * \section install_sec Installation
+ * \ref symtable : The Symbol Table for the compiler.
  *
- * \subsection step1 Step 1: Opening the box
+ * \ref scanner : The Scanner for the compiler.
  *
- * etc...
+ * \ref parser : The Parser for the compiler.
+ *
+ * \section run_instr Instructions for Running the Compiler
+ *
+ * This is where you say how to run things.
+ *
  */
 
-/*! \page page1 A documentation page
-  \tableofcontents
-  Leading text.
-  \section sec An example section
-  This page contains the subsections \ref subsection1 and \ref subsection2.
-  For more info see page \ref page2.
-  \subsection subsection1 The first subsection
-  Text.
-  \subsection subsection2 The second subsection
-  More text.
+ //Symbol Table:
+/*! \page symtable Symbol Table
+ *
+ * insert overview details
+ *
+   \section test_symtable Testing the Symbol Table
+
+   how to run the tests
+
+   \section links_symtable Links
+
+  links to actual file, test cases, and outputs
 */
 
-/*! \page page2 Another page
+//Scanner:
+/*! \page scanner Scanner
+ *
+  insert overview details
+
+  \section test_scanner Testing the Scanner
+
+  put stuff
+
+  \section links_scanner Links
+  links to actual file, test cases, and outputs
+*/
+
+//Parser:
+/*! \page parser Parser
+ *
   Even more info.
+
+  \section test_parser Testing the Parser
+
+  can probably copy/paste this from scanner one
+
+  \section links_parser Links
+
+  links to actual file, test cases, and outputs
 */
 
-/**
- * Your Project Repository Wiki shoudl be created in such a way that it has all the information appropriate for a User Manual and a Technical Manual in it
-Table of Contents (first page with links to others)
-Overview of the document
-Your name, course, date, etc.
-Language features of the compiler
-Implementation (symbol tables, etc.)
-Assumptions Made (Line length,etc.)
-Restrictions (Number of errors before it quits,etc.)
-Directions to run your program, location of the files
-Description of each Module with source file links, test cases and their outputs, and other items you think are appropriate
- */
+//Reference:
 
 // https://www.stack.nl/~dimitri/doxygen/manual/commands.html
-
-//look into this as well to make this a .md file https://www.stack.nl/~dimitri/doxygen/manual/markdown.html
-
-//gcc test.c -o test -pedantic -std=c89
