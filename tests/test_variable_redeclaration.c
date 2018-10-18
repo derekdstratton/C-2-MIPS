@@ -1,4 +1,5 @@
-//
-// Created by Derek Stratton on 10/17/2018.
-//
-
+int main() {
+    int x;
+    short x;
+    return 0;
+}
