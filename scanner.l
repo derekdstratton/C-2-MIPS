@@ -17,7 +17,9 @@
 //#include "parse.tab.h"
 
 #include "parser.hpp"
+extern bool debug[4];
 extern FILE * yyin;
+extern char* fileName;
 //TODO: output source code and do column numbers
 stringstream sourceStream;
 string currentLine;
@@ -29,9 +31,6 @@ using namespace std;
 
 void processToken() //updates column number and outputs source code to file for each token
 {
-    cout << "column right now is " << first_column << endl;
-    cout << "Adding " << yytext << " to currentline" << endl;
-    cout << "Adding " << yyleng << " spaces to first_column" << endl;
     first_column += yyleng;
     currentLine += yytext;
 }
@@ -39,11 +38,13 @@ void processToken() //updates column number and outputs source code to file for 
 void to_token_file(int token) {
     first_column += yyleng;
     currentLine += yytext;
-    ofstream tokenfile;
-    //cout << "this happened" << endl;
-    tokenfile.open("tokens.out", ios::app);
-    tokenfile << yytext << "\n";
-    tokenfile.close();
+    if (debug[0] && debug[1]) {
+        ofstream tokenfile;
+        tokenfile.open("tokens.out", ios::app);
+        tokenfile << yytext << " " << token << "\n";
+        tokenfile.close();
+    }
+    yylloc.first_line = yylineno;
 }
 
 %}
@@ -74,7 +75,7 @@ character_constant \'([^']|{escape_sequence})\'
 
 %%
 
-{newLine} {cout << "clearing first_column and currentLine" << endl; first_column = 0; currentLine.clear(); yylloc.first_line++;}
+{newLine} {first_column = 0; currentLine.clear(); yylloc.first_line++; }
 {ws} {processToken();}
 
 
@@ -180,9 +181,33 @@ return {
     to_token_file(SEMI);
     return (SEMI);}
 "{" {
+    if(debug[0] && debug[2])
+    {
+        cout << "Dumping symbol table at line " << yylineno << endl;
+        cout << symbolTable;
+        if(debug[3])
+        {
+            ofstream SymDump;
+            SymDump.open("SymDump.out", ios::app);
+            SymDump << symbolTable << "\n\n";
+            SymDump.close();
+        }
+    }
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
+    if(debug[0] && debug[2])
+    {
+        cout << "Dumping symbol table at line " << yylineno << endl;
+        cout << symbolTable;
+        if(debug[3])
+        {
+            ofstream SymDump;
+            SymDump.open("SymDump.out", ios::app);
+            SymDump << symbolTable << "\n\n";
+            SymDump.close();
+        }
+    }
     to_token_file(CLOSCUR);
     return (CLOSCUR);}
 "," {
@@ -439,8 +464,14 @@ return {
         currentLine += yytext;
         yylex();
     }*/
+    ifstream errInput;
+    errInput.open(fileName);
+    for(int i = 0; i < yylineno - 1; i++)
+    {
+        getline(errInput, currentLine);
+    }
+    getline(errInput, currentLine);
     cout << "unrecognized token at line number " << yylineno << endl;
-    cout << "first_column is " << first_column << endl;
     cout << currentLine << endl;
     while(first_column-- > 1)
         cout << ' ';

@@ -5,6 +5,9 @@
 #include <cctype>
 #include <string>
 #include <sstream>
+#include <cstdio>
+#include <stdio.h>
+#include <string.h>
 
 #include <fstream>
 #include <string>
@@ -12,12 +15,13 @@
 //TODO add in debug option to turn off/on all productions
 
 using namespace std;
-
 extern FILE * yyin;
-//extern int line; //to keep track of line number for error
+bool debug[4]; // -d, -l, -s, -o
+char* fileName;
 void yyerror (char const *s);
 int yylex();
 stringstream prodStream;
+#define YYDEBUG 1
 %}
 
 %union {
@@ -51,6 +55,7 @@ stringstream prodStream;
 
 %locations
 %error-verbose
+%debug
 
 //user defined tokens
 /*
@@ -509,12 +514,28 @@ int main(int argc, char **argv)
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
-    yyin = fopen(argv[2], "r");
+    for(int i = 0; i < 4; i++)
+        debug[i] = false;
+    for(int i = 1; i < argc; i++)
+    {
+        if(strcmp(argv[i],"-d") == 0)
+            debug[0] = true;
+        else if(strcmp(argv[i],"-l") == 0)
+            debug[1] = true;
+        else if(strcmp(argv[i],"-s") == 0)
+            debug[2] = true;
+        else if(strcmp(argv[i],"-o") == 0)
+            debug[3] = true;
+    }
+    /*cout << "debug array is "<< endl;
+    for(int i = 0; i < 4; i++)
+        cout << "debug[i] is " << debug[i] << endl;*/
+    yyin = fopen(argv[argc - 1], "r");
     if ( !yyin )
         cout << "Opening file unsuccessful" << endl;
+    fileName = argv[argc - 1];
     //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
-	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
 	{
 	    ofstream myFile;
