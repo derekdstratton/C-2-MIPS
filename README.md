@@ -29,8 +29,8 @@ make
 
 ### Usage:
 
-- To run the Scanner/Parser, type `./ScannerParser [options] [file_path]`
-- To run the Symbol Table driver, type `./SymbolTable`
+- To run the Scanner/Parser, type `./ScannerParser [options] file_path`
+- To run the Symbol Table driver, type `./SymbolTableTest`
 
 ### Wiki:
 

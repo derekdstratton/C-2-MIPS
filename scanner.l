@@ -544,18 +544,34 @@ return {
     return (STRING_LITERAL); }
 {real} {
     to_token_file(FLOATING_CONSTANT);
+    long num = atol(yytext);
+    string orig = yytext;
+    string updated = to_string(num);
+    if (orig != updated) {
+        //cout << "aaaah";
+        for(int i = 0; i < yyleng; i++)
+            columnQueue.pop_back();
+        outputError("too long buddy", "Floating Constant too long.", true);
+    }
+    //todo check size
     yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT);
     //test if the integer is too big, aka bigger than a long
-    char * max_int = "2147483647";
-    char * min_int = "2147483648";
+    long num = atol(yytext);
+    string orig = yytext;
+    string updated = to_string(num);
+    if (orig != updated) {
+        //cout << "aaaah";
+        for(int i = 0; i < yyleng; i++)
+            columnQueue.pop_back();
+        outputError("too long buddy", "Integer Constant too long.", true);
+    }
     //todo check size for a long, c string compare
     yylval.ival = atol(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
-    to_token_file(IDENTIFIER);
     if (yyleng > 31) {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
@@ -563,8 +579,8 @@ return {
     }
     string s = yytext;
     Node x = Node();
-    x.setLineNumber(1); //todo
-    x.setColumnNumber(2); //todo
+    x.setLineNumber(yylineno);
+    x.setColumnNumber(columnQueue.size() - yyleng + 1);
     x.setTypeSpecifier(type_specifier);
     x.setTypeQualifier(type_qualifier);
     x.setStorageClassSpecifier(storage_class_specifier);
@@ -581,9 +597,12 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
-            for(int i = 0; i < yyleng; i++)
+            for(int i = 0; i < yyleng; i++) {
                 columnQueue.pop_back();
+            }
+                to_token_file(ERROR);
                 outputError("Not found", "Identifier not defined.", false);
+                return (ERROR);
             }
         } else {
             //this is a normal insert
@@ -594,7 +613,9 @@ return {
             if (!insertSuccess) {
                 for(int i = 0; i < yyleng; i++)
                     columnQueue.pop_back();
+                to_token_file(ERROR);
                 outputError("Already exists", "Variable already exists on this scope.", false);
+                return (ERROR);
             } else if (!notShadowing) {
                 for(int i = 0; i < yyleng; i++)
                     columnQueue.pop_back();
@@ -602,7 +623,7 @@ return {
             }
         }
     } else {
-        cout << "going else" << endl;
+        //cout << "going else" << endl;
         //currently in lookup mode
         //lookup mode operations
         tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
@@ -612,13 +633,17 @@ return {
         if (status == "not") {
             for(int i = 0; i < yyleng; i++)
                 columnQueue.pop_back();
+            to_token_file(ERROR);
             outputError("Not found", "Identifier not defined.", false);
+            return (ERROR);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
+    to_token_file(IDENTIFIER);
     return ( IDENTIFIER );}
 
 . {
+    to_token_file(ERROR);
     outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
     return (ERROR);

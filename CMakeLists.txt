@@ -5,8 +5,8 @@ set(CMAKE_CXX_STANDARD 11)
 
 # Symbol Table
 
-set(SYMBOL_TABLE SymbolTableDriver.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
-add_executable(SymbolTable ${SYMBOL_TABLE})
+set(SYMBOL_TABLE SymbolTableTest.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+add_executable(SymbolTableTest ${SYMBOL_TABLE})
 
 # Scanner/Parser
 
