@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Best C Compiler: Symbol Table</title>
+<title>C 2 MIPS: Symbol Table</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Best C Compiler
+   <div id="projectname">C 2 MIPS
    </div>
   </td>
  </tr>
@@ -62,23 +62,33 @@ $(function() {
 <div class="title">Symbol Table </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The Symbol Table is a class that communicates with the Scanner and Parser to track and store data about identifiers encountered. The main table variable in the class is a list of maps that have a key of type string and a value of type <a class="el" href="class_node.html">Node</a>. The list is treated like a stack. The Node class is a collection of data corresponding to each identifier. For more information about the technical details of these classes, view the <a class="el" href="class_symbol_table.html">SymbolTable</a> or <a class="el" href="class_node.html">Node</a> page.</p>
+<div class="textblock"><p>The Symbol Table is a class that communicates with the Scanner and Parser to track and store data about identifiers encountered. The main table variable in the class is a list of maps that have a key of type string and a value of type Node. The list is treated like a stack. The Node class is a collection of data corresponding to each identifier. For more information about the technical details of these classes, view the <a class="el" href="class_symbol_table.html">SymbolTable</a> or <a class="el" href="class_node.html">Node</a> page.</p>
+<h1><a class="anchor" id="drive_symtable"></a>
+Symbol Table Driver</h1>
+<p>The Symbol Table can be run with the driver <a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableDriver.cpp">https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableDriver.cpp</a>.</p>
+<p>To run the test driver, run <code>./SymbolTableDriver</code>. The prompt gives details of how to use the Symbol Table.</p>
 <h1><a class="anchor" id="test_symtable"></a>
 Testing the Symbol Table</h1>
-<p>The Symbol Table can be tested with the test driver <a class="el" href="_symbol_table_driver_8cpp.html">SymbolTableDriver.cpp</a>.</p>
-<p>To run the test driver, run <code>SymbolTable</code> in CLion.</p>
+<p>The Symbol Table can be tested with the test driver <a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableTest.cpp">https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableTest.cpp</a>.</p>
+<p>To run the test driver, run <code>./SymbolTableTest</code></p>
+<p>To view the output, go to this file:</p>
+<ul>
+<li><p class="startli"><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableTestOutput.txt">https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableTestOutput.txt</a></p>
+<p class="startli">Note, the Symbol Table test driver inputs default empty nodes. They have a default line number of -1, default column number of -1, and type int.</p>
+</li>
+</ul>
 <p>From there, the program will prompt you to add a number corresponding to the desired test case. The numbers can be found in the documentation for <a class="el" href="_symbol_table_driver_8cpp.html">SymbolTableDriver.cpp</a> or in the comments of that file in the source code.</p>
 <h1><a class="anchor" id="links_symtable"></a>
 Links</h1>
 <p>Symbol Table Class Documentation: <a class="el" href="class_symbol_table.html">SymbolTable</a></p>
 <p>Symbol Table Source Code:</p><ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.cpp">https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.cpp</a></li>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.h">https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.h</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.cpp">https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.cpp</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.h">https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.h</a></li>
 </ul>
 <p>Node Class Documentation: <a class="el" href="class_node.html">Node</a></p>
 <p>Node Source Code:</p><ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.cpp">https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.cpp</a></li>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.h">https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.h</a> </li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.cpp">https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.cpp</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.h">https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.h</a> </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->

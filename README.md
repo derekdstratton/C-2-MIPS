@@ -1,4 +1,4 @@
-# Best C Compiler
+# C 2 MIPS
 
 For CS 460, Compiler Construction, Fall 2018
 
@@ -22,7 +22,7 @@ be found in the [wiki](https://derekdstratton.github.io/Best-C-Compiler/).
 ### Installation: 
 
 ```
-git clone https://github.com/derekdstratton/Best-C-Compiler
+git clone https://github.com/derekdstratton/C-2-MIPS
 cmake Best-C-Compiler
 make
 ```
@@ -31,7 +31,8 @@ make
 
 - To run the Scanner/Parser, type `./ScannerParser [options] file_path`
 - To run the Symbol Table driver, type `./SymbolTableDriver`
+- To run the Symbol Table Test driver, type `./SymbolTableTest`
 
 ### Wiki:
 
-https://derekdstratton.github.io/Best-C-Compiler/
+https://derekdstratton.github.io/C-2-MIPS

@@ -49,7 +49,6 @@ using namespace std;
 }
 
 %code provides {
-    //void apple();
     SymbolTable * getTable();
 }
 

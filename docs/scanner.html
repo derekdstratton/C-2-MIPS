@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Best C Compiler: Scanner</title>
+<title>C 2 MIPS: Scanner</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Best C Compiler
+   <div id="projectname">C 2 MIPS
    </div>
   </td>
  </tr>
@@ -62,25 +62,36 @@ $(function() {
 <div class="title">Scanner </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>insert overview details</p>
+<div class="textblock"><p>The Scanner is written in C++ and runs with Flex. The Scanner returns tokens and outputs tokens to file. It also recognizes special debug tokens, and causes output from them. When the Scanner sees identifiers, it stores them along with other information like the line number. It also tracks and outputs warning such as identifiers being too long and integer constants being too long.</p>
 <h1><a class="anchor" id="test_scanner"></a>
 Testing the Scanner</h1>
 <p>The Scanner can be tested by running the Test Files with <code>ScannerParser</code>. The program argument should contain a file from the tests folder.</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests">https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests</a></li>
 </ul>
 <p>These tests can be compared with their outputs, found in the tests/output directory.</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output">https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output</a></li>
 </ul>
 <h1><a class="anchor" id="tech_details"></a>
 Technical Details</h1>
-<p>salkdfjlk</p>
+<h2><a class="anchor" id="debug_tokens"></a>
+Debug Tokens</h2>
+<p><code>!!S</code>: Dumps all Symbol Table info to output stream</p>
+<p><code>!!M</code>: Outputs Symbol Table mode</p>
+<p><code>!!P</code>: Toggles production output to file on and off</p>
+<h2><a class="anchor" id="error_warn"></a>
+Errors and Warnings Output</h2>
+<p>Identifier Too Large: A warning is thrown if an identifier is over 31 characters long.</p>
+<p>Integer Too Large: A warning is thrown if an integer constant does not fit in the space for an int.</p>
+<p>Float Too Large: A warning is thrown if a floating constant does not fit in the space for a float.</p>
+<p>Shadowing Error: A warning is thrown if a variable is shadowing one from an outer scope.</p>
+<p>Redeclaration Error: An error is thrown is a variable is redeclared in the same scope.</p>
 <h1><a class="anchor" id="links_scanner"></a>
 Links</h1>
 <p>Scanner Lex File:</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/scanner.l">https://github.com/derekdstratton/Best-C-Compiler/blob/master/scanner.l</a> </li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/scanner.l">https://github.com/derekdstratton/C-2-MIPS/blob/master/scanner.l</a> </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->

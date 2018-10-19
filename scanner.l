@@ -1,5 +1,7 @@
 %{
 
+//TODO deal with comments /* */
+
 /* Headers */
 
 #include <string>
@@ -539,8 +541,8 @@ return {
     yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
+    float num = stof(yytext);
     to_token_file(FLOATING_CONSTANT, "FLOATING_CONSTANT");
-    long num = atol(yytext);
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
@@ -554,8 +556,9 @@ return {
 {integer} {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
     //test if the integer is too big, aka bigger than a long
-    long num = atol(yytext);
-    string orig = yytext;    string updated = to_string(num);
+    long num = stol(yytext);
+    string orig = yytext;
+    string updated = to_string(num);
     if (orig != updated) {
         for(int i = 0; i < yyleng+1; i++)
             columnQueue.pop_back();

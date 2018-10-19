@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['index',['Index',['../index.html',1,'']]],
-  ['insert',['insert',['../class_symbol_table.html#afff93e49f2f86d85c33692bbf8f02583',1,'SymbolTable']]],
-  ['insertconflict',['insertConflict',['../_symbol_table_driver_8cpp.html#a5305269bdfc1f441ad81bec6f0301fea',1,'SymbolTableDriver.cpp']]],
-  ['insertshadowing',['insertShadowing',['../_symbol_table_driver_8cpp.html#a3c97bc4861d418cc836b6462736e451a',1,'SymbolTableDriver.cpp']]]
+  ['enum',['Enum',['../_node_8h.html#a609af7e79694833e6dec688969d7d916a15dfdbfcfc62a618920124c6cd0cdd78',1,'Node.h']]],
+  ['extern',['Extern',['../_node_8h.html#a1d7616a95b013a6e7f8fbe47dfad3290acc2095146c832d047006acd1fbad8d40',1,'Node.h']]]
 ];

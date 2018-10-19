@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Best C Compiler: Parser</title>
+<title>C 2 MIPS: Parser</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Best C Compiler
+   <div id="projectname">C 2 MIPS
    </div>
   </td>
  </tr>
@@ -62,25 +62,33 @@ $(function() {
 <div class="title">Parser </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Even more info.</p>
+<div class="textblock"><p>The Parser receives tokens from the Scanner and creates productions from them and finds syntax errors. It is written in C++ and runs with Bison. This file defines the tokens and the productions for the grammar. It also contains the main function for running the ScannerParser, which includes options for the command line arguments. The Symbol Table is declared in this file as well (and the Lex file has access to it). The source code interspersed with productions is printed to a file called list_file by default after running the Parser.</p>
 <h1><a class="anchor" id="test_parser"></a>
 Testing the Parser</h1>
 <p>The Parser can be tested by running the Test Files with <code>ScannerParser</code>. The program argument should contain a file from the tests folder.</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests">https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests</a></li>
 </ul>
 <p>These tests can be compared with their outputs, found in the tests/output directory.</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output">https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output</a></li>
 </ul>
 <h1><a class="anchor" id="tech_details"></a>
 Technical Details</h1>
-<p>salkdfjlk</p>
+<h2><a class="anchor" id="debug_options"></a>
+Command Line Debug Options</h2>
+<ul>
+<li><code>-d</code>: enables the -l and -s debug flags to work</li>
+<li><code>-l</code>: outputs the source code token, the token name, and token value of all tokens to a file called tokens.out</li>
+<li><code>-s</code>: dumps the symbol table at the beginning and end of each block to a file called SymDump.out</li>
+<li><code>-p</code>: outputs recorded productions to a file called productions.out. The token '!!P' in the source file toggles on and off recording the productions. By default, production recording is turned on.</li>
+<li><code>-o</code>: outputs the final output of the parser (source code interspersed with reductions) to be written to a specific file. The -o flag must be followed by a space and then the file name. If the -o flag is not used, this final output is written to list_file.</li>
+</ul>
 <h1><a class="anchor" id="links_parser"></a>
 Links</h1>
 <p>Parser Yacc File:</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/Best-C-Compiler/blob/master/parse.y">https://github.com/derekdstratton/Best-C-Compiler/blob/master/parse.y</a> </li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/blob/master/parse.y">https://github.com/derekdstratton/C-2-MIPS/blob/master/parse.y</a> </li>
 </ul>
 </div></div><!-- contents -->
 <!-- start footer part -->
