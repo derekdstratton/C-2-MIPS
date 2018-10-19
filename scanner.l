@@ -1,7 +1,5 @@
 %{
 
-//TODO deal with comments /* */
-
 /* Headers */
 
 #include <string>
@@ -12,6 +10,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <deque>
+
 #include "SymbolTable.h"
 #include "Node.h"
 #include "parser.hpp"
@@ -291,6 +290,7 @@ return {
     to_token_file(SEMI, "SEMI");
     return (SEMI);}
 "{" {
+    getTable()->pushLevel();
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
@@ -318,6 +318,7 @@ return {
         SymDump << *getTable() << "\n\n";
         SymDump.close();
     }
+    getTable()->popLevel();
     to_token_file(CLOSCUR, "CLOSECUR");
     return (CLOSCUR);}
 "," {
@@ -543,8 +544,7 @@ return {
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
-        //cout << "aaaah";
-        for(int i = 0; i < yyleng; i++)
+        for(int i = 0; i < yyleng+1; i++)
             columnQueue.pop_back();
         outputError("too long buddy", "Floating Constant too long.", true);
     }
@@ -555,11 +555,9 @@ return {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
     //test if the integer is too big, aka bigger than a long
     long num = atol(yytext);
-    string orig = yytext;
-    string updated = to_string(num);
+    string orig = yytext;    string updated = to_string(num);
     if (orig != updated) {
-        //cout << "aaaah";
-        for(int i = 0; i < yyleng; i++)
+        for(int i = 0; i < yyleng+1; i++)
             columnQueue.pop_back();
         outputError("too long buddy", "Integer Constant too long.", true);
     }
@@ -567,6 +565,7 @@ return {
     yylval.ival = atol(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
+    to_token_file(IDENTIFIER, "IDENTIFIER");
     if (yyleng > 31) {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
@@ -592,12 +591,11 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
-            for(int i = 0; i < yyleng; i++) {
+            for(int i = 0; i < yyleng+1; i++) {
                 columnQueue.pop_back();
             }
                 to_token_file(ERROR, "ERROR");
                 outputError("Not found", "Identifier not defined.", false);
-                return (ERROR);
             }
         } else {
             //this is a normal insert
@@ -606,11 +604,10 @@ return {
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
             if (!insertSuccess) {
-                for(int i = 0; i < yyleng; i++)
+                for(int i = 0; i < yyleng+1; i++)
                     columnQueue.pop_back();
                 to_token_file(ERROR, "ERROR");
                 outputError("Already exists", "Variable already exists on this scope.", false);
-                return (ERROR);
             } else if (!notShadowing) {
                 for(int i = 0; i < yyleng; i++)
                     columnQueue.pop_back();
@@ -626,22 +623,24 @@ return {
         string status;
         tie(it, status) = result;
         if (status == "not") {
-            for(int i = 0; i < yyleng; i++)
+            for(int i = 0; i < yyleng+1; i++)
                 columnQueue.pop_back();
             to_token_file(ERROR, "ERROR");
             outputError("Not found", "Identifier not defined.", false);
-            return (ERROR);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
     to_token_file(IDENTIFIER, "IDENTIFIER");
-    return ( IDENTIFIER );}
+    return ( IDENTIFIER );
+}
+    /*return ( IDENTIFIER );}*/
 
 . {
+    for(int i = 0; i < yyleng; i++)
+        columnQueue.pop_back();
     to_token_file(ERROR, "ERROR");
-    outputErrorWarningLine();
-    outputErrorWarningPosition("Unexpected Character");
-    return (ERROR);
+    outputError("Invalid", "Invalid character", false);
+    exit(0);
   }
 
 
@@ -651,6 +650,8 @@ void outputError(string errmsg1, string errmsg2, bool errtype) {
     outputErrorWarningLine();
     int columnNum = outputErrorWarningPosition(errmsg1);
     outputErrorWarning(errtype, errmsg2, columnNum);
+    if(!errtype)
+        exit(0);
 }
 
 void outputErrorWarningLine(){
@@ -700,7 +701,7 @@ void to_token_file(int token, string tokName) {
         pStream.open("list_file", ios::app);
 
     pStream << endl << yytext << endl << endl;
-    for(int i =0; i < yyleng; i++)
+    for(int i = 0; i < yyleng; i++)
         columnQueue.push_back(' ');
     if(debug[1] && debug[0]) {
         ofstream tokenfile;

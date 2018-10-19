@@ -1,0 +1,5 @@
+    short x;
+          ^ Already exists
+Error on line 3 (column 11): Variable already exists on this scope.
+
+Process finished with exit code 0
