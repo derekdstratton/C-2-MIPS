@@ -541,7 +541,7 @@ return {
     return (STRING_LITERAL); }
 {real} {
     to_token_file(FLOATING_CONSTANT);
-    long num = atol(yytext);
+    float num = stof(yytext);
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
@@ -556,7 +556,7 @@ return {
 {integer} {
     to_token_file(INTEGER_CONSTANT);
     //test if the integer is too big, aka bigger than a long
-    long num = atol(yytext);
+    long num = stol(yytext);
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
@@ -623,6 +623,11 @@ return {
         //cout << "going else" << endl;
         //currently in lookup mode
         //lookup mode operations
+        /*if (insertModeFlag) {
+            for(int i = 0; i < yyleng; i++)
+                columnQueue.pop_back();
+            outputError("Not in Insert Mode", "Currently in Lookup Mode.", false);
+        }*/
         tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
         map<string, Node>::iterator it;
         string status;

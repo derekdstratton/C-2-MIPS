@@ -64,8 +64,7 @@ $(function() {
 <div class="contents">
 <div class="textblock"><p>This is the formal documentation for the Compilers project. This was written by Derek Stratton and Chris Koh for CS 460. This is published for the demonstration on October 19, 2018. The compiler's end goal is to translate source code in ANSI C to target code in MIPS Assembler code. Currently, the project contains a scanner and a parser integrated with a Symbol Table, and it can output tokens or productions.</p>
 <p>The compiler is written in C++. The Symbol Table is implemented as a class that integrates with the scanner and parser. The scanner is implemented as a Lex (.l) file that processes an input character stream and returns tokens. The parser is implemented as a Yacc (.l) file that processes tokens from the scanner and returns productions. The scanner uses Flex and the parser uses Bison for compilation. The Compiler's build is automated with CMake, and it is being written and tested with the IDE CLion.</p>
-<p>Some assumptions for this phase include that the Symbol Table does not have to process structs, unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode escape characters are not input. The compiler is restricted to receiving a character stream from a file, and not from stdin.</p>
-<p>Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums. Also assuming no escape character octals or hex</p>
+<p>Some assumptions for this phase include that the Symbol Table does not have to process structs, unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode escape characters are not input. The compiler is restricted to receiving a character stream from a file, and not from stdin. Functions are also restricted from having the same name as variables in the Symbol Table.</p>
 <h1><a class="anchor" id="module"></a>
 Modules</h1>
 <p><a class="el" href="symtable.html">Symbol Table</a> : The Symbol Table for the compiler.</p>
@@ -83,11 +82,8 @@ Running the ScannerParser</h2>
 <p><code>./ScannerParser [options] file_path</code></p>
 <p>options:</p>
 <ul>
-<li><code>-d</code>:</li>
-<li><code>-l</code>:</li>
-<li><code>-s</code>:</li>
-<li><code>-p</code>:</li>
-<li><code>-o</code>:</li>
+<li><code>-d</code>, <code>-l</code>, <code>-s</code>, <code>-p</code>, <code>-o</code></li>
+<li>more details on the Parser page</li>
 </ul>
 <p>file_path:</p>
 <ul>

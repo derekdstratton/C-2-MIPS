@@ -18,10 +18,8 @@
  * Some assumptions for this phase include that the Symbol Table does not have to process structs,
  * unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode
  * escape characters are not input. The compiler is restricted to receiving a character stream
- * from a file, and not from stdin.
- *
- * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums.
- * Also assuming no escape character octals or hex
+ * from a file, and not from stdin. Functions are also restricted from having the same name as
+ * variables in the Symbol Table.
  *
  * \section module Modules
  *
@@ -47,15 +45,9 @@
 
     options:
 
-    - `-d`:
+    - `-d`, `-l`, `-s`, `-p`, `-o`
 
-    - `-l`:
-
-    - `-s`:
-
-    - `-p`:
-
-    - `-o`:
+    - more details on the Parser page
 
     file_path:
 
@@ -77,13 +69,13 @@
  *
  * The Symbol Table can be run with the driver https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTableDriver.cpp.
  *
- * The prompt gives details of how to use the Symbol Table.
+ * To run the test driver, run `./%SymbolTableDriver`. The prompt gives details of how to use the Symbol Table.
  *
    \section test_symtable Testing the Symbol Table
 
    The Symbol Table can be tested with the test driver https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTableTest.cpp.
 
-  To run the test driver, run `%SymbolTableTest` in CLion.
+  To run the test driver, run `./%SymbolTableTest`
 
   To view the output, go to this file:
 
@@ -136,11 +128,23 @@
 
   \subsection debug_tokens Debug Tokens
 
-  ksadjlkf
+  `!!S`: Dumps all Symbol Table info to output stream
+
+  `!!M`: Outputs Symbol Table mode
+
+  `!!P`: Toggles production output to file on and off
 
   \subsection error_warn Errors and Warnings Output
 
-  dsfasd
+  Identifier Too Large: A warning is thrown if an identifier is over 31 characters long.
+
+  Integer Too Large: A warning is thrown if an integer constant does not fit in the space for an int.
+
+  Float Too Large: A warning is thrown if a floating constant does not fit in the space for a float.
+
+  Shadowing Error: A warning is thrown if a variable is shadowing one from an outer scope.
+
+  Redeclaration Error: An error is thrown is a variable is redeclared in the same scope.
 
   \section links_scanner Links
 
@@ -157,7 +161,8 @@
   defines the tokens and the productions for the grammar. It also contains the
   main function for running the ScannerParser, which includes options for the
   command line arguments. The Symbol Table is declared in this file as well (and
-  the Lex file has access to it).
+  the Lex file has access to it). The source code interspersed with productions
+  is printed to a file called list_file by default after running the Parser.
 
   \section test_parser Testing the Parser
 
@@ -174,7 +179,18 @@
 
   \subsection debug_options Command Line Debug Options
 
-  lksdajflksdaj
+    - `-d`: enables the -l and -s debug flags to work
+
+    - `-l`: outputs the source code token, the token name, and token value of all tokens to a file called tokens.out
+
+    - `-s`: dumps the symbol table at the beginning and end of each block to a file called SymDump.out
+
+    - `-p`: outputs recorded productions to a file called productions.out. The token '!!P' in the source
+    file toggles on and off recording the productions. By default, production recording is turned on.
+
+    - `-o`: outputs the final output of the parser (source code interspersed with reductions) to
+    be written to a specific file. The -o flag must be followed by a space and then the file name.
+    If the -o flag is not used, this final output is written to list_file.
 
   \section links_parser Links
 
