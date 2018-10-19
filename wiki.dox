@@ -76,7 +76,7 @@
 
   To view the output, go to this file:
 
-  -
+  - 
 
   * Note, the Symbol Table test driver inputs default empty nodes. They have a default
   * line number of -1, default column number of -1, and type int.

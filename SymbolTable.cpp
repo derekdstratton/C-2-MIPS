@@ -28,6 +28,7 @@ tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
     if (retval == "top") {
         return make_tuple(false, false);
     } else if (retval == "other") {
+        table.front().insert(item);
         return make_tuple(true, false);
     }
 
@@ -69,7 +70,7 @@ tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key
     if (!topLevelOnly && !found) {
         auto stack_ptr = table.begin()++; //points to the second level
 
-        while (stack_ptr != table.end() && !found){
+        while (stack_ptr != table.end() && !found) {
             node_iterator = stack_ptr->find(key);
             if (node_iterator != stack_ptr->end()) {
                 found = true;
