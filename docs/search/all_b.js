@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['x',['x',['../test__shadowing_8c.html#a6150e0515f7202e2fb518f7206ed97dc',1,'test_shadowing.c']]]
+  ['parser',['Parser',['../parser.html',1,'']]],
+  ['poplevel',['popLevel',['../class_symbol_table.html#aefe5b4893390dab2d910b05c53cb5571',1,'SymbolTable']]],
+  ['poptoplevel',['popTopLevel',['../_symbol_table_test_8cpp.html#aff1a86f2840357963fe8704e55f1641d',1,'SymbolTableTest.cpp']]],
+  ['pushlevel',['pushLevel',['../class_symbol_table.html#a4ae4c247e136cd9d13224ba952fccb88',1,'SymbolTable']]]
 ];

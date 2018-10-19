@@ -62,11 +62,15 @@ $(function() {
 <div class="title">Symbol Table </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The Symbol Table is a class that communicates with the Scanner and Parser to track and store data about identifiers encountered. The main table variable in the class is a list of maps that have a key of type string and a value of type <a class="el" href="class_node.html">Node</a>. The list is treated like a stack. The Node class is a collection of data corresponding to each identifier. For more information about the technical details of these classes, view the <a class="el" href="class_symbol_table.html">SymbolTable</a> or <a class="el" href="class_node.html">Node</a> page.</p>
+<div class="textblock"><p>The Symbol Table is a class that communicates with the Scanner and Parser to track and store data about identifiers encountered. The main table variable in the class is a list of maps that have a key of type string and a value of type Node. The list is treated like a stack. The Node class is a collection of data corresponding to each identifier. For more information about the technical details of these classes, view the <a class="el" href="class_symbol_table.html">SymbolTable</a> or <a class="el" href="class_node.html">Node</a> page.</p>
 <h1><a class="anchor" id="test_symtable"></a>
 Testing the Symbol Table</h1>
-<p>The Symbol Table can be tested with the test driver <a class="el" href="_symbol_table_driver_8cpp.html">SymbolTableDriver.cpp</a>.</p>
-<p>To run the test driver, run <code>SymbolTable</code> in CLion.</p>
+<p>The Symbol Table can be tested with the test driver <a class="el" href="_symbol_table_test_8cpp.html">SymbolTableTest.cpp</a>.</p>
+<p>To run the test driver, run <code>SymbolTableTest</code> in CLion.</p>
+<p>To view the output, go to this file:</p>
+<ul>
+<li>Note, the Symbol Table test driver inputs default empty nodes. They have a default line number of -1, default column number of -1, and type int.</li>
+</ul>
 <p>From there, the program will prompt you to add a number corresponding to the desired test case. The numbers can be found in the documentation for <a class="el" href="_symbol_table_driver_8cpp.html">SymbolTableDriver.cpp</a> or in the comments of that file in the source code.</p>
 <h1><a class="anchor" id="links_symtable"></a>
 Links</h1>

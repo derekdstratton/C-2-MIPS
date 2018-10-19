@@ -1,13 +1,5 @@
 var searchData=
 [
-  ['scanner',['Scanner',['../scanner.html',1,'']]],
-  ['search',['search',['../class_symbol_table.html#a4c9c6a8d8d472c6c1e4689940babe1fb',1,'SymbolTable']]],
-  ['setinsertlookupmode',['setInsertLookupMode',['../_symbol_table_driver_8cpp.html#ac8829d86325107ff975d219340f9f9c9',1,'SymbolTableDriver.cpp']]],
-  ['setmode',['setMode',['../class_symbol_table.html#a85dc0f5d1967eb533851fb80b38031ff',1,'SymbolTable']]],
-  ['specifiers',['specifiers',['../_symbol_table_driver_8cpp.html#a0a01724298c7cec6c537023cd932ad00',1,'SymbolTableDriver.cpp']]],
-  ['symboltable',['SymbolTable',['../class_symbol_table.html',1,'SymbolTable'],['../class_symbol_table.html#a1fbe6cec5594463b766db0ac58c9aa1d',1,'SymbolTable::SymbolTable()']]],
-  ['symboltable_2ecpp',['SymbolTable.cpp',['../_symbol_table_8cpp.html',1,'']]],
-  ['symboltable_2eh',['SymbolTable.h',['../_symbol_table_8h.html',1,'']]],
-  ['symboltabledriver_2ecpp',['SymbolTableDriver.cpp',['../_symbol_table_driver_8cpp.html',1,'']]],
-  ['symbol_20table',['Symbol Table',['../symtable.html',1,'']]]
+  ['main',['main',['../_symbol_table_driver_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;SymbolTableDriver.cpp'],['../_symbol_table_test_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;SymbolTableTest.cpp'],['../test__basic__addition_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_basic_addition.c'],['../test__errors__with__multiline__comments_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_errors_with_multiline_comments.c'],['../test__float__too__long_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_float_too_long.c'],['../test__identifier__too__long_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_identifier_too_long.c'],['../test__integer__too__long_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_integer_too_long.c'],['../test__invalid__token_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_invalid_token.c'],['../test__shadowing_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_shadowing.c'],['../test__simple_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_simple.c'],['../test__toggle__production__outputs_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_toggle_production_outputs.c'],['../test__variable__redeclaration_8c.html#ae66f6b31b5ad750f1fe042a706a4e3d4',1,'main():&#160;test_variable_redeclaration.c']]],
+  ['multileveltable',['multiLevelTable',['../_symbol_table_test_8cpp.html#a64a63ce69c9c17c812964953abb3cc91',1,'SymbolTableTest.cpp']]]
 ];

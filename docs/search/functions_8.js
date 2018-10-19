@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['search',['search',['../class_symbol_table.html#a4c9c6a8d8d472c6c1e4689940babe1fb',1,'SymbolTable']]],
-  ['setinsertlookupmode',['setInsertLookupMode',['../_symbol_table_driver_8cpp.html#ac8829d86325107ff975d219340f9f9c9',1,'SymbolTableDriver.cpp']]],
-  ['setmode',['setMode',['../class_symbol_table.html#a85dc0f5d1967eb533851fb80b38031ff',1,'SymbolTable']]],
-  ['symboltable',['SymbolTable',['../class_symbol_table.html#a1fbe6cec5594463b766db0ac58c9aa1d',1,'SymbolTable']]]
+  ['poplevel',['popLevel',['../class_symbol_table.html#aefe5b4893390dab2d910b05c53cb5571',1,'SymbolTable']]],
+  ['poptoplevel',['popTopLevel',['../_symbol_table_test_8cpp.html#aff1a86f2840357963fe8704e55f1641d',1,'SymbolTableTest.cpp']]],
+  ['pushlevel',['pushLevel',['../class_symbol_table.html#a4ae4c247e136cd9d13224ba952fccb88',1,'SymbolTable']]]
 ];

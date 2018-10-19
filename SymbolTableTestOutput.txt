@@ -1,0 +1,139 @@
+Enter a test number (1-11), or 0 to exit.
+1
+1
+Tests that a one-level Symbol Table works properly.
+Symbol Table: (Stack size: 1)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 3)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+Enter a test number (1-11), or 0 to exit.
+2
+2
+Tests that a multiple-level Symbol Table works properly.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+Enter a test number (1-11), or 0 to exit.
+3
+3
+Tests that the top level of the Symbol Table can be successfully popped.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+1
+Symbol Table: (Stack size: 1)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+Enter a test number (1-11), or 0 to exit.
+4
+4
+Tests that the Symbol Table will not pop off it's only level.Symbol Table: (Stack size: 1)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 0)
+0
+Enter a test number (1-11), or 0 to exit.
+5
+5
+Tests that the Symbol Table returns appropriate info for an insert conflict.
+Symbol Table: (Stack size: 1)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 1)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+0
+Enter a test number (1-11), or 0 to exit.
+6
+6
+Tests that the Symbol Table returns appropriate info for a shadowing variable.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 0)
+        Map at level 1 (size: 1)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+0
+Enter a test number (1-11), or 0 to exit.
+7
+7
+Tests that the Symbol Table can find an element on the top scope and return that info.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+top
+Enter a test number (1-11), or 0 to exit.
+8
+8
+Tests that the Symbol Table can find an element on the top scope and return that info.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+other
+Enter a test number (1-11), or 0 to exit.
+9
+9
+Tests that the Symbol Table will return appropriate info that search didn't find an item.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+not
+Enter a test number (1-11), or 0 to exit.
+10
+10
+Tests that the Symbol Table dumps info to a file. Currently called symbolTable.out.
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+        Map at level 0 (size: 2)
+                Key: Item 3, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 4, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+        Map at level 1 (size: 2)
+                Key: Item 1, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+                Key: Item 2, Value: Line Number: -1, Column Number: -1, Declaration Specifiers: int
+Enter a test number (1-11), or 0 to exit.
+11
+11
+Tests that the Symbol Table can be set to insert or lookup mode.
+0
+1
+Enter a test number (1-11), or 0 to exit.
+0
+0
+
+Process finished with exit code 0

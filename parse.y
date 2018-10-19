@@ -43,7 +43,6 @@ stringstream prodStream;
 }
 
 %code provides {
-    //void apple();
     SymbolTable * getTable();
 }
 
