@@ -127,7 +127,7 @@ void findOnTopScope() {
     s.insert(item3);
     s.insert(item4);
     cout << s;
-    tuple<map<string, Node>::iterator, string> ret = s.search("Item 3");
+    tuple<map<string, Node>::iterator, string> ret = s.search("Item 3", true);
     map<string, Node>::iterator it;
     string status;
     tie(it, status) = ret;
