@@ -83,7 +83,7 @@ comment \/\*(.|{newLine})*\*\/
 
 %%
 
-{comment} {cout << "comment ";}
+{comment} {/*do nothing*/;}
 
 {newLine} {
     first_column = 0;
