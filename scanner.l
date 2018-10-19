@@ -17,9 +17,10 @@
 #include "SymbolTable.h"
 #include "Node.h"
 #include "parser.hpp"
-
-/* Global Variables*/
-
+extern bool debug[4];
+extern FILE * yyin;
+extern char* fileName;
+//TODO: output source code and do column numbers
 SymbolTable * sym;
 bool isFunction; //true if function
 string type_specifier = "none";
@@ -42,6 +43,10 @@ void processToken();
 void to_token_file(int token);
 
 using namespace std;
+    //note: i'm shoving all my comments up here for lack of better space
+    //enumeration constant? i don't think that's even used;
+
+void to_token_file(int token);
 
 %}
 
@@ -70,7 +75,7 @@ character_constant \'([^']|{escape_sequence})\'
 %%
 
 {newLine} {
-    first_column = 0; 
+    first_column = 0;
     currentLine.clear();
     yylloc.first_line++;
     }
@@ -78,12 +83,12 @@ character_constant \'([^']|{escape_sequence})\'
     processToken();
     }
 
-"!!S" { 
+"!!S" {
     cout << *getTable();
     }
 
-"!!M" { 
-    string s = getTable()->getMode() ? "Insert" : "Lookup"; 
+"!!M" {
+    string s = getTable()->getMode() ? "Insert" : "Lookup";
     cout << "Mode: " << s << endl;
     }
 
@@ -274,6 +279,18 @@ return {
     to_token_file(SEMI);
     return (SEMI);}
 "{" {
+    if(debug[0] && debug[2])
+    {
+        cout << "Dumping symbol table at line " << yylineno << endl;
+        cout << symbolTable;
+        if(debug[3])
+        {
+            ofstream SymDump;
+            SymDump.open("SymDump.out", ios::app);
+            SymDump << symbolTable << "\n\n";
+            SymDump.close();
+        }
+    }
     getTable()->setMode(true);
     //flip to insert mode, make sure all this is reset
     string type_specifier = "none";
@@ -283,6 +300,18 @@ return {
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
+    if(debug[0] && debug[2])
+    {
+        cout << "Dumping symbol table at line " << yylineno << endl;
+        cout << symbolTable;
+        if(debug[3])
+        {
+            ofstream SymDump;
+            SymDump.open("SymDump.out", ios::app);
+            SymDump << symbolTable << "\n\n";
+            SymDump.close();
+        }
+    }
     to_token_file(CLOSCUR);
     return (CLOSCUR);}
 "," {
@@ -568,6 +597,28 @@ return {
     return ( IDENTIFIER );}
 
 . { processToken();
+    /*while(string(yytext) != "\n")
+    {
+        cout << "yytext is " << string(yytext) << endl;
+        currentLine += yytext;
+        yylex();
+    }*/
+    ifstream errInput;
+    errInput.open(fileName);
+    for(int i = 0; i < yylineno - 1; i++)
+    {
+        getline(errInput, currentLine);
+    }
+    getline(errInput, currentLine);
+    cout << "unrecognized token at line number " << yylineno << endl;
+    cout << currentLine << endl;
+    while(first_column-- > 1)
+        cout << ' ';
+    cout << "^ Unexpected character\n";
+    return (-1);}
+
+%%
+
     outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
     return (ERROR);}
