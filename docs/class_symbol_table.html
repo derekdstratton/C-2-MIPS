@@ -79,8 +79,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a4c9c6a8d8d472c6c1e4689940babe1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ae4c247e136cd9d13224ba952fccb88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a4ae4c247e136cd9d13224ba952fccb88">pushLevel</a> ()</td></tr>
 <tr class="separator:a4ae4c247e136cd9d13224ba952fccb88"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b7d90f3fa8a1d79f2cbeef555f1375f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a2b7d90f3fa8a1d79f2cbeef555f1375f">popLevel</a> ()</td></tr>
-<tr class="separator:a2b7d90f3fa8a1d79f2cbeef555f1375f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefe5b4893390dab2d910b05c53cb5571"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#aefe5b4893390dab2d910b05c53cb5571">popLevel</a> ()</td></tr>
+<tr class="separator:aefe5b4893390dab2d910b05c53cb5571"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac19c00aa8fc5c8bb3bccaa0ea50e0399"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#ac19c00aa8fc5c8bb3bccaa0ea50e0399">getMode</a> ()</td></tr>
 <tr class="separator:ac19c00aa8fc5c8bb3bccaa0ea50e0399"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85dc0f5d1967eb533851fb80b38031ff"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a85dc0f5d1967eb533851fb80b38031ff">setMode</a> (const bool &amp;newMode)</td></tr>
@@ -125,7 +125,8 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<p>Returns the current mode of the Symbol Table.</p>
+<dl class="section return"><dt>Returns</dt><dd>True if in Insert Mode, False if in Lookup Mode </dd></dl>
 
 </div>
 </div>
@@ -156,21 +157,22 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="a2b7d90f3fa8a1d79f2cbeef555f1375f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b7d90f3fa8a1d79f2cbeef555f1375f">&#9670;&nbsp;</a></span>popLevel()</h2>
+<a id="aefe5b4893390dab2d910b05c53cb5571"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefe5b4893390dab2d910b05c53cb5571">&#9670;&nbsp;</a></span>popLevel()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void SymbolTable::popLevel </td>
+          <td class="memname">bool SymbolTable::popLevel </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Pops the top level from the stack </p>
+<p>Pops the top level from the stack</p>
+<dl class="section return"><dt>Returns</dt><dd>Returns true if the level is successfully popped, false otherwise. </dd></dl>
 
 </div>
 </div>
@@ -244,9 +246,10 @@ Friends</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Sets the Symbol Table to either insert or lookup mode.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">newMode</td><td></td></tr>
+    <tr><td class="paramname">newMode</td><td>The new mode being set to. True corresponds to insert mode, false to lookup mode. </td></tr>
   </table>
   </dd>
 </dl>
@@ -287,14 +290,15 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<p>An operator overload to output the Symbol Table to a stream.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">os</td><td></td></tr>
-    <tr><td class="paramname">symbolTable</td><td></td></tr>
+    <tr><td class="paramname">os</td><td>The output stream </td></tr>
+    <tr><td class="paramname">symbolTable</td><td>The Symbol Table object being output to a stream </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>A reference to the ostream to allow for chaining </dd></dl>
 
 </div>
 </div>

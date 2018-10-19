@@ -20,15 +20,37 @@
  //Symbol Table:
 /*! \page symtable Symbol Table
  *
- * insert overview details
+ * The Symbol Table is a class that communicates with the Scanner and Parser to
+ * track and store data about identifiers encountered. The main table variable in the
+ * class is a list of maps that have a key of type string and a value of type Node.
+ * The list is treated like a stack. The %Node class is a collection of data corresponding
+ * to each identifier. For more information about the technical details of these classes,
+ * view the SymbolTable or Node page.
  *
    \section test_symtable Testing the Symbol Table
 
-   how to run the tests
+   The Symbol Table can be tested with the test driver SymbolTableDriver.cpp.
+
+  To run the test driver, run `%SymbolTable` in CLion.
+
+  From there, the program will prompt you to add a number corresponding to the
+  desired test case. The numbers can be found in the documentation for SymbolTableDriver.cpp
+  or in the comments of that file in the source code.
 
    \section links_symtable Links
 
-  links to actual file, test cases, and outputs
+  Symbol Table Class Documentation: SymbolTable
+
+  Symbol Table Source Code:
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.cpp
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.h
+
+  %Node Class Documentation: Node
+
+  %Node Source Code:
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.cpp
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.h
+
 */
 
 //Scanner:
@@ -38,7 +60,12 @@
 
   \section test_scanner Testing the Scanner
 
-  put stuff
+  The Scanner can be tested by running the Test Files with `ScannerParser`. The
+  program argument should contain a file from the `tests` folder. The files include:
+
+  todo
+
+  These tests can be compared with their outputs, found in the `tests/output` directory.
 
   \section links_scanner Links
   links to actual file, test cases, and outputs

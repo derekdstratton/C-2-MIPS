@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['parser',['Parser',['../parser.html',1,'']]]
+  ['scanner',['Scanner',['../scanner.html',1,'']]],
+  ['symbol_20table',['Symbol Table',['../symtable.html',1,'']]]
 ];
