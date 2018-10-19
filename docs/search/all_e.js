@@ -7,6 +7,7 @@ var searchData=
   ['test_5fidentifier_5ftoo_5flong_2ec',['test_identifier_too_long.c',['../test__identifier__too__long_8c.html',1,'']]],
   ['test_5finteger_5ftoo_5flong_2ec',['test_integer_too_long.c',['../test__integer__too__long_8c.html',1,'']]],
   ['test_5finvalid_5ftoken_2ec',['test_invalid_token.c',['../test__invalid__token_8c.html',1,'']]],
+  ['test_5fnot_5fin_5finsert_5fmode_2ec',['test_not_in_insert_mode.c',['../test__not__in__insert__mode_8c.html',1,'']]],
   ['test_5fshadowing_2ec',['test_shadowing.c',['../test__shadowing_8c.html',1,'']]],
   ['test_5fsimple_2ec',['test_simple.c',['../test__simple_8c.html',1,'']]],
   ['test_5fsimple_5foutput_2etxt',['test_simple_output.txt',['../test__simple__output_8txt.html',1,'']]],
