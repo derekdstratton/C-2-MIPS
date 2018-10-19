@@ -537,23 +537,33 @@ int main(int argc, char **argv)
     {
         for(int i = 1; i < argc; i++)
             {
-                if(strcmp(argv[i],"-d") == 0)
-                    debug[0] = true;
-                else if(strcmp(argv[i],"-l") == 0)
-                    debug[1] = true;
-                else if(strcmp(argv[i],"-s") == 0)
-                    debug[2] = true;
-                else if(strcmp(argv[i],"-o") == 0)
-                    debug[3] = true;
+                string buffer = argv[i];
+                if(buffer[0] == '-')
+                {
+                    if(strcmp(argv[i],"-d") == 0)
+                        debug[0] = true;
+                    else if(strcmp(argv[i],"-l") == 0)
+                        debug[1] = true;
+                    else if(strcmp(argv[i],"-s") == 0)
+                        debug[2] = true;
+                    else if(strcmp(argv[i],"-o") == 0)
+                        debug[3] = true;
+                    else
+                        cout << argv[1] << " is not a valid command line argument." << endl;
+                }
+                else
+                {
+                    yyin = fopen(argv[argc - 1], "r");
+                         if ( !yyin )
+                         {
+                             cout << "Opening file unsuccessful, aborting." << endl;
+                             return(-1);
+                         }
+                         else
+                                     fileName = argv[argc - 1];
+                }
             }
-        yyin = fopen(argv[argc - 1], "r");
-        if ( !yyin )
-        {
-            cout << "Opening file unsuccessful, aborting." << endl;
-            return(-1);
-        }
-        else
-            fileName = argv[argc - 1];
+
     }
 	yyparse();
 	return 0;
