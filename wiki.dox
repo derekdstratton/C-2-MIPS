@@ -61,11 +61,13 @@
   \section test_scanner Testing the Scanner
 
   The Scanner can be tested by running the Test Files with `ScannerParser`. The
-  program argument should contain a file from the `tests` folder. The files include:
+  program argument should contain a file from the tests folder.
 
-  todo
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests
 
-  These tests can be compared with their outputs, found in the `tests/output` directory.
+  These tests can be compared with their outputs, found in the tests/output directory.
+
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output
 
   \section links_scanner Links
   links to actual file, test cases, and outputs
