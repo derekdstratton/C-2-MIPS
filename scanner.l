@@ -18,7 +18,7 @@
 
 /* Global Variables */
 
-extern bool debug[4];
+extern bool debug[5];
 extern char* fileName;
 deque <char> columnQueue;
 SymbolTable * sym;
@@ -30,6 +30,7 @@ signed_or_unsigneds signed_or_unsigned = NoSU;
 map<string, Node> struct_or_union_symbols;
 
 stringstream sourceStream;
+extern string newOutputFile;
 string currentLine;
 static bool insertModeFlag = false;
 
@@ -95,6 +96,10 @@ comment \/\*(.|{newLine})*\*\/
 "!!M" {
     string s = getTable()->getMode() ? "Insert" : "Lookup";
     cout << "Mode: " << s << endl;
+    }
+
+"!!P" {
+    debug[3] = !debug[3];
     }
 
 typedef {
@@ -289,15 +294,11 @@ return {
 "{" {
     if(debug[0] && debug[2])
     {
-        cout << "Dumping symbol table at line " << yylineno << endl;
-        cout << *getTable();
-        if(debug[3])
-        {
-            ofstream SymDump;
-            SymDump.open("SymDump.out", ios::app);
-            SymDump << *getTable() << "\n\n";
-            SymDump.close();
-        }
+        ofstream SymDump;
+        SymDump.open("SymDump.out", ios::app);
+        SymDump << "DUMPING SYMBOL TABLE AT LINE " << yylineno << endl;
+        SymDump << *getTable() << "\n\n";
+        SymDump.close();
     }
     getTable()->setMode(true);
     //flip to insert mode, make sure all this is reset
@@ -312,15 +313,11 @@ return {
 "}" {
     if(debug[0] && debug[2])
     {
-        cout << "Dumping symbol table at line " << yylineno << endl;
-        cout << *getTable();
-        if(debug[3])
-        {
-            ofstream SymDump;
-            SymDump.open("SymDump.out", ios::app);
-            SymDump << *getTable() << "\n\n";
-            SymDump.close();
-        }
+        ofstream SymDump;
+        SymDump.open("SymDump.out", ios::app);
+        SymDump << "DUMPING SYMBOL TABLE AT LINE " << yylineno << endl;
+        SymDump << *getTable() << "\n\n";
+        SymDump.close();
     }
     to_token_file(CLOSCUR);
     return (CLOSCUR);}
@@ -697,10 +694,20 @@ void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
 }
 
 void to_token_file(int token) {
+    ofstream pStream;
+
+    if(debug[4])
+        pStream.open(newOutputFile, ios::app);
+    else
+        pStream.open("list_file", ios::app);
+
+    pStream << endl << yytext << endl << endl;
     for(int i =0; i < yyleng; i++)
         columnQueue.push_back(' ');
-    ofstream tokenfile;
-    tokenfile.open("tokens.out", ios::app);
-    tokenfile << yytext << " " << token << "\n";
-    tokenfile.close();
+    if(debug[1] && debug[0]) {
+        ofstream tokenfile;
+        tokenfile.open("tokens.out", ios::app);
+        tokenfile << yytext << " " << token << "\n";
+        tokenfile.close();
+    }
 }
