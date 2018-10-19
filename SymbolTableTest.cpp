@@ -225,7 +225,7 @@ void setInsertLookupMode() {
 int main() {
     int num;
     do {
-        cout << "Enter a test number (1-12), or 0 to exit." << endl;
+        cout << "Enter a test number (1-11), or 0 to exit." << endl;
         cin >> num;
         switch (num) {
             case 0:
@@ -263,8 +263,6 @@ int main() {
                 break;
             case 11:
                 setInsertLookupMode();
-                break;
-            case 12:
                 break;
             default:
                 cout << "Please enter a valid number." << endl;
