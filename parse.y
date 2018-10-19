@@ -15,28 +15,34 @@
 #include <deque>
 
 #include "SymbolTable.h"
+SymbolTable * table_ptr;
 
 /* Global Variables */
 
+using namespace std;
+
+/* Global Variables */
+//SymbolTable * table_ptr;
+
+extern deque <char> columnQueue;
+string newOutputFile;
+extern FILE * yyin;
 bool debug[5]; // -d, -l, -s, productions flag, -o
 // -d enable debugging
 // -l produces a list of tokens and their values to a file
 // -s dumps symbol table at key points to a file
 // -p prints all productions to a file
 // -o name a file to output interspersed reductions to
-
-SymbolTable * table_ptr;
-string newOutputFile;
-extern FILE * yyin;
-extern deque <char> columnQueue;
 char* fileName;
 void yyerror (char const *s);
 void handleProd (string prod);
 bool printProd = false;
-int yylex();
 extern int yyleng;
 stringstream prodStream;
-using namespace std;
+
+/* Function declarations */
+
+int yylex();
 %}
 
 %union {
@@ -49,10 +55,14 @@ using namespace std;
 }
 
 %code provides {
+    // A function that returns a pointer to the table, for communicating with the Scanner
     SymbolTable * getTable();
 }
 
 %code {
+    /**
+     * Returns a pointer to the Symbol Table, accessible for all files including parser.hpp
+     */
     SymbolTable * getTable() {
         return table_ptr;
     }
@@ -84,18 +94,6 @@ using namespace std;
 
 %locations
 %error-verbose
-
-//user defined tokens
-/*
-IDENTIFIER
-INTEGER_CONSTANT
-FLOATING_CONSTANT
-CHARACTER_CONSTANT
-ENUMERATION_CONSTANT
-STRING_LITERAL
-OR_ASSIGN
-TYPEDEF_NAME
-*/
 
 %token SEMI OPENCUR CLOSCUR COMMA ASSIGN COLON OPENSQ CLOSSQ STAR OPENPAR CLOSEPAR TERNARY
 %token BAR XOR AND LESSTH GREATH PLUS MINUS SLASH MODULO TILDE BANG PERIOD NEWLINE
@@ -531,6 +529,12 @@ identifier
  * @details yyerror prints out the type of error followed with the
  * @param s is the type of error that bison detects.
  */
+extern int column;
+
+/** error function called when parsing fails, prints error to stderr stream thingy
+ *
+ * @param s the error string to be output
+ */
 void yyerror (char const* s)
 {
     ifstream errInput;
@@ -567,6 +571,10 @@ void yyerror (char const* s)
 	return;
 }
 
+/**
+ * this function handles outputting of the productions
+ * @param prod the production handled
+ */
 void handleProd (string prod)
 {
     if(debug[3])
@@ -583,6 +591,7 @@ void handleProd (string prod)
     pStream << prod;
 }
 
+//The entry point to the ScannerParser
 int main(int argc, char **argv)
 {
     SymbolTable symbolTable;
