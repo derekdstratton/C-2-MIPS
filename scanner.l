@@ -503,7 +503,7 @@ return {
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
-    to_token_file(STRING_LITERAL);
+    //to_token_file(STRING_LITERAL);
     //run through the string to search for escape characters
     //This way, yylval will contain the proper values
     to_token_file(STRING_LITERAL, "STRING_LITERAL");
@@ -553,7 +553,7 @@ return {
     yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
-    float num = stof(yytext);
+    float num = atof(yytext);
     to_token_file(FLOATING_CONSTANT, "FLOATING_CONSTANT");
     string orig = yytext;
     string updated = to_string(num);
@@ -568,7 +568,7 @@ return {
 {integer} {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
     //test if the integer is too big, aka bigger than a long
-    long num = stol(yytext);
+    long num = atoi(yytext);
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {

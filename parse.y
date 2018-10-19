@@ -22,7 +22,7 @@ SymbolTable * table_ptr;
 using namespace std;
 
 /* Global Variables */
-SymbolTable * table_ptr;
+//SymbolTable * table_ptr;
 
 extern deque <char> columnQueue;
 string newOutputFile;
