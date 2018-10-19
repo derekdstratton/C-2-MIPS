@@ -36,6 +36,7 @@ extern FILE * yyin;
 
 /* Function Declarations */
 //todo probably combine these three into one function
+void outputError(string errmsg1, string errmsg2, bool errtype);
 void outputErrorWarningLine();
 void outputErrorWarningPosition(string errmsg);
 void outputErrorWarning(bool errtype, string errmsg);
@@ -282,12 +283,12 @@ return {
     if(debug[0] && debug[2])
     {
         cout << "Dumping symbol table at line " << yylineno << endl;
-        cout << symbolTable;
+        cout << *getTable();
         if(debug[3])
         {
             ofstream SymDump;
             SymDump.open("SymDump.out", ios::app);
-            SymDump << symbolTable << "\n\n";
+            SymDump << *getTable() << "\n\n";
             SymDump.close();
         }
     }
@@ -297,18 +298,19 @@ return {
     string type_qualifier = "none";
     string storage_class_specifier = "none";
     string signed_or_unsigned = "none";
+    insertModeFlag = false;
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
     if(debug[0] && debug[2])
     {
         cout << "Dumping symbol table at line " << yylineno << endl;
-        cout << symbolTable;
+        cout << *getTable();
         if(debug[3])
         {
             ofstream SymDump;
             SymDump.open("SymDump.out", ios::app);
-            SymDump << symbolTable << "\n\n";
+            SymDump << *getTable() << "\n\n";
             SymDump.close();
         }
     }
@@ -547,8 +549,7 @@ return {
 {identifier} {
     to_token_file(IDENTIFIER);
     if (yyleng > 31) {
-        outputErrorWarningPosition("too long buddy");
-        outputErrorWarning(true, "Identifier name too long.");
+        outputError("too long buddy", "Identifier name too long.", true);
     }
     string s = yytext;
     string types[4] = {type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned};
@@ -565,8 +566,7 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
-                outputErrorWarningPosition("Not found");
-                outputErrorWarning(false, "Identifier not defined.");
+                outputError("Not found", "Identifier not defined.", false);
             }
         } else {
             //this is a normal insert
@@ -575,14 +575,13 @@ return {
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
             if (!insertSuccess) {
-                outputErrorWarningPosition("Already exists");
-                outputErrorWarning(false, "Variable already exists on this scope.");
+                outputError("Already exists", "Variable already exists on this scope.", false);
             } else if (!notShadowing) {
-                outputErrorWarningPosition("Already exists");
-                outputErrorWarning(true, "Shadowing an identifier from an outer scope.");
+                outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
             }
         }
     } else {
+        cout << "going else" << endl;
         //currently in lookup mode
         //lookup mode operations
         tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
@@ -590,8 +589,7 @@ return {
         string status;
         tie(it, status) = result;
         if (status == "not") {
-            outputErrorWarningPosition("Not found");
-            outputErrorWarning(false, "Identifier not defined.");
+            outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
@@ -604,6 +602,21 @@ return {
         currentLine += yytext;
         yylex();
     }*/
+
+    outputErrorWarningLine();
+    outputErrorWarningPosition("Unexpected Character");
+    return (ERROR); }
+
+
+%%
+
+void outputError(string errmsg1, string errmsg2, bool errtype) {
+    outputErrorWarningLine();
+    outputErrorWarningPosition(errmsg1);
+    outputErrorWarning(errtype, errmsg2);
+}
+
+void outputErrorWarningLine(){
     ifstream errInput;
     errInput.open(fileName);
     for(int i = 0; i < yylineno - 1; i++)
@@ -611,22 +624,6 @@ return {
         getline(errInput, currentLine);
     }
     getline(errInput, currentLine);
-    cout << "unrecognized token at line number " << yylineno << endl;
-    cout << currentLine << endl;
-    while(first_column-- > 1)
-        cout << ' ';
-    cout << "^ Unexpected character\n";
-    return (-1);}
-
-%%
-
-    outputErrorWarningLine();
-    outputErrorWarningPosition("Unexpected Character");
-    return (ERROR); }
-
-%%
-
-void outputErrorWarningLine() {
     cerr << currentLine << endl;
     //todo put this along with every error. except make a separate file pointer so it prints the whole line
 }
@@ -656,6 +653,6 @@ void to_token_file(int token) {
     currentLine += yytext;
     ofstream tokenfile;
     tokenfile.open("tokens.out", ios::app);
-    tokenfile << yytext << "\n";
+    tokenfile << yytext << " " << token << "\n";
     tokenfile.close();
 }
