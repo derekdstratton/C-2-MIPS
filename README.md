@@ -30,7 +30,7 @@ make
 ### Usage:
 
 - To run the Scanner/Parser, type `./ScannerParser [options] file_path`
-- To run the Symbol Table driver, type `./SymbolTableTest`
+- To run the Symbol Table driver, type `./SymbolTableDriver`
 
 ### Wiki:
 
