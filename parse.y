@@ -13,23 +13,39 @@
 #include <string>
 //TODO continue parsing after error happens, use 'error' token or yyerrok
 //TODO add in debug option to turn off/on all productions
+#include "SymbolTable.h"
+SymbolTable * table_ptr;
 
 using namespace std;
+
 extern FILE * yyin;
 bool debug[4]; // -d, -l, -s, -o
 char* fileName;
 void yyerror (char const *s);
 int yylex();
 stringstream prodStream;
-#define YYDEBUG 1
 %}
 
 %union {
-    int ival;
+    long ival;
     float fval;
     char cval;
     char * sval;
+    //
+    void * vval;
 }
+
+%code provides {
+    //void apple();
+    SymbolTable * getTable();
+}
+
+%code {
+    //void apple() { cout << "APPLE SALAD BURRITO";}
+    SymbolTable * getTable() {
+        return table_ptr;
+    }
+};
 
 %token IDENTIFIER
 %token<ival> INTEGER_CONSTANT
@@ -53,9 +69,10 @@ stringstream prodStream;
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
+%token ERROR
+
 %locations
 %error-verbose
-%debug
 
 //user defined tokens
 /*
@@ -505,12 +522,15 @@ extern int column;
 void yyerror (char const* s)
 {
     //string s ("syntax error, I am going to die now.");
-    cout << s << " AT LINE NUMBER " << yylloc.first_line << endl;
+    cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
 
 int main(int argc, char **argv)
 {
+    //todo yyin file pointers
+    SymbolTable symbolTable;
+    table_ptr = &symbolTable;
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
@@ -536,11 +556,13 @@ int main(int argc, char **argv)
     fileName = argv[argc - 1];
     //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
+
+	//cout << "argv[1] is :" << argv[1] << endl;
 	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
 	{
 	    ofstream myFile;
 	    myFile.open ("productions.txt");
-	    cout << "Dumping prodStream\n";
+	    //cout << "Dumping prodStream\n";
 	    string str = prodStream.str();
 	    myFile << str;
 	    myFile.close();
@@ -548,6 +570,9 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+//SymbolTable * getTable() {
+//    return &symb;
+//}
 /*
 {
 	fflush(stdout);

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['a_20documentation_20page',['A documentation page',['../page1.html',1,'']]],
-  ['another_20page',['Another page',['../page2.html',1,'']]]
+  ['best_20c_20compiler',['Best C Compiler',['../md__r_e_a_d_m_e.html',1,'']]]
 ];
