@@ -1,5 +1,8 @@
 
 %{
+
+/* Libraries */
+
 #include <iostream>
 #include <fstream>
 #include <cctype>
@@ -14,9 +17,13 @@
 //TODO continue parsing after error happens, use 'error' token or yyerrok
 //TODO add in debug option to turn off/on all productions
 #include "SymbolTable.h"
-SymbolTable * table_ptr;
 
 using namespace std;
+
+/* Global Variables */
+SymbolTable * table_ptr;
+
+
 string newOutputFile;
 extern FILE * yyin;
 bool debug[5]; // -d, -l, -s, productions flag, -o
@@ -29,8 +36,11 @@ char* fileName;
 void yyerror (char const *s);
 void handleProd (string prod);
 bool printProd = false;
-int yylex();
 stringstream prodStream;
+
+/* Function declarations */
+
+int yylex();
 %}
 
 %union {
@@ -43,10 +53,14 @@ stringstream prodStream;
 }
 
 %code provides {
+    // A function that returns a pointer to the table, for communicating with the Scanner
     SymbolTable * getTable();
 }
 
 %code {
+    /**
+     * Returns a pointer to the Symbol Table, accessible for all files including parser.hpp
+     */
     SymbolTable * getTable() {
         return table_ptr;
     }
@@ -78,18 +92,6 @@ stringstream prodStream;
 
 %locations
 %error-verbose
-
-//user defined tokens
-/*
-IDENTIFIER
-INTEGER_CONSTANT
-FLOATING_CONSTANT
-CHARACTER_CONSTANT
-ENUMERATION_CONSTANT
-STRING_LITERAL
-OR_ASSIGN
-TYPEDEF_NAME
-*/
 
 %token SEMI OPENCUR CLOSCUR COMMA ASSIGN COLON OPENSQ CLOSSQ STAR OPENPAR CLOSEPAR TERNARY
 %token BAR XOR AND LESSTH GREATH PLUS MINUS SLASH MODULO TILDE BANG PERIOD NEWLINE
@@ -521,13 +523,20 @@ identifier
 
 extern int column;
 
-//error function called when parsing fails, prints error to stderr stream thingy
+/** error function called when parsing fails, prints error to stderr stream thingy
+ *
+ * @param s the error string to be output
+ */
 void yyerror (char const* s)
 {
     cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
 
+/**
+ * this function handles outputting of the productions
+ * @param prod the production handled
+ */
 void handleProd (string prod)
 {
     if(debug[3])
@@ -544,6 +553,7 @@ void handleProd (string prod)
     pStream << prod;
 }
 
+//The entry point to the ScannerParser
 int main(int argc, char **argv)
 {
     SymbolTable symbolTable;

@@ -21,8 +21,8 @@
 extern bool debug[5];
 extern char* fileName;
 deque <char> columnQueue;
-SymbolTable * sym;
-bool isFunction; //true if function
+
+//Symbol Table Enum types for node construction
 type_specifiers type_specifier = Int; //default type specifier of "int" for everything
 type_qualifiers type_qualifier = NoTQ;
 storage_class_specifiers storage_class_specifier = NoSCS;
@@ -32,7 +32,7 @@ map<string, Node> struct_or_union_symbols;
 stringstream sourceStream;
 extern string newOutputFile;
 string currentLine;
-static bool insertModeFlag = false;
+static bool insertModeFlag = false; //Flag set to true if a statement declares a variable
 
 /* Function Declarations */
 void outputError(string errmsg1, string errmsg2, bool errtype);
@@ -78,27 +78,33 @@ comment \/\*(.|{newLine})*\*\/
 {comment} {/*do nothing*/;}
 
 {newLine} {
+    //Increments line counter and fixes column count
     yylloc.first_line++;
     while(!columnQueue.empty())
         columnQueue.pop_front();
     }
 {tab} {
+    //Fix column count
     columnQueue.push_back('\t');
     }
 {space} {
+    //Fix column count
     columnQueue.push_back(' ');
     }
 
 "!!S" {
+    //Dump symbol table
     cout << *getTable();
     }
 
 "!!M" {
+    //Output symbol table mode
     string s = getTable()->getMode() ? "Insert" : "Lookup";
     cout << "Mode: " << s << endl;
     }
 
 "!!P" {
+    //Toggle production output
     debug[3] = !debug[3];
     }
 
@@ -277,11 +283,12 @@ return {
 
 
 ";" {
+    //Important for differentiating statements
     if (!insertModeFlag) {
         //move to lookup mode
         getTable()->setMode(false);
     } else {
-        //still in insert mode, reset all this
+        //still in insert mode, reset all this for next declaration check
         type_specifier = Int; //default to int
         type_qualifier = NoTQ;
         storage_class_specifier = NoSCS;
@@ -292,6 +299,7 @@ return {
     to_token_file(SEMI);
     return (SEMI);}
 "{" {
+    //Dump symbol table at scope entry
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
@@ -311,6 +319,7 @@ return {
     to_token_file(OPENCUR);
     return (OPENCUR);}
 "}" {
+    //Dump symbol table at scope exit
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
@@ -495,12 +504,15 @@ return {
     return (CHARACTER_CONSTANT); }
 {string_literal} {
     to_token_file(STRING_LITERAL);
+    //run through the string to search for escape characters
+    //This way, yylval will contain the proper values
     char * strstart = yytext+1;
     int initial_len = strlen(strstart);
     strstart[initial_len-1] = '\0';
     char * lead = strstart;
     char * lag = strstart;
     while (*lead != '\0') {
+        //Dealing with escape characters
         if (*lead == '\\') {
             lead++;
             switch(*lead) {
@@ -548,7 +560,7 @@ return {
         //cout << "aaaah";
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
-        outputError("too long buddy", "Floating Constant too long.", true);
+        outputError("Too long", "Floating Constant too long.", true);
     }
     //todo check size
     yylval.fval = atof(yytext);
@@ -563,7 +575,7 @@ return {
         //cout << "aaaah";
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
-        outputError("too long buddy", "Integer Constant too long.", true);
+        outputError("Too long", "Integer Constant too long.", true);
     }
     //todo check size for a long, c string compare
     yylval.ival = atol(yytext);
@@ -572,9 +584,10 @@ return {
     if (yyleng > 31) {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
-        outputError("too long buddy", "Identifier name too long.", true);
+        outputError("Too long", "Identifier name too long.", true);
     }
     string s = yytext;
+    //Constructing a Symbol Table node
     Node x = Node();
     x.setLineNumber(yylineno);
     x.setColumnNumber(columnQueue.size() - yyleng + 1);
@@ -586,7 +599,7 @@ return {
         //currently in insert mode
         if (!insertModeFlag) {
             //this is a change from insert to lookup, UNLESS you're a typedef
-            //todo check to see if you're a typedef'd type
+            //todo check to see if you're a typedef
             getTable()->setMode(false); //now you're in lookup mode
             //lookup mode operations
             tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
@@ -620,14 +633,7 @@ return {
             }
         }
     } else {
-        //cout << "going else" << endl;
-        //currently in lookup mode
-        //lookup mode operations
-        /*if (insertModeFlag) {
-            for(int i = 0; i < yyleng; i++)
-                columnQueue.pop_back();
-            outputError("Not in Insert Mode", "Currently in Lookup Mode.", false);
-        }*/
+        //Lookup Mode
         tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
         map<string, Node>::iterator it;
         string status;
@@ -645,21 +651,31 @@ return {
     return ( IDENTIFIER );}
 
 . {
+    //Unrecognized tokens
     to_token_file(ERROR);
     outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
     return (ERROR);
   }
 
-
 %%
 
+/**
+ * Outputs an Error or Warnign Message
+ *
+ * @param errmsg1 the error message right next to the ^
+ * @param errmsg2 the error message on the following line
+ * @param errtype true if its a warning, false if its an error
+ */
 void outputError(string errmsg1, string errmsg2, bool errtype) {
     outputErrorWarningLine();
     int columnNum = outputErrorWarningPosition(errmsg1);
     outputErrorWarning(errtype, errmsg2, columnNum);
 }
 
+/**
+ * Outputs the preceding line from source code for the error
+ */
 void outputErrorWarningLine(){
     ifstream errInput;
     errInput.open(fileName);
@@ -677,7 +693,11 @@ void outputErrorWarningLine(){
     cerr << endl;
 }
 
-
+/**
+ * Outputs the position of the error with a ^ pointer
+ * @param errmsg the message that goes next to it
+ * @return The error position
+ */
 int outputErrorWarningPosition(string errmsg) {
     int columnNum = columnQueue.size();
     while(!columnQueue.empty()) {
@@ -692,12 +712,18 @@ int outputErrorWarningPosition(string errmsg) {
     return columnNum + 1;
 }
 
-//errtype true if its a warning, false if its an error
+/**
+ * Outputs the actual cerr message
+ */
 void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
     string s = errtype ? "Warning" : "Error";
     cerr << s << " on line " << yylineno << " (column " << columnNum << "): " << errmsg << endl;
 }
 
+/**
+ * Outputs the token to a file, including the token value and the string representation
+ * @param token the token number to be output
+ */
 void to_token_file(int token) {
     ofstream pStream;
 
