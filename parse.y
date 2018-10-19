@@ -1,5 +1,7 @@
-
 %{
+
+/* Headers */
+
 #include <iostream>
 #include <fstream>
 #include <cctype>
@@ -8,29 +10,33 @@
 #include <cstdio>
 #include <stdio.h>
 #include <string.h>
-
 #include <fstream>
 #include <string>
-//TODO continue parsing after error happens, use 'error' token or yyerrok
-//TODO add in debug option to turn off/on all productions
-#include "SymbolTable.h"
-SymbolTable * table_ptr;
+#include <deque>
 
-using namespace std;
-string newOutputFile;
-extern FILE * yyin;
+#include "SymbolTable.h"
+
+/* Global Variables */
+
 bool debug[5]; // -d, -l, -s, productions flag, -o
-// -d enable debugging WORKS
+// -d enable debugging
 // -l produces a list of tokens and their values to a file
 // -s dumps symbol table at key points to a file
 // -p prints all productions to a file
 // -o name a file to output interspersed reductions to
+
+SymbolTable * table_ptr;
+string newOutputFile;
+extern FILE * yyin;
+extern deque <char> columnQueue;
 char* fileName;
 void yyerror (char const *s);
 void handleProd (string prod);
 bool printProd = false;
 int yylex();
+extern int yyleng;
 stringstream prodStream;
+using namespace std;
 %}
 
 %union {
@@ -50,7 +56,7 @@ stringstream prodStream;
     SymbolTable * getTable() {
         return table_ptr;
     }
-};
+}
 
 %token IDENTIFIER
 %token<ival> INTEGER_CONSTANT
@@ -519,12 +525,45 @@ identifier
 	;
 %%
 
-extern int column;
-
-//error function called when parsing fails, prints error to stderr stream thingy
+/**
+ * @brief The yyerror function is a default yacc function that is called whenever
+ *        bison cannot match a production.
+ * @details yyerror prints out the type of error followed with the
+ * @param s is the type of error that bison detects.
+ */
 void yyerror (char const* s)
 {
-    cerr << s << " on line " << yylloc.first_line << endl;
+    ifstream errInput;
+    string currentLine;
+    errInput.open(fileName);
+    for(int i = 0; i < yylloc.first_line - 1; i++)
+        getline(errInput, currentLine);
+
+    deque <char> errQueue;
+    while(errInput.peek() != '\n')
+        errQueue.push_back(errInput.get());
+
+    while(!errQueue.empty()) {
+        cerr << errQueue.front();
+        errQueue.pop_front();
+    }
+    cerr << endl;
+
+    for(int i = 0; i < yyleng; i++)
+        columnQueue.pop_back();
+
+    int columnNum = columnQueue.size();
+    while(!columnQueue.empty()) {
+        if(columnQueue.front() == '\t')
+            cerr << columnQueue.front();
+        else
+            cerr << ' ';
+
+        columnQueue.pop_front();
+    }
+        cerr << "^ " << "\n";
+
+    cerr << s << " on line " << yylloc.first_line << " (column " << columnNum + 1 << ")" << endl;
 	return;
 }
 
@@ -550,6 +589,7 @@ int main(int argc, char **argv)
     table_ptr = &symbolTable;
     for(int i = 0; i < 5; i++) //initialize all debug options to false
         debug[i] = false;
+    debug[3] = true;
     if(argc > 1)
     {
         for(int i = 1; i < argc; i++)

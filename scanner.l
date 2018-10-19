@@ -12,6 +12,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <deque>
+
 #include "SymbolTable.h"
 #include "Node.h"
 #include "parser.hpp"
@@ -39,13 +40,12 @@ void outputError(string errmsg1, string errmsg2, bool errtype);
 void outputErrorWarningLine();
 int outputErrorWarningPosition(string errmsg);
 void outputErrorWarning(bool errtype, string errmsg, int columnNum);
-void to_token_file(int token);
+void to_token_file(int token, string tokName);
 
 using namespace std;
     //note: i'm shoving all my comments up here for lack of better space
     //enumeration constant? i don't think that's even used;
 
-void to_token_file(int token);
 
 %}
 
@@ -106,49 +106,49 @@ typedef {
     if (getTable()->getMode()) {
         insertModeFlag = true;
     }
-    to_token_file(TYPEDEF);
+    to_token_file(TYPEDEF, "TYPEDEF");
     return ( TYPEDEF );}
 extern {
     if (getTable()->getMode()) {
         insertModeFlag = true;
         storage_class_specifier = Extern;
     }
-    to_token_file(EXTERN);
+    to_token_file(EXTERN, "EXTERN");
     return ( EXTERN );}
 static {
     if (getTable()->getMode()) {
         insertModeFlag = true;
         storage_class_specifier = Static;
     }
-    to_token_file(STATIC);
+    to_token_file(STATIC, "STATIC");
     return ( STATIC );}
 auto {
     if (getTable()->getMode()) {
         storage_class_specifier = Auto;
         insertModeFlag = true;
     }
-    to_token_file(AUTO);
+    to_token_file(AUTO, "AUTO");
     return ( AUTO );}
 register {
     if (getTable()->getMode()) {
         storage_class_specifier = Register;
         insertModeFlag = true;
     }
-    to_token_file(REGISTER);
+    to_token_file(REGISTER, "REGISTER");
     return ( REGISTER );}
 char {
     if (getTable()->getMode()) {
         type_specifier = Char;
         insertModeFlag = true;
     }
-    to_token_file(CHAR);
+    to_token_file(CHAR, "CHAR");
     return ( CHAR );}
 short {
     if (getTable()->getMode()) {
         type_specifier = Short;
         insertModeFlag = true;
     }
-    to_token_file(SHORT);
+    to_token_file(SHORT, "SHORT");
     return ( SHORT );}
 int {
     if (getTable()->getMode()) {
@@ -159,120 +159,120 @@ int {
         }
         insertModeFlag = true;
     }
-    to_token_file(INT);
+    to_token_file(INT, "INT");
     return ( INT );}
 long {
     if (getTable()->getMode()) {
         type_specifier = Long;
         insertModeFlag = true;
     }
-    to_token_file(LONG);
+    to_token_file(LONG, "LONG");
     return ( LONG );}
 signed {
     if (getTable()->getMode()) {
         signed_or_unsigned = Signed;
         insertModeFlag = true;
     }
-    to_token_file(SIGNED);
+    to_token_file(SIGNED, "SIGNED");
     return ( SIGNED );}
 unsigned {
     if (getTable()->getMode()) {
         signed_or_unsigned = Unsigned;
         insertModeFlag = true;
     }
-    to_token_file(UNSIGNED);
+    to_token_file(UNSIGNED, "UNSIGNED");
     return ( UNSIGNED );}
 float {
     if (getTable()->getMode()) {
         type_specifier = Float;
         insertModeFlag = true;
     }
-    to_token_file(FLOAT);
+    to_token_file(FLOAT, "FLOAT");
     return ( FLOAT );}
 double {
     if (getTable()->getMode()) {
         type_specifier = Double;
         insertModeFlag = true;
     }
-    to_token_file(DOUBLE);
+    to_token_file(DOUBLE, "DOUBLE");
     return ( DOUBLE );}
 const {
     if (getTable()->getMode()) {
         type_qualifier = Const;
         insertModeFlag = true;
     }
-    to_token_file(CONST);
+    to_token_file(CONST, "CONST");
     return ( CONST );}
 volatile {
     if (getTable()->getMode()) {
         type_qualifier = Volatile;
         insertModeFlag = true;
     }
-    to_token_file(VOLATILE);
+    to_token_file(VOLATILE, "VOLATILE");
     return ( VOLATILE );}
 void {
     if (getTable()->getMode()) {
         type_specifier = Void;
         insertModeFlag = true;
     }
-    to_token_file(VOID);
+    to_token_file(VOID, "VOID");
     return ( VOID );}
 struct {
     if (getTable()->getMode()) {
         type_specifier = Struct;
         insertModeFlag = true;
     }
-    to_token_file(STRUCT);
+    to_token_file(STRUCT, "STRUCT");
     return ( STRUCT );}
 union {
     if (getTable()->getMode()) {
         type_specifier = Union;
         insertModeFlag = true;
     }
-    to_token_file(UNION);
+    to_token_file(UNION, "UNION");
     return ( UNION );}
 enum {
     if (getTable()->getMode()) {
         insertModeFlag = true;
     }
-    to_token_file(ENUM);
+    to_token_file(ENUM, "ENUM");
     return ( ENUM );}
 
 case {
-    to_token_file(CASE);
+    to_token_file(CASE, "CASE");
     return ( CASE );}
 default {
-    to_token_file(DEFAULT);
+    to_token_file(DEFAULT, "DEFAULT");
     return ( DEFAULT );}
 if {
-    to_token_file(IF);
+    to_token_file(IF, "IF");
     return ( IF );}
 else {
-    to_token_file(ELSE);
+    to_token_file(ELSE, "ELSE");
     return ( ELSE );}
 switch {
-    to_token_file(SWITCH);
+    to_token_file(SWITCH, "SWITCH");
     return ( SWITCH );}
 while {
-    to_token_file(WHILE);
+    to_token_file(WHILE, "WHILE");
     return ( WHILE );}
 do {
-    to_token_file(DO);
+    to_token_file(DO, "DO");
     return ( DO );}
 for {
-    to_token_file(FOR);
+    to_token_file(FOR, "FOR");
     return ( FOR );}
 goto {
-    to_token_file(GOTO);
+    to_token_file(GOTO, "GOTO");
     return ( GOTO );}
 continue {
-    to_token_file(CONTINUE);
+    to_token_file(CONTINUE, "CONTINUE");
     return ( CONTINUE );}
 break {
-    to_token_file(BREAK);
+    to_token_file(BREAK, "BREAK");
     return ( BREAK );}
 return {
-    to_token_file(RETURN);
+    to_token_file(RETURN, "RETURN");
     return ( RETURN );}
 
 
@@ -289,9 +289,10 @@ return {
         struct_or_union_symbols.clear();
     }
     insertModeFlag = false;
-    to_token_file(SEMI);
+    to_token_file(SEMI, "SEMI");
     return (SEMI);}
 "{" {
+    getTable()->pushLevel();
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
@@ -308,7 +309,7 @@ return {
     signed_or_unsigned = NoSU;
     struct_or_union_symbols.clear();
     insertModeFlag = false;
-    to_token_file(OPENCUR);
+    to_token_file(OPENCUR, "OPENCUR");
     return (OPENCUR);}
 "}" {
     if(debug[0] && debug[2])
@@ -319,146 +320,146 @@ return {
         SymDump << *getTable() << "\n\n";
         SymDump.close();
     }
-    to_token_file(CLOSCUR);
+    getTable()->popLevel();
+    to_token_file(CLOSCUR, "CLOSECUR");
     return (CLOSCUR);}
 "," {
-    to_token_file(COMMA);
+    to_token_file(COMMA, "COMMA");
     return (COMMA);}
 "=" {
-    to_token_file(ASSIGN);
+    to_token_file(ASSIGN, "ASSIGN");
     return (ASSIGN);}
 ":" {
-    to_token_file(COLON);
+    to_token_file(COLON, "COLON");
     return (COLON);}
 "[" {
-    to_token_file(OPENSQ);
+    to_token_file(OPENSQ, "OPENSQ");
     return (OPENSQ);}
 "]" {
-    to_token_file(CLOSSQ);
+    to_token_file(CLOSSQ, "CLOSSQ");
     return (CLOSSQ);}
 "*" {
-    to_token_file(STAR);
+    to_token_file(STAR, "STAR");
     return (STAR);}
 "(" {
-    to_token_file(OPENPAR);
+    to_token_file(OPENPAR, "OPENPAR");
     return (OPENPAR);}
 ")" {
-    to_token_file(CLOSEPAR);
+    to_token_file(CLOSEPAR, "CLOSPAR");
     return (CLOSEPAR);}
 "?" {
-    to_token_file(TERNARY);
+    to_token_file(TERNARY, "TERNARY");
     return (TERNARY);}
 "|" {
-    to_token_file(BAR);
+    to_token_file(BAR, "BAR");
     return (BAR);}
 "^" {
-    to_token_file(XOR);
+    to_token_file(XOR, "XOR");
     return (XOR);}
 "&" {
-    to_token_file(AND);
+    to_token_file(AND, "AND");
     return (AND);}
 "<" {
-    to_token_file(LESSTH);
+    to_token_file(LESSTH, "LESSTH");
     return (LESSTH);}
 ">" {
-    to_token_file(GREATH);
+    to_token_file(GREATH, "GREATH");
     return (GREATH);}
 "+" {
-    to_token_file(PLUS);
+    to_token_file(PLUS, "PLUS");
     return (PLUS);}
 "-" {
-    to_token_file(MINUS);
+    to_token_file(MINUS, "MINUS");
     return (MINUS);}
 "/" {
-    to_token_file(SLASH);
+    to_token_file(SLASH, "SLASH");
     return (SLASH);}
 "%" {
-    to_token_file(MODULO);
+    to_token_file(MODULO, "MODULO");
     return (MODULO);}
 "~" {
-    to_token_file(TILDE);
+    to_token_file(TILDE, "TILDE");
     return (TILDE);}
 "!" {
-    to_token_file(BANG);
+    to_token_file(BANG, "BANG");
     return (BANG);}
 "." {
-    to_token_file(PERIOD);
+    to_token_file(PERIOD, "PERIOD");
     return (PERIOD);}
 
 
 "..." {
-    to_token_file(ELIPSIS);
+    to_token_file(ELIPSIS, "ELIPSIS");
     return ( ELIPSIS );}
-
 "sizeof"    {
-    to_token_file(SIZEOF);
+    to_token_file(SIZEOF, "SIZEOF");
     return ( SIZEOF );}
 "->"    {
-    to_token_file(PTR_OP);
+    to_token_file(PTR_OP, "PTR_OP");
     return ( PTR_OP );}
 "++"    {
-    to_token_file(INC_OP);
+    to_token_file(INC_OP, "INC_OP");
     return ( INC_OP );}
 "--"    {
-    to_token_file(DEC_OP);
+    to_token_file(DEC_OP, "DEC_OP");
     return ( DEC_OP );}
 "<<"    {
-    to_token_file(LEFT_OP);
+    to_token_file(LEFT_OP, "LEFT_OP");
     return ( LEFT_OP );}
 ">>"    {
-    to_token_file(RIGHT_OP);
+    to_token_file(RIGHT_OP, "RIGHT_OP");
     return ( RIGHT_OP );}
 "<="    {
-    to_token_file(LE_OP);
+    to_token_file(LE_OP, "LE_OP");
     return ( LE_OP );}
 ">="    {
-    to_token_file(GE_OP);
+    to_token_file(GE_OP, "GE_OP");
     return ( GE_OP );}
 "=="    {
-    to_token_file(EQ_OP);
+    to_token_file(EQ_OP, "EQ_OP");
     return ( EQ_OP );}
 "!="    {
-    to_token_file(NE_OP);
+    to_token_file(NE_OP, "NE_OP");
     return ( NE_OP );}
 "&&"    {
-    to_token_file(AND_OP);
+    to_token_file(AND_OP, "AND_OP");
     return ( AND_OP );}
 "||"    {
-    to_token_file(OR_OP);
+    to_token_file(OR_OP, "OR_OP");
     return ( OR_OP );}
 "*="    {
-    to_token_file(MUL_ASSIGN);
+    to_token_file(MUL_ASSIGN, "MUL_ASSIGN");
     return ( MUL_ASSIGN );}
 "/="    {
-    to_token_file(DIV_ASSIGN);
+    to_token_file(DIV_ASSIGN, "DIV_ASSIGN");
     return ( DIV_ASSIGN );}
 "%="    {
-    to_token_file(MOD_ASSIGN);
+    to_token_file(MOD_ASSIGN, "MOD_ASSIGN");
     return ( MOD_ASSIGN );}
 "+="    {
-    to_token_file(ADD_ASSIGN);
+    to_token_file(ADD_ASSIGN, "ADD_ASSIGN");
     return ( ADD_ASSIGN );}
 "-="    {
-    to_token_file(SUB_ASSIGN);
+    to_token_file(SUB_ASSIGN, "SUB_ASSIGN");
     return ( SUB_ASSIGN );}
 "<<="   {
-    to_token_file(LEFT_ASSIGN);
+    to_token_file(LEFT_ASSIGN, "LEFT_ASSIGN");
     return ( LEFT_ASSIGN );}
 ">>="   {
-    to_token_file(RIGHT_ASSIGN);
+    to_token_file(RIGHT_ASSIGN, "RIGHT_ASSIGN");
     return ( RIGHT_ASSIGN );}
 "&="    {
-    to_token_file(AND_ASSIGN);
+    to_token_file(AND_ASSIGN, "AND_ASSIGN");
     return ( AND_ASSIGN );}
 "^="    {
-    to_token_file(XOR_ASSIGN);
+    to_token_file(XOR_ASSIGN, "XOR_ASSIGN");
     return ( XOR_ASSIGN );}
 "|="    {
-    to_token_file(NE_OP);
+    to_token_file(NE_OP, "NE_OP");
     return ( NE_OP );}
 
 {character_constant} {
-    to_token_file(CHARACTER_CONSTANT);
+    to_token_file(CHARACTER_CONSTANT, "CHARACTER_CONSTANT");
     //passing escape characters
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
@@ -494,7 +495,7 @@ return {
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
-    to_token_file(STRING_LITERAL);
+    to_token_file(STRING_LITERAL, "STRING_LITERAL");
     char * strstart = yytext+1;
     int initial_len = strlen(strstart);
     strstart[initial_len-1] = '\0';
@@ -540,13 +541,12 @@ return {
     yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
-    to_token_file(FLOATING_CONSTANT);
     float num = stof(yytext);
+    to_token_file(FLOATING_CONSTANT, "FLOATING_CONSTANT");
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
-        //cout << "aaaah";
-        for(int i = 0; i < yyleng; i++)
+        for(int i = 0; i < yyleng+1; i++)
             columnQueue.pop_back();
         outputError("too long buddy", "Floating Constant too long.", true);
     }
@@ -554,14 +554,13 @@ return {
     yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
-    to_token_file(INTEGER_CONSTANT);
+    to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
     //test if the integer is too big, aka bigger than a long
     long num = stol(yytext);
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
-        //cout << "aaaah";
-        for(int i = 0; i < yyleng; i++)
+        for(int i = 0; i < yyleng+1; i++)
             columnQueue.pop_back();
         outputError("too long buddy", "Integer Constant too long.", true);
     }
@@ -569,6 +568,7 @@ return {
     yylval.ival = atol(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
+    to_token_file(IDENTIFIER, "IDENTIFIER");
     if (yyleng > 31) {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
@@ -594,12 +594,11 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
-            for(int i = 0; i < yyleng; i++) {
+            for(int i = 0; i < yyleng+1; i++) {
                 columnQueue.pop_back();
             }
-                to_token_file(ERROR);
+                to_token_file(ERROR, "ERROR");
                 outputError("Not found", "Identifier not defined.", false);
-                return (ERROR);
             }
         } else {
             //this is a normal insert
@@ -608,11 +607,10 @@ return {
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
             if (!insertSuccess) {
-                for(int i = 0; i < yyleng; i++)
+                for(int i = 0; i < yyleng+1; i++)
                     columnQueue.pop_back();
-                to_token_file(ERROR);
+                to_token_file(ERROR, "ERROR");
                 outputError("Already exists", "Variable already exists on this scope.", false);
-                return (ERROR);
             } else if (!notShadowing) {
                 for(int i = 0; i < yyleng; i++)
                     columnQueue.pop_back();
@@ -623,32 +621,29 @@ return {
         //cout << "going else" << endl;
         //currently in lookup mode
         //lookup mode operations
-        /*if (insertModeFlag) {
-            for(int i = 0; i < yyleng; i++)
-                columnQueue.pop_back();
-            outputError("Not in Insert Mode", "Currently in Lookup Mode.", false);
-        }*/
         tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
         map<string, Node>::iterator it;
         string status;
         tie(it, status) = result;
         if (status == "not") {
-            for(int i = 0; i < yyleng; i++)
+            for(int i = 0; i < yyleng+1; i++)
                 columnQueue.pop_back();
-            to_token_file(ERROR);
+            to_token_file(ERROR, "ERROR");
             outputError("Not found", "Identifier not defined.", false);
-            return (ERROR);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
-    to_token_file(IDENTIFIER);
-    return ( IDENTIFIER );}
+    to_token_file(IDENTIFIER, "IDENTIFIER");
+    return ( IDENTIFIER );
+}
+    /*return ( IDENTIFIER );}*/
 
 . {
-    to_token_file(ERROR);
-    outputErrorWarningLine();
-    outputErrorWarningPosition("Unexpected Character");
-    return (ERROR);
+    for(int i = 0; i < yyleng; i++)
+        columnQueue.pop_back();
+    to_token_file(ERROR, "ERROR");
+    outputError("Invalid", "Invalid character", false);
+    exit(0);
   }
 
 
@@ -658,6 +653,8 @@ void outputError(string errmsg1, string errmsg2, bool errtype) {
     outputErrorWarningLine();
     int columnNum = outputErrorWarningPosition(errmsg1);
     outputErrorWarning(errtype, errmsg2, columnNum);
+    if(!errtype)
+        exit(0);
 }
 
 void outputErrorWarningLine(){
@@ -698,7 +695,7 @@ void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
     cerr << s << " on line " << yylineno << " (column " << columnNum << "): " << errmsg << endl;
 }
 
-void to_token_file(int token) {
+void to_token_file(int token, string tokName) {
     ofstream pStream;
 
     if(debug[4])
@@ -707,12 +704,12 @@ void to_token_file(int token) {
         pStream.open("list_file", ios::app);
 
     pStream << endl << yytext << endl << endl;
-    for(int i =0; i < yyleng; i++)
+    for(int i = 0; i < yyleng; i++)
         columnQueue.push_back(' ');
     if(debug[1] && debug[0]) {
         ofstream tokenfile;
         tokenfile.open("tokens.out", ios::app);
-        tokenfile << yytext << " " << token << "\n";
+        tokenfile << yytext << " " << tokName << " " << token << "\n";
         tokenfile.close();
     }
 }
