@@ -17,13 +17,16 @@
 #include "SymbolTable.h"
 #include "Node.h"
 #include "parser.hpp"
+
+/* Global Variables */
+
 extern bool debug[4];
 extern FILE * yyin;
 extern char* fileName;
 //TODO: output source code and do column numbers
 SymbolTable * sym;
 bool isFunction; //true if function
-type_specifiers type_specifier = NoTS;
+type_specifiers type_specifier = Int; //default type specifier of "int" for everything
 type_qualifiers type_qualifier = NoTQ;
 storage_class_specifiers storage_class_specifier = NoSCS;
 signed_or_unsigneds signed_or_unsigned = NoSU;
@@ -37,6 +40,7 @@ static bool insertModeFlag = false;
 extern FILE * yyin;
 
 /* Function Declarations */
+
 //todo probably combine these three into one function
 void outputError(string errmsg1, string errmsg2, bool errtype);
 void outputErrorWarningLine();
@@ -75,7 +79,11 @@ escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9]?[0-9
 
 character_constant \'([^']|{escape_sequence})\'
 
+comment \/\*(.|{newLine})*\*\/
+
 %%
+
+{comment} {cout << "comment ";}
 
 {newLine} {
     first_column = 0;
@@ -275,10 +283,11 @@ return {
         getTable()->setMode(false);
     } else {
         //still in insert mode, reset all this
-        string type_specifier = "none";
-        string type_qualifier = "none";
-        string storage_class_specifier = "none";
-        string signed_or_unsigned = "none";
+        type_specifier = Int; //default to int
+        type_qualifier = NoTQ;
+        storage_class_specifier = NoSCS;
+        signed_or_unsigned = NoSU;
+        struct_or_union_symbols.clear();
     }
     insertModeFlag = false;
     to_token_file(SEMI);
@@ -298,10 +307,11 @@ return {
     }
     getTable()->setMode(true);
     //flip to insert mode, make sure all this is reset
-    string type_specifier = "none";
-    string type_qualifier = "none";
-    string storage_class_specifier = "none";
-    string signed_or_unsigned = "none";
+    type_specifier = Int; //default to int
+    type_qualifier = NoTQ;
+    storage_class_specifier = NoSCS;
+    signed_or_unsigned = NoSU;
+    struct_or_union_symbols.clear();
     insertModeFlag = false;
     to_token_file(OPENCUR);
     return (OPENCUR);}

@@ -4,7 +4,7 @@
  * Default Constructor for a Node. Sets default values. Other values must be manually set.
  *
  */
-Node::Node() : lineNumber(-1), columnNumber(-1), type_specifier(NoTS), type_qualifier(NoTQ),
+Node::Node() : lineNumber(-1), columnNumber(-1), type_specifier(Int), type_qualifier(NoTQ),
     storage_class_specifier(NoSCS), signed_or_unsigned(NoSU){
 }
 
@@ -19,17 +19,95 @@ ostream& operator<<(ostream& os, const Node& node) {
     os << "Line Number: " << node.lineNumber << ", ";
     os << "Column Number: " << node.columnNumber << ", ";
     os << "Declaration Specifiers: ";
-    if (node.type_specifier != NoTS) { //todo make these not suck
-        os << node.type_specifier << " ";
+    if (node.type_specifier != NoTS) {
+        string s;
+        switch (node.type_specifier) {
+            case Int:
+                s = "int";
+                break;
+            case Char:
+                s = "char";
+                break;
+            case Short:
+                s = "short";
+                break;
+            case Long:
+                s = "long";
+                break;
+            case Float:
+                s = "float";
+                break;
+            case Double:
+                s = "double";
+                break;
+            case Struct:
+                s = "struct";
+                break;
+            case Union:
+                s = "union";
+                break;
+            case TypedefName:
+                s = "not implemented";
+                break;
+            case Void:
+                s = "void";
+                break;
+            default:
+                break;
+        }
+        os << s << " ";
     }
     if (node.type_qualifier != NoTQ) {
-        os << node.type_qualifier << " ";
+        string s;
+        switch(node.type_qualifier) {
+            case Const:
+                s = "const";
+                break;
+            case Volatile:
+                s = "volatile";
+                break;
+            default:
+                break;
+        }
+        os << s << " ";
     }
     if (node.storage_class_specifier != NoSCS) {
-        os << node.storage_class_specifier << " ";
+        //{Auto, Register, Static, Extern, Typedef, NoSCS};
+        string s;
+        switch (node.storage_class_specifier) {
+            case Auto:
+                s = "auto";
+                break;
+            case Register:
+                s = "register";
+                break;
+            case Static:
+                s = "static";
+                break;
+            case Extern:
+                s = "extern";
+                break;
+            case Typedef:
+                s = "typedef";
+                break;
+            default:
+                break;
+        }
+        os << s<< " ";
     }
     if (node.signed_or_unsigned != NoSU) {
-        os << node.signed_or_unsigned << " ";
+        string s;
+        switch(node.signed_or_unsigned) {
+            case Signed:
+                s = "signed";
+                break;
+            case Unsigned:
+                s = "unsigned";
+                break;
+            default:
+                break;
+        }
+        os << s<< " ";
     }
     return os;
 }
