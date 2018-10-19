@@ -1,4 +1,4 @@
-# Best C Compiler
+# C 2 MIPS
 
 For CS 460, Compiler Construction, Fall 2018
 
