@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['project_5fnode_5fh',['PROJECT_NODE_H',['../scanner_8l.html#a72327f3532aaf64f85fb3b8217a64a2d',1,'scanner.l']]]
+  ['architecture_5fid',['ARCHITECTURE_ID',['../_c_make_c_compiler_id_8c.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCCompilerId.c'],['../_c_make_c_x_x_compiler_id_8cpp.html#aba35d0d200deaeb06aee95ca297acb28',1,'ARCHITECTURE_ID():&#160;CMakeCXXCompilerId.cpp']]]
 ];

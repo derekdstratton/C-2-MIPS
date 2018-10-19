@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['type_5fqualifier',['type_qualifier',['../class_node.html#ad3aca030b357c27bdffc489e20232d92',1,'Node']]],
-  ['type_5fspecifier',['type_specifier',['../class_node.html#ad01b789a6cbef299f7a202a213e171a3',1,'Node']]]
+  ['last_5fcolumn',['last_column',['../struct_y_y_l_t_y_p_e.html#acf87f8c98686f286eaf700c4b62157b2',1,'YYLTYPE']]],
+  ['last_5fline',['last_line',['../struct_y_y_l_t_y_p_e.html#a3075f2bc3448df5d2a9f16d22bff2cc1',1,'YYLTYPE']]]
 ];

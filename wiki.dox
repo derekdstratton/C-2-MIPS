@@ -1,9 +1,23 @@
 //Main Page:
  * /*! \mainpage Index
  *
- * This is the formal documentation for the C Compiler project. [more overview details]
+ * This is the formal documentation for the Compilers project. This was written by
+ * Derek Stratton and Chris Koh for CS 460. This is published for the demonstration on
+ * October 19, 2018. The compiler's end goal is to translate source code in ANSI C
+ * to target code in MIPS Assembler code. Currently, the project contains a scanner
+ * and a parser integrated with a Symbol Table, and it can output tokens or productions.
  *
- * \section contents Table of Contents
+ * The compiler is written in C++. The Symbol Table is implemented as a class
+ * that integrates with the scanner and parser. The scanner is implemented as a Lex (.l)
+ * file that processes an input character stream and returns tokens. The parser is
+ * implemented as a Yacc (.l) file that processes tokens from the scanner and returns
+ * productions. The scanner uses Flex and the parser uses Bison for compilation. The
+ * Compiler's build is automated with CMake, and it is being written and tested with the
+ * IDE CLion.
+ *
+ * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums.
+ *
+ * \section module Modules
  *
  * \ref symtable : The Symbol Table for the compiler.
  *
@@ -13,22 +27,76 @@
  *
  * \section run_instr Instructions for Running the Compiler
  *
- * This is where you say how to run things.
+ * \subsection inst Installation
+ *
+ * `git clone https://github.com/derekdstratton/Best-C-Compiler`
+ *
+    `cmake Best-C-Compiler`
+
+    `make`
+
+    \subsection run Running the Compiler
+
+    `./ScannerParser [options] [file_path]`
+
+    options:
+
+    - `-d`:
+
+    - `-l`:
+
+    - `-p`:
+
+    - `-o`:
+
+    file_path:
+
+    - The path to the file being compiled.
+    If none is specified, it will default to the input stream.
  *
  */
 
  //Symbol Table:
 /*! \page symtable Symbol Table
  *
- * insert overview details
+ * The Symbol Table is a class that communicates with the Scanner and Parser to
+ * track and store data about identifiers encountered. The main table variable in the
+ * class is a list of maps that have a key of type string and a value of type Node.
+ * The list is treated like a stack. The %Node class is a collection of data corresponding
+ * to each identifier. For more information about the technical details of these classes,
+ * view the SymbolTable or Node page.
  *
    \section test_symtable Testing the Symbol Table
 
-   how to run the tests
+   The Symbol Table can be tested with the test driver SymbolTableDriver.cpp.
+
+  To run the test driver, run `%SymbolTable` in CLion.
+
+  To view the output, go to this file:
+
+  -
+
+  * Note, the Symbol Table test driver inputs default empty nodes. They have a default
+  * line number of -1, default column number of -1, and type int.
+
+  From there, the program will prompt you to add a number corresponding to the
+  desired test case. The numbers can be found in the documentation for SymbolTableDriver.cpp
+  or in the comments of that file in the source code.
 
    \section links_symtable Links
 
-  links to actual file, test cases, and outputs
+  Symbol Table Class Documentation: SymbolTable
+
+  Symbol Table Source Code:
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.cpp
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTable.h
+
+  %Node Class Documentation: Node
+
+  %Node Source Code:
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.cpp
+    - https://github.com/derekdstratton/Best-C-Compiler/blob/master/Node.h
+
 */
 
 //Scanner:
@@ -38,10 +106,24 @@
 
   \section test_scanner Testing the Scanner
 
-  put stuff
+  The Scanner can be tested by running the Test Files with `ScannerParser`. The
+  program argument should contain a file from the tests folder.
+
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests
+
+  These tests can be compared with their outputs, found in the tests/output directory.
+
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output
+
+  \section tech_details Technical Details
+
+  salkdfjlk
 
   \section links_scanner Links
-  links to actual file, test cases, and outputs
+
+  Scanner Lex File:
+
+  - https://github.com/derekdstratton/Best-C-Compiler/blob/master/scanner.l
 */
 
 //Parser:
@@ -51,11 +133,24 @@
 
   \section test_parser Testing the Parser
 
-  can probably copy/paste this from scanner one
+  The Parser can be tested by running the Test Files with `ScannerParser`. The
+  program argument should contain a file from the tests folder.
+
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests
+
+  These tests can be compared with their outputs, found in the tests/output directory.
+
+  - https://github.com/derekdstratton/Best-C-Compiler/tree/master/tests/output
+
+  \section tech_details Technical Details
+
+  salkdfjlk
 
   \section links_parser Links
 
-  links to actual file, test cases, and outputs
+  Parser Yacc File:
+
+  - https://github.com/derekdstratton/Best-C-Compiler/blob/master/parse.y
 */
 
 //Reference:
