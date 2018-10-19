@@ -17,11 +17,18 @@
 SymbolTable * table_ptr;
 
 using namespace std;
-
+string newOutputFile;
 extern FILE * yyin;
-bool debug[4]; // -d, -l, -s, -o
+bool debug[5]; // -d, -l, -s, productions flag, -o
+// -d enable debugging WORKS
+// -l produces a list of tokens and their values to a file
+// -s dumps symbol table at key points to a file
+// -p prints all productions to a file
+// -o name a file to output interspersed reductions to
 char* fileName;
 void yyerror (char const *s);
+void handleProd (string prod);
+bool printProd = false;
 int yylex();
 stringstream prodStream;
 %}
@@ -41,7 +48,6 @@ stringstream prodStream;
 }
 
 %code {
-    //void apple() { cout << "APPLE SALAD BURRITO";}
     SymbolTable * getTable() {
         return table_ptr;
     }
@@ -93,424 +99,424 @@ TYPEDEF_NAME
 %%
 
 translation_unit
-	/*: TYPEDEF {prodStream << "translation_unit -> TYPEDEF";}*/
-	: external_declaration {prodStream << "translation_unit -> external_declaration\n";}
-	| translation_unit external_declaration {prodStream << "translation_unit -> translation_unit external_declaration\n";}
+	/*: TYPEDEF {handleProd("translation_unit -> TYPEDEF"\n);}*/
+	: external_declaration {handleProd("translation_unit -> external_declaration\n");}
+	| translation_unit external_declaration {handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
 
 external_declaration
-	: function_definition {prodStream << "external_declaration -> function_definition\n";}
-	| declaration {prodStream << "external_declaration -> declaration\n";}
+	: function_definition {handleProd("external_declaration -> function_definition\n");}
+	| declaration {handleProd("external_declaration -> declaration\n");}
 	;
 
 function_definition
-	: declarator compound_statement {prodStream << "function_definition -> declarator compound_statement\n";}
-	| declarator declaration_list compound_statement {prodStream << "function_definition -> declarator declaration_list compound_statement\n";}
-	| declaration_specifiers declarator compound_statement {prodStream << "function_definition -> declaration_specifiers declarator compound_statement\n";}
-	| declaration_specifiers declarator declaration_list compound_statement {prodStream << "function_definition -> declaration_specifiers declarator declaration_list compound_statement\n";}
+	: declarator compound_statement {handleProd("function_definition -> declarator compound_statement\n");}
+	| declarator declaration_list compound_statement {handleProd("function_definition -> declarator declaration_list compound_statement\n");}
+	| declaration_specifiers declarator compound_statement {handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
+	| declaration_specifiers declarator declaration_list compound_statement {handleProd("function_definition -> declaration_specifiers declarator declaration_list compound_statement\n");}
 	;
 
 declaration
-	: declaration_specifiers SEMI {prodStream << "declaration -> declaration_specifiers SEMI\n";}
-	| declaration_specifiers init_declarator_list SEMI {prodStream << "declaration -> declaration_specifiers init_declarator_list SEMI\n";}
+	: declaration_specifiers SEMI {handleProd("declaration -> declaration_specifiers SEMI\n");}
+	| declaration_specifiers init_declarator_list SEMI {handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
 declaration_list
-	: declaration {prodStream << "declaration_list -> declaration\n";}
-	| declaration_list declaration {prodStream << "declaration_list -> declaration_list declaration\n";}
+	: declaration {handleProd("declaration_list -> declaration\n");}
+	| declaration_list declaration {handleProd("declaration_list -> declaration_list declaration\n");}
 	;
 
 declaration_specifiers
-	: storage_class_specifier {prodStream << "declaration_specifiers -> storage_class_specifier\n";}
-	| storage_class_specifier declaration_specifiers {prodStream << "declaration_specifiers -> storage_class_specifier declaration_specifiers\n";}
-	| type_specifier {prodStream << "declaration_specifiers -> type_specifier\n";}
-	| type_specifier declaration_specifiers {prodStream << "declaration_specifiers -> type_specifier declaration_specifiers\n";}
-	| type_qualifier {prodStream << "declaration_specifiers -> type_qualifier\n";}
-	| type_qualifier declaration_specifiers {prodStream << "declaration_specifiers -> type_qualifier declaration_specifiers\n";}
+	: storage_class_specifier {handleProd("declaration_specifiers -> storage_class_specifier\n");}
+	| storage_class_specifier declaration_specifiers {handleProd("declaration_specifiers -> storage_class_specifier declaration_specifiers\n");}
+	| type_specifier {handleProd("declaration_specifiers -> type_specifier\n");}
+	| type_specifier declaration_specifiers {handleProd("declaration_specifiers -> type_specifier declaration_specifiers\n");}
+	| type_qualifier {handleProd("declaration_specifiers -> type_qualifier\n");}
+	| type_qualifier declaration_specifiers {handleProd("declaration_specifiers -> type_qualifier declaration_specifiers\n");}
 	;
 
 storage_class_specifier
-	: AUTO {prodStream << "storage_class_specifier -> AUTO\n";}
-	| REGISTER {prodStream << "storage_class_specifier -> REGISTER\n";}
-	| STATIC {prodStream << "storage_class_specifier -> STATIC\n";}
-	| EXTERN {prodStream << "storage_class_specifier -> EXTERN\n";}
-	| TYPEDEF {prodStream << "storage_class_specifier -> TYPEDEF\n";}
+	: AUTO {handleProd("storage_class_specifier -> AUTO\n");}
+	| REGISTER {handleProd("storage_class_specifier -> REGISTER\n");}
+	| STATIC {handleProd("storage_class_specifier -> STATIC\n");}
+	| EXTERN {handleProd("storage_class_specifier -> EXTERN\n");}
+	| TYPEDEF {handleProd("storage_class_specifier -> TYPEDEF\n");}
 	;
 
 type_specifier
-	: VOID {prodStream << "type_specifier -> VOID\n";}
-	| CHAR {prodStream << "type_specifier -> CHAR\n";}
-	| SHORT {prodStream << "type_specifier -> SHORT\n";}
-	| INT {prodStream << "type_specifier -> INT\n";}
-	| LONG {prodStream << "type_specifier -> LONG\n";}
-	| FLOAT {prodStream << "type_specifier -> FLOAT\n";}
-	| DOUBLE {prodStream << "type_specifier -> DOUBLE\n";}
-	| SIGNED {prodStream << "type_specifier -> SIGNED\n";}
-	| UNSIGNED {prodStream << "type_specifier -> UNSIGNED\n";}
-	| struct_or_union_specifier {prodStream << "type_specifier -> struct_or_union_specifier\n";}
-	| enum_specifier {prodStream << "type_specifier -> enum_specifier\n";}
-	| TYPEDEF_NAME {prodStream << "type_specifier -> TYPEDEF_NAME\n";}
+	: VOID {handleProd("type_specifier -> VOID\n");}
+	| CHAR {handleProd("type_specifier -> CHAR\n");}
+	| SHORT {handleProd("type_specifier -> SHORT\n");}
+	| INT {handleProd("type_specifier -> INT\n");}
+	| LONG {handleProd("type_specifier -> LONG\n");}
+	| FLOAT {handleProd("type_specifier -> FLOAT\n");}
+	| DOUBLE {handleProd("type_specifier -> DOUBLE\n");}
+	| SIGNED {handleProd("type_specifier -> SIGNED\n");}
+	| UNSIGNED {handleProd("type_specifier -> UNSIGNED\n");}
+	| struct_or_union_specifier {handleProd("type_specifier -> struct_or_union_specifier\n");}
+	| enum_specifier {handleProd("type_specifier -> enum_specifier\n");}
+	| TYPEDEF_NAME {handleProd("type_specifier -> TYPEDEF_NAME\n");}
 	;
 
 type_qualifier
-	: CONST {prodStream << "type_qualifier -> CONST\n";}
-	| VOLATILE {prodStream << "type_qualifier -> VOLATILE\n";}
+	: CONST {handleProd("type_qualifier -> CONST\n");}
+	| VOLATILE {handleProd("type_qualifier -> VOLATILE\n");}
 	;
 
 struct_or_union_specifier
-	: struct_or_union identifier OPENCUR struct_declaration_list CLOSCUR {prodStream << "struct_or_union_specifier -> struct_or_union identifier OPENCUR struct_declaration_list CLOSCUR\n";}
-	| struct_or_union OPENCUR struct_declaration_list CLOSCUR {prodStream << "struct_or_union_specifier -> struct_or_union OPENCUR struct_declaration_list CLOSCUR\n";}
-	| struct_or_union identifier {prodStream << "struct_or_union_specifier -> struct_or_union identifier\n";}
+	: struct_or_union identifier OPENCUR struct_declaration_list CLOSCUR {handleProd("struct_or_union_specifier -> struct_or_union identifier OPENCUR struct_declaration_list CLOSCUR\n");}
+	| struct_or_union OPENCUR struct_declaration_list CLOSCUR {handleProd("struct_or_union_specifier -> struct_or_union OPENCUR struct_declaration_list CLOSCUR\n");}
+	| struct_or_union identifier {handleProd("struct_or_union_specifier -> struct_or_union identifier\n");}
 	;
 
 struct_or_union
-	: STRUCT {prodStream << "struct_or_union -> STRUCT\n";}
-	| UNION {prodStream << "struct_or_union -> UNION\n";}
+	: STRUCT {handleProd("struct_or_union -> STRUCT\n");}
+	| UNION {handleProd("struct_or_union -> UNION\n");}
 	;
 
 struct_declaration_list
-	: struct_declaration {prodStream << "struct_declaration_list -> struct_declaration\n";}
-	| struct_declaration_list struct_declaration {prodStream << "struct_declaration_list -> struct_declaration_list struct_declaration\n";}
+	: struct_declaration {handleProd("struct_declaration_list -> struct_declaration\n");}
+	| struct_declaration_list struct_declaration {handleProd("struct_declaration_list -> struct_declaration_list struct_declaration\n");}
 	;
 
 init_declarator_list
-	: init_declarator {prodStream << "init_declarator_list -> init_declarator\n";}
-	| init_declarator_list COMMA init_declarator {prodStream << "init_declarator_list -> init_declarator_list COMMA init_declarator\n";}
+	: init_declarator {handleProd("init_declarator_list -> init_declarator\n");}
+	| init_declarator_list COMMA init_declarator {handleProd("init_declarator_list -> init_declarator_list COMMA init_declarator\n");}
 	;
 
 init_declarator
-	: declarator {prodStream << "init_declarator -> declarator\n";}
-	| declarator ASSIGN initializer {prodStream << "init_declarator -> declarator ASSIGN initializer\n";}
+	: declarator {handleProd("init_declarator -> declarator\n");}
+	| declarator ASSIGN initializer {handleProd("init_declarator -> declarator ASSIGN initializer\n");}
 	;
 
 struct_declaration
-	: specifier_qualifier_list struct_declarator_list SEMI {prodStream << "struct_declaration -> specifier_qualifier_list struct_declarator_list SEMI\n";}
+	: specifier_qualifier_list struct_declarator_list SEMI {handleProd("struct_declaration -> specifier_qualifier_list struct_declarator_list SEMI\n");}
 	;
 
 specifier_qualifier_list
-	: type_specifier {prodStream << "specifier_qualifier_list -> type_specifier\n";}
-	| type_specifier specifier_qualifier_list {prodStream << "specifier_qualifier_list -> type_specifier specifier_qualifier_list\n";}
-	| type_qualifier {prodStream << "specifier_qualifier_list -> type_qualifier\n";}
-	| type_qualifier specifier_qualifier_list {prodStream << "specifier_qualifier_list -> type_qualifier specifier_qualifier_list\n";}
+	: type_specifier {handleProd("specifier_qualifier_list -> type_specifier\n");}
+	| type_specifier specifier_qualifier_list {handleProd("specifier_qualifier_list -> type_specifier specifier_qualifier_list\n");}
+	| type_qualifier {handleProd("specifier_qualifier_list -> type_qualifier\n");}
+	| type_qualifier specifier_qualifier_list {handleProd("specifier_qualifier_list -> type_qualifier specifier_qualifier_list\n");}
 	;
 
 struct_declarator_list
-	: struct_declarator {prodStream << "struct_declarator_list -> struct_declarator\n";}
-	| struct_declarator_list COMMA struct_declarator {prodStream << "struct_declarator_list -> struct_declarator_list COMMA struct_declarator\n";}
+	: struct_declarator {handleProd("struct_declarator_list -> struct_declarator\n");}
+	| struct_declarator_list COMMA struct_declarator {handleProd("struct_declarator_list -> struct_declarator_list COMMA struct_declarator\n");}
 	;
 
 struct_declarator
-	: declarator {prodStream << "struct_declarator -> declarator\n";}
-	| COLON constant_expression {prodStream << "struct_declarator -> COLON constant_expression\n";}
-	| declarator COLON constant_expression {prodStream << "struct_declarator -> declarator COLON constant_expression\n";}
+	: declarator {handleProd("struct_declarator -> declarator\n");}
+	| COLON constant_expression {handleProd("struct_declarator -> COLON constant_expression\n");}
+	| declarator COLON constant_expression {handleProd("struct_declarator -> declarator COLON constant_expression\n");}
 	;
 
 enum_specifier
-	: ENUM OPENCUR enumerator_list CLOSCUR {prodStream << "enum_specifier -> ENUM OPENCUR enumerator_list CLOSCUR\n";}
-	| ENUM identifier OPENCUR enumerator_list CLOSCUR {prodStream << "enum_specifier -> ENUM identifier OPENCUR enumerator_list CLOSCUR\n";}
-	| ENUM identifier {prodStream << "enum_specifier -> ENUM identifier\n";}
+	: ENUM OPENCUR enumerator_list CLOSCUR {handleProd("enum_specifier -> ENUM OPENCUR enumerator_list CLOSCUR\n");}
+	| ENUM identifier OPENCUR enumerator_list CLOSCUR {handleProd("enum_specifier -> ENUM identifier OPENCUR enumerator_list CLOSCUR\n");}
+	| ENUM identifier {handleProd("enum_specifier -> ENUM identifier\n");}
 	;
 
 enumerator_list
-	: enumerator {prodStream << "enumerator_list -> enumerator\n";}
-	| enumerator_list COMMA enumerator {prodStream << "enumerator_list -> enumerator_list COMMA enumerator\n";}
+	: enumerator {handleProd("enumerator_list -> enumerator\n");}
+	| enumerator_list COMMA enumerator {handleProd("enumerator_list -> enumerator_list COMMA enumerator\n");}
 	;
 
 enumerator
-	: identifier {prodStream << "enumerator -> identifier\n";}
-	| identifier ASSIGN constant_expression {prodStream << "enumerator -> identifier ASSIGN constant_expression\n";}
+	: identifier {handleProd("enumerator -> identifier\n");}
+	| identifier ASSIGN constant_expression {handleProd("enumerator -> identifier ASSIGN constant_expression\n");}
 	;
 
 declarator
-	: direct_declarator {prodStream << "declarator -> direct_declarator\n";}
-	| pointer direct_declarator {prodStream << "declarator -> pointer direct_declarator\n";}
+	: direct_declarator {handleProd("declarator -> direct_declarator\n");}
+	| pointer direct_declarator {handleProd("declarator -> pointer direct_declarator\n");}
 	;
 
 direct_declarator
-	: identifier {prodStream << "direct_declarator -> identifier\n";}
-	| OPENPAR declarator CLOSEPAR {prodStream << "direct_declarator -> OPENPAR declarator CLOSEPAR\n";}
-	| direct_declarator OPENSQ CLOSSQ {prodStream << "direct_declarator -> direct_declarator OPENSQ CLOSSQ\n";}
-	| direct_declarator OPENSQ constant_expression CLOSSQ {prodStream << "direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n";}
-	| direct_declarator OPENPAR CLOSEPAR {prodStream << "direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n";}
-	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {prodStream << "direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n";}
-	| direct_declarator OPENPAR identifier_list CLOSEPAR {prodStream << "direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n";}
+	: identifier {handleProd("direct_declarator -> identifier\n");}
+	| OPENPAR declarator CLOSEPAR {handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
+	| direct_declarator OPENSQ CLOSSQ {handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
+	| direct_declarator OPENSQ constant_expression CLOSSQ {handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
+	| direct_declarator OPENPAR CLOSEPAR {handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
+	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
+	| direct_declarator OPENPAR identifier_list CLOSEPAR {handleProd("direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n");}
 	;
 
 pointer
-	: STAR {prodStream << "pointer -> STAR\n";}
-	| STAR type_qualifier_list {prodStream << "pointer -> STAR type_qualifier_list\n";}
-	| STAR pointer {prodStream << "pointer -> STAR pointer\n";}
-	| STAR type_qualifier_list pointer {prodStream << "pointer -> STAR type_qualifier_list pointer\n";}
+	: STAR {handleProd("pointer -> STAR\n");}
+	| STAR type_qualifier_list {handleProd("pointer -> STAR type_qualifier_list\n");}
+	| STAR pointer {handleProd("pointer -> STAR pointer\n");}
+	| STAR type_qualifier_list pointer {handleProd("pointer -> STAR type_qualifier_list pointer\n");}
 	;
 
 type_qualifier_list
-	: type_qualifier {prodStream << "type_qualifier_list -> type_qualifier\n";}
+	: type_qualifier {handleProd("type_qualifier_list -> type_qualifier\n");}
 	;
 
 parameter_type_list
-	: parameter_list {prodStream << "parameter_type_list -> parameter_list\n";}
-	| parameter_list COMMA ELIPSIS {prodStream << "parameter_type_list -> parameter_list COMMA ELIPSIS\n";}
+	: parameter_list {handleProd("parameter_type_list -> parameter_list\n");}
+	| parameter_list COMMA ELIPSIS {handleProd("parameter_type_list -> parameter_list COMMA ELIPSIS\n");}
 	;
 
 parameter_list
-	: parameter_declaration {prodStream << "parameter_list -> parameter_declaration\n";}
-	| parameter_list COMMA parameter_declaration {prodStream << "parameter_list -> parameter_list COMMA parameter_declaration\n";}
+	: parameter_declaration {handleProd("parameter_list -> parameter_declaration\n");}
+	| parameter_list COMMA parameter_declaration {handleProd("parameter_list -> parameter_list COMMA parameter_declaration\n");}
 	;
 
 parameter_declaration
-	: declaration_specifiers declarator {prodStream << "parameter_declaration -> declaration_specifiers declarator\n";}
-	| declaration_specifiers {prodStream << "parameter_declaration -> declaration_specifiers\n";}
-	| declaration_specifiers abstract_declarator {prodStream << "parameter_declaration -> declaration_specifiers abstract_declarator\n";}
+	: declaration_specifiers declarator {handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
+	| declaration_specifiers {handleProd("parameter_declaration -> declaration_specifiers\n");}
+	| declaration_specifiers abstract_declarator {handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}
 	;
 
 identifier_list
-	: identifier {prodStream << "identifier_list -> identifier\n";}
-	| identifier_list COMMA identifier {prodStream << "identifier_list -> identifier_list COMMA identifier\n";}
+	: identifier {handleProd("identifier_list -> identifier\n");}
+	| identifier_list COMMA identifier {handleProd("identifier_list -> identifier_list COMMA identifier\n");}
 	;
 
 initializer
-	: assignment_expression {prodStream << "initializer -> assignment_expression\n";}
-	| OPENCUR initializer_list CLOSCUR {prodStream << "initializer -> OPENCUR initializer_list CLOSCUR\n";}
-	| OPENCUR initializer_list COMMA CLOSCUR {prodStream << "initializer -> OPENCUR initializer_list COMMA CLOSCUR\n";}
+	: assignment_expression {handleProd("initializer -> assignment_expression\n");}
+	| OPENCUR initializer_list CLOSCUR {handleProd("initializer -> OPENCUR initializer_list CLOSCUR\n");}
+	| OPENCUR initializer_list COMMA CLOSCUR {handleProd("initializer -> OPENCUR initializer_list COMMA CLOSCUR\n");}
 	;
 
 initializer_list
-	: initializer {prodStream << "initializer_list -> initializer\n";}
-	| initializer_list COMMA initializer {prodStream << "initializer_list -> initializer_list COMMA initializer\n";}
+	: initializer {handleProd("initializer_list -> initializer\n");}
+	| initializer_list COMMA initializer {handleProd("initializer_list -> initializer_list COMMA initializer\n");}
 	;
 
 type_name
-	: specifier_qualifier_list {prodStream << "type_name -> specifier_qualifier_list\n";}
-	| specifier_qualifier_list abstract_declarator {prodStream << "type_name -> specifier_qualifier_list abstract_declarator\n";}
+	: specifier_qualifier_list {handleProd("type_name -> specifier_qualifier_list\n");}
+	| specifier_qualifier_list abstract_declarator {handleProd("type_name -> specifier_qualifier_list abstract_declarator\n");}
 	;
 
 abstract_declarator
-	: pointer {prodStream << "abstract_declarator -> pointer\n";}
-	| direct_abstract_declarator {prodStream << "abstract_declarator -> direct_abstract_declarator\n";}
-	| pointer direct_abstract_declarator {prodStream << "abstract_declarator -> pointer direct_abstract_declarator\n";}
+	: pointer {handleProd("abstract_declarator -> pointer\n");}
+	| direct_abstract_declarator {handleProd("abstract_declarator -> direct_abstract_declarator\n");}
+	| pointer direct_abstract_declarator {handleProd("abstract_declarator -> pointer direct_abstract_declarator\n");}
 	;
 
 direct_abstract_declarator
-	: OPENPAR abstract_declarator CLOSEPAR {prodStream << "direct_abstract_declarator -> OPENPAR abstract_declarator CLOSEPAR\n";}
-	| OPENSQ CLOSSQ {prodStream << "direct_abstract_declarator -> OPENSQ CLOSSQ\n";}
-	| OPENSQ constant_expression CLOSSQ {prodStream << "direct_abstract_declarator -> OPENSQ constant_expression CLOSSQ\n";}
-	| direct_abstract_declarator OPENSQ CLOSSQ {prodStream << "direct_abstract_declarator -> direct_abstract_declarator OPENSQ CLOSSQ\n";}
-	| direct_abstract_declarator OPENSQ constant_expression CLOSSQ {prodStream << "direct_abstract_declarator -> direct_abstract_declarator OPENSQ constant_expression CLOSSQ\n";}
-	| OPENPAR CLOSEPAR {prodStream << "direct_abstract_declarator -> OPENPAR CLOSEPAR\n";}
-	| OPENPAR parameter_type_list CLOSEPAR {prodStream << "direct_abstract_declarator -> OPENPAR parameter_type_list CLOSEPAR\n";}
-	| direct_abstract_declarator OPENPAR CLOSEPAR {prodStream << "direct_abstract_declarator -> direct_abstract_declarator OPENPAR CLOSEPAR\n";}
-	| direct_abstract_declarator OPENPAR parameter_type_list CLOSEPAR {prodStream << "direct_abstract_declarator -> direct_abstract_declarator OPENPAR parameter_type_list\n";}
+	: OPENPAR abstract_declarator CLOSEPAR {handleProd("direct_abstract_declarator -> OPENPAR abstract_declarator CLOSEPAR\n");}
+	| OPENSQ CLOSSQ {handleProd("direct_abstract_declarator -> OPENSQ CLOSSQ\n");}
+	| OPENSQ constant_expression CLOSSQ {handleProd("direct_abstract_declarator -> OPENSQ constant_expression CLOSSQ\n");}
+	| direct_abstract_declarator OPENSQ CLOSSQ {handleProd("direct_abstract_declarator -> direct_abstract_declarator OPENSQ CLOSSQ\n");}
+	| direct_abstract_declarator OPENSQ constant_expression CLOSSQ {handleProd("direct_abstract_declarator -> direct_abstract_declarator OPENSQ constant_expression CLOSSQ\n");}
+	| OPENPAR CLOSEPAR {handleProd("direct_abstract_declarator -> OPENPAR CLOSEPAR\n");}
+	| OPENPAR parameter_type_list CLOSEPAR {handleProd("direct_abstract_declarator -> OPENPAR parameter_type_list CLOSEPAR\n");}
+	| direct_abstract_declarator OPENPAR CLOSEPAR {handleProd("direct_abstract_declarator -> direct_abstract_declarator OPENPAR CLOSEPAR\n");}
+	| direct_abstract_declarator OPENPAR parameter_type_list CLOSEPAR {handleProd("direct_abstract_declarator -> direct_abstract_declarator OPENPAR parameter_type_list\n");}
 	;
 
 statement
-	: labeled_statement {prodStream << "statement -> labeled_statement\n";}
-	| compound_statement {prodStream << "statement -> compound_statement\n";}
-	| expression_statement {prodStream << "statement -> expression_statement\n";}
-	| selection_statement {prodStream << "statement -> selection_statement\n";}
-	| iteration_statement {prodStream << "statement -> iteration_statement\n";}
-	| jump_statement {prodStream << "statement -> jump_statement\n";}
+	: labeled_statement {handleProd("statement -> labeled_statement\n");}
+	| compound_statement {handleProd("statement -> compound_statement\n");}
+	| expression_statement {handleProd("statement -> expression_statement\n");}
+	| selection_statement {handleProd("statement -> selection_statement\n");}
+	| iteration_statement {handleProd("statement -> iteration_statement\n");}
+	| jump_statement {handleProd("statement -> jump_statement\n");}
 	;
 
 labeled_statement
-	: identifier COLON statement {prodStream << "labeled_statement -> identifier COLON statement\n";}
-	| CASE constant_expression COLON statement {prodStream << "labeled_statement -> CASE constant_expression COLON statement\n";}
-	| DEFAULT COLON statement {prodStream << "labeled_statement -> DEFAULT COLON statement\n";}
+	: identifier COLON statement {handleProd("labeled_statement -> identifier COLON statement\n");}
+	| CASE constant_expression COLON statement {handleProd("labeled_statement -> CASE constant_expression COLON statement\n");}
+	| DEFAULT COLON statement {handleProd("labeled_statement -> DEFAULT COLON statement\n");}
 	;
 
 expression_statement
-	: SEMI {prodStream << "expression_statement -> SEMI\n";}
-	| expression SEMI {prodStream << "expression_statement -> expression SEMI\n";}
+	: SEMI {handleProd("expression_statement -> SEMI\n");}
+	| expression SEMI {handleProd("expression_statement -> expression SEMI\n");}
 	;
 
 compound_statement
-	: OPENCUR CLOSCUR {prodStream << "compound_statement -> OPENCUR CLOSCUR\n";}
-	| OPENCUR statement_list CLOSCUR {prodStream << "compound_statement -> OPENCUR statement_list CLOSCUR\n";}
-	| OPENCUR declaration_list CLOSCUR {prodStream << "compound_statement -> OPENCUR declaration_list CLOSCUR\n";}
-	| OPENCUR declaration_list statement_list CLOSCUR {prodStream << "compound_statement -> OPENCUR declaration_list statement_list CLOSCUR\n";}
+	: OPENCUR CLOSCUR {handleProd("compound_statement -> OPENCUR CLOSCUR\n");}
+	| OPENCUR statement_list CLOSCUR {handleProd("compound_statement -> OPENCUR statement_list CLOSCUR\n");}
+	| OPENCUR declaration_list CLOSCUR {handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
+	| OPENCUR declaration_list statement_list CLOSCUR {handleProd("compound_statement -> OPENCUR declaration_list statement_list CLOSCUR\n");}
 	;
 
 statement_list
-	: statement {prodStream << "statement_list -> statement\n";}
-	| statement_list statement {prodStream << "statement_list -> statement_list statement\n";}
+	: statement {handleProd("statement_list -> statement\n");}
+	| statement_list statement {handleProd("statement_list -> statement_list statement\n");}
 	;
 
 selection_statement
-	: IF OPENPAR expression CLOSEPAR statement {prodStream << "selection_statement -> IF OPENPAR expression CLOSEPAR statement\n";}
-	| IF OPENPAR expression CLOSEPAR statement ELSE statement {prodStream << "selection_statement -> IF OPENPAR expression CLOSEPAR statement ELSE statement\n";}
-	| SWITCH OPENPAR expression CLOSEPAR statement {prodStream << "selection_statement -> SWITCH OPENPAR expression CLOSEPAR statement\n";}
+	: IF OPENPAR expression CLOSEPAR statement {handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement\n");}
+	| IF OPENPAR expression CLOSEPAR statement ELSE statement {handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement ELSE statement\n");}
+	| SWITCH OPENPAR expression CLOSEPAR statement {handleProd("selection_statement -> SWITCH OPENPAR expression CLOSEPAR statement\n");}
 	;
 
 iteration_statement
-	: WHILE OPENPAR expression CLOSEPAR statement {prodStream << "iteration_statement -> WHILE OPENPAR expression CLOSEPAR statement\n";}
-	| DO statement WHILE OPENPAR expression CLOSEPAR SEMI {prodStream << "iteration_statement -> DO statement WHILE OPENPAR expression CLOSEPAR SEMI\n";}
-	| FOR OPENPAR SEMI SEMI CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR SEMI SEMI CLOSEPAR statement\n";}
-	| FOR OPENPAR SEMI SEMI expression CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR SEMI SEMI expression CLOSEPAR statement\n";}
-	| FOR OPENPAR SEMI expression SEMI CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR SEMI expression SEMI CLOSEPAR statement\n";}
-	| FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement\n";}
-	| FOR OPENPAR expression SEMI SEMI CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR expression SEMI SEMI CLOSEPAR statement\n";}
-	| FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement\n";}
-	| FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement\n";}
-	| FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement {prodStream << "iteration_statement -> FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement\n";}
+	: WHILE OPENPAR expression CLOSEPAR statement {handleProd("iteration_statement -> WHILE OPENPAR expression CLOSEPAR statement\n");}
+	| DO statement WHILE OPENPAR expression CLOSEPAR SEMI {handleProd("iteration_statement -> DO statement WHILE OPENPAR expression CLOSEPAR SEMI\n");}
+	| FOR OPENPAR SEMI SEMI CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR SEMI SEMI CLOSEPAR statement\n");}
+	| FOR OPENPAR SEMI SEMI expression CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR SEMI SEMI expression CLOSEPAR statement\n");}
+	| FOR OPENPAR SEMI expression SEMI CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR SEMI expression SEMI CLOSEPAR statement\n");}
+	| FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement\n");}
+	| FOR OPENPAR expression SEMI SEMI CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR expression SEMI SEMI CLOSEPAR statement\n");}
+	| FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement\n");}
+	| FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement\n");}
+	| FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement {handleProd("iteration_statement -> FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement\n");}
 	;
 
 jump_statement
-	: GOTO identifier SEMI {prodStream << "jump_statement -> GOTO identifier SEMI\n";}
-	| CONTINUE  {prodStream << "jump_statement -> CONTINUE \n";}
-	| BREAK  {prodStream << "jump_statement -> BREAK\n";}
-	| RETURN SEMI {prodStream << "jump_statement -> RETURN SEMI\n";}
-	| RETURN expression SEMI {prodStream << "jump_statement -> RETURN expression SEMI\n";}
+	: GOTO identifier SEMI {handleProd("jump_statement -> GOTO identifier SEMI\n");}
+	| CONTINUE  {handleProd("jump_statement -> CONTINUE \n");}
+	| BREAK  {handleProd("jump_statement -> BREAK\n");}
+	| RETURN SEMI {handleProd("jump_statement -> RETURN SEMI\n");}
+	| RETURN expression SEMI {handleProd("jump_statement -> RETURN expression SEMI\n");}
 	;
 
 expression
-	: assignment_expression {prodStream << "expression -> assignment_expression\n";}
-	| expression COMMA assignment_expression {prodStream << "expression -> expression COMMA assignment_expression\n";}
+	: assignment_expression {handleProd("expression -> assignment_expression\n");}
+	| expression COMMA assignment_expression {handleProd("expression -> expression COMMA assignment_expression\n");}
 	;
 
 assignment_expression
-	: conditional_expression {prodStream << "assignment_expression -> conditional_expression\n";}
-	| unary_expression assignment_operator assignment_expression {prodStream << "assignment_expression -> unary_expression assignment_operator assignment_expression\n";}
+	: conditional_expression {handleProd("assignment_expression -> conditional_expression\n");}
+	| unary_expression assignment_operator assignment_expression {handleProd("assignment_expression -> unary_expression assignment_operator assignment_expression\n");}
 	;
 
 assignment_operator
-	: ASSIGN {prodStream << "assignment_operator -> ASSIGN\n";}
-	| MUL_ASSIGN {prodStream << "assignment_operator -> MUL_ASSIGN\n";}
-	| DIV_ASSIGN {prodStream << "assignment_operator -> DIV_ASSIGN\n";}
-	| MOD_ASSIGN {prodStream << "assignment_operator -> MOD_ASSIGN\n";}
-	| ADD_ASSIGN {prodStream << "assignment_operator -> ADD_ASSIGN\n";}
-	| SUB_ASSIGN {prodStream << "assignment_operator -> SUB_ASSIGN\n";}
-	| LEFT_ASSIGN {prodStream << "assignment_operator -> LEFT_ASSIGN\n";}
-	| RIGHT_ASSIGN {prodStream << "assignment_operator -> RIGHT_ASSIGN\n";}
-	| AND_ASSIGN {prodStream << "assignment_operator -> AND_ASSIGN\n";}
-	| XOR_ASSIGN {prodStream << "assignment_operator -> XOR_ASSIGN\n";}
-	| OR_ASSIGN {prodStream << "assignment_operator -> OR_ASSIGN\n";}
+	: ASSIGN {handleProd("assignment_operator -> ASSIGN\n");}
+	| MUL_ASSIGN {handleProd("assignment_operator -> MUL_ASSIGN\n");}
+	| DIV_ASSIGN {handleProd("assignment_operator -> DIV_ASSIGN\n");}
+	| MOD_ASSIGN {handleProd("assignment_operator -> MOD_ASSIGN\n");}
+	| ADD_ASSIGN {handleProd("assignment_operator -> ADD_ASSIGN\n");}
+	| SUB_ASSIGN {handleProd("assignment_operator -> SUB_ASSIGN\n");}
+	| LEFT_ASSIGN {handleProd("assignment_operator -> LEFT_ASSIGN\n");}
+	| RIGHT_ASSIGN {handleProd("assignment_operator -> RIGHT_ASSIGN\n");}
+	| AND_ASSIGN {handleProd("assignment_operator -> AND_ASSIGN\n");}
+	| XOR_ASSIGN {handleProd("assignment_operator -> XOR_ASSIGN\n");}
+	| OR_ASSIGN {handleProd("assignment_operator -> OR_ASSIGN\n");}
 	;
 
 conditional_expression
-	: logical_or_expression {prodStream << "conditional_expression -> logical_or_expression\n";}
-	| logical_or_expression TERNARY expression COLON conditional_expression {prodStream << "conditional_expression -> logical_or_expression TERNARY expression COLON conditional_expression \n";}
+	: logical_or_expression {handleProd("conditional_expression -> logical_or_expression\n");}
+	| logical_or_expression TERNARY expression COLON conditional_expression {handleProd("conditional_expression -> logical_or_expression TERNARY expression COLON conditional_expression \n");}
 	;
 
 constant_expression
-	: conditional_expression {prodStream << "constant_expression -> conditional_expression\n";}
+	: conditional_expression {handleProd("constant_expression -> conditional_expression\n");}
 	;
 
 logical_or_expression
-	: logical_and_expression {prodStream << "logical_or_expression -> logical_and_expression\n";}
-	| logical_or_expression OR_OP logical_and_expression {prodStream << "logical_or_expression -> logical_or_expression OR_OP logical_and_expression\n";}
+	: logical_and_expression {handleProd("logical_or_expression -> logical_and_expression\n");}
+	| logical_or_expression OR_OP logical_and_expression {handleProd("logical_or_expression -> logical_or_expression OR_OP logical_and_expression\n");}
 	;
 
 logical_and_expression
-	: inclusive_or_expression {prodStream << "logical_and_expression -> inclusive_or_expression\n";}
-	| logical_and_expression AND_OP inclusive_or_expression {prodStream << "logical_and_expression -> logical_and_expression AND_OP inclusive_or_expression\n";}
+	: inclusive_or_expression {handleProd("logical_and_expression -> inclusive_or_expression\n");}
+	| logical_and_expression AND_OP inclusive_or_expression {handleProd("logical_and_expression -> logical_and_expression AND_OP inclusive_or_expression\n");}
 	;
 
 inclusive_or_expression
-	: exclusive_or_expression {prodStream << "inclusive_or_expression -> exclusive_or_expression\n";}
-	| inclusive_or_expression BAR exclusive_or_expression {prodStream << "inclusive_or_expression -> inclusive_or_expression BAR exclusive_or_expression\n";}
+	: exclusive_or_expression {handleProd("inclusive_or_expression -> exclusive_or_expression\n");}
+	| inclusive_or_expression BAR exclusive_or_expression {handleProd("inclusive_or_expression -> inclusive_or_expression BAR exclusive_or_expression\n");}
 	;
 
 exclusive_or_expression
-	: and_expression {prodStream << "exclusive_or_expression -> and_expression\n";}
-	| exclusive_or_expression XOR and_expression {prodStream << "exclusive_or_expression -> exclusive_or_expression XOR and_expression\n";}
+	: and_expression {handleProd("exclusive_or_expression -> and_expression\n");}
+	| exclusive_or_expression XOR and_expression {handleProd("exclusive_or_expression -> exclusive_or_expression XOR and_expression\n");}
 	;
 
 and_expression
-	: equality_expression {prodStream << "and_expression -> equality_expression\n";}
-	| and_expression AND equality_expression {prodStream << "and_expression -> and_expression AND equality_expression\n";}
+	: equality_expression {handleProd("and_expression -> equality_expression\n");}
+	| and_expression AND equality_expression {handleProd("and_expression -> and_expression AND equality_expression\n");}
 	;
 
 equality_expression
-	: relational_expression {prodStream << "equality_expression -> relational_expression\n";}
-	| equality_expression EQ_OP relational_expression {prodStream << "equality_expression -> equality_expression EQ_OP relational_expression\n";}
-	| equality_expression NE_OP relational_expression {prodStream << "equality_expression -> equality_expression NE_OP relational_expression\n";}
+	: relational_expression {handleProd("equality_expression -> relational_expression\n");}
+	| equality_expression EQ_OP relational_expression {handleProd("equality_expression -> equality_expression EQ_OP relational_expression\n");}
+	| equality_expression NE_OP relational_expression {handleProd("equality_expression -> equality_expression NE_OP relational_expression\n");}
 	;
 
 relational_expression
-	: shift_expression {prodStream << "relational_expression -> shift_expression\n";}
-	| relational_expression LESSTH shift_expression {prodStream << "relational_expression -> relational_expression LESSTH shift_expression\n";}
-	| relational_expression GREATH shift_expression {prodStream << "relational_expression -> relational_expression GREATH shift_expression\n";}
-	| relational_expression LE_OP shift_expression {prodStream << "relational_expression -> relational_expression LE_OP shift_expression\n";}
-	| relational_expression GE_OP shift_expression {prodStream << "relational_expression -> relational_expression GE_OP shift_expression\n";}
+	: shift_expression {handleProd("relational_expression -> shift_expression\n");}
+	| relational_expression LESSTH shift_expression {handleProd("relational_expression -> relational_expression LESSTH shift_expression\n");}
+	| relational_expression GREATH shift_expression {handleProd("relational_expression -> relational_expression GREATH shift_expression\n");}
+	| relational_expression LE_OP shift_expression {handleProd("relational_expression -> relational_expression LE_OP shift_expression\n");}
+	| relational_expression GE_OP shift_expression {handleProd("relational_expression -> relational_expression GE_OP shift_expression\n");}
 	;
 
 shift_expression
-	: additive_expression {prodStream << "shift_expression -> additive_expression\n";}
-	| shift_expression LEFT_OP additive_expression {prodStream << "shift_expression -> shift_expression LEFT_OP additive_expression\n";}
-	| shift_expression RIGHT_OP additive_expression {prodStream << "shift_expression -> shift_expression RIGHT_OP additive_expression\n";}
+	: additive_expression {handleProd("shift_expression -> additive_expression\n");}
+	| shift_expression LEFT_OP additive_expression {handleProd("shift_expression -> shift_expression LEFT_OP additive_expression\n");}
+	| shift_expression RIGHT_OP additive_expression {handleProd("shift_expression -> shift_expression RIGHT_OP additive_expression\n");}
 	;
 
 additive_expression
-	: multiplicative_expression {prodStream << "additive_expression -> multiplicative_expression\n";}
-	| additive_expression PLUS multiplicative_expression {prodStream << "additive_expression -> additive_expression PLUS multiplicative_expression\n";}
-	| additive_expression MINUS multiplicative_expression {prodStream << "additive_expression -> additive_expression MINUS multiplicative_expression\n";}
+	: multiplicative_expression {handleProd("additive_expression -> multiplicative_expression\n");}
+	| additive_expression PLUS multiplicative_expression {handleProd("additive_expression -> additive_expression PLUS multiplicative_expression\n");}
+	| additive_expression MINUS multiplicative_expression {handleProd("additive_expression -> additive_expression MINUS multiplicative_expression\n");}
 	;
 
 multiplicative_expression
-	: cast_expression {prodStream << "multiplicative_expression -> cast_expression\n";}
-	| multiplicative_expression STAR cast_expression {prodStream << "multiplicative_expression -> multiplicative_expression STAR cast_expression\n";}
-	| multiplicative_expression SLASH cast_expression {prodStream << "multiplicative_expression -> multiplicative_expression SLASH cast_expression\n";}
-	| multiplicative_expression MODULO cast_expression {prodStream << "multiplicative_expression -> multiplicative_expression MODULO cast_expression\n";}
+	: cast_expression {handleProd("multiplicative_expression -> cast_expression\n");}
+	| multiplicative_expression STAR cast_expression {handleProd("multiplicative_expression -> multiplicative_expression STAR cast_expression\n");}
+	| multiplicative_expression SLASH cast_expression {handleProd("multiplicative_expression -> multiplicative_expression SLASH cast_expression\n");}
+	| multiplicative_expression MODULO cast_expression {handleProd("multiplicative_expression -> multiplicative_expression MODULO cast_expression\n");}
 	;
 
 cast_expression
-	: unary_expression {prodStream << "cast_expression -> unary_expression\n";}
-	| OPENPAR type_name CLOSEPAR cast_expression {prodStream << "cast_expression -> OPENPAR type_name CLOSEPAR cast_expression\n";}
+	: unary_expression {handleProd("cast_expression -> unary_expression\n");}
+	| OPENPAR type_name CLOSEPAR cast_expression {handleProd("cast_expression -> OPENPAR type_name CLOSEPAR cast_expression\n");}
 	;
 
 unary_expression
-	: postfix_expression {prodStream << "unary_expression -> postfix_expression\n";}
-	| INC_OP unary_expression {prodStream << "unary_expression -> INC_OP unary_expression\n";}
-	| DEC_OP unary_expression {prodStream << "unary_expression -> DEC_OP unary_expression\n";}
-	| unary_operator cast_expression {prodStream << "unary_expression -> unary_operator cast_expression\n";}
-	| SIZEOF unary_expression {prodStream << "unary_expression -> SIZEOF unary_expression\n";}
-	| SIZEOF OPENPAR type_name CLOSEPAR {prodStream << "unary_expression -> SIZEOF OPENPAR type_name CLOSEPAR\n";}
+	: postfix_expression {handleProd("unary_expression -> postfix_expression\n");}
+	| INC_OP unary_expression {handleProd("unary_expression -> INC_OP unary_expression\n");}
+	| DEC_OP unary_expression {handleProd("unary_expression -> DEC_OP unary_expression\n");}
+	| unary_operator cast_expression {handleProd("unary_expression -> unary_operator cast_expression\n");}
+	| SIZEOF unary_expression {handleProd("unary_expression -> SIZEOF unary_expression\n");}
+	| SIZEOF OPENPAR type_name CLOSEPAR {handleProd("unary_expression -> SIZEOF OPENPAR type_name CLOSEPAR\n");}
 	;
 
 unary_operator
-	: AND {prodStream << "unary_operator -> AND\n";}
-	| STAR {prodStream << "unary_operator -> STAR\n";}
-	| PLUS {prodStream << "unary_operator -> PLUS\n";}
-	| MINUS {prodStream << "unary_operator -> MINUS\n";}
-	| TILDE {prodStream << "unary_operator -> TILDE\n";}
-	| BANG {prodStream << "unary_operator -> BANG\n";}
+	: AND {handleProd("unary_operator -> AND\n");}
+	| STAR {handleProd("unary_operator -> STAR\n");}
+	| PLUS {handleProd("unary_operator -> PLUS\n");}
+	| MINUS {handleProd("unary_operator -> MINUS\n");}
+	| TILDE {handleProd("unary_operator -> TILDE\n");}
+	| BANG {handleProd("unary_operator -> BANG\n");}
 	;
 
 postfix_expression
-	: primary_expression {prodStream << "postfix_expression -> primary_expression\n";}
-	| postfix_expression OPENSQ expression CLOSSQ {prodStream << "postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n";}
-	| postfix_expression OPENPAR CLOSEPAR {prodStream << "postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n";}
-	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {prodStream << "postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n";}
-	| postfix_expression PERIOD identifier {prodStream << "postfix_expression -> postfix_expression PERIOD identifier\n";}
-	| postfix_expression PTR_OP identifier {prodStream << "postfix_expression -> postfix_expression PTR_OP identifier\n";}
-	| postfix_expression INC_OP {prodStream << "postfix_expression -> postfix_expression INC_OP\n";}
-	| postfix_expression DEC_OP {prodStream << "postfix_expression -> postfix_expression DEC_OP\n";}
+	: primary_expression {handleProd("postfix_expression -> primary_expression\n");}
+	| postfix_expression OPENSQ expression CLOSSQ {handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
+	| postfix_expression OPENPAR CLOSEPAR {handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
+	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {handleProd("postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n");}
+	| postfix_expression PERIOD identifier {handleProd("postfix_expression -> postfix_expression PERIOD identifier\n");}
+	| postfix_expression PTR_OP identifier {handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
+	| postfix_expression INC_OP {handleProd("postfix_expression -> postfix_expression INC_OP\n");}
+	| postfix_expression DEC_OP {handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 
 primary_expression
-	: identifier {prodStream << "primary_expression -> identifier\n";}
-	| constant {prodStream << "primary_expression -> constant\n";}
-	| string {prodStream << "primary_expression -> string\n";}
-	| OPENPAR expression CLOSEPAR {prodStream << "primary_expression -> OPENPAR expression CLOSEPAR\n";}
+	: identifier {handleProd("primary_expression -> identifier\n");}
+	| constant {handleProd("primary_expression -> constant\n");}
+	| string {handleProd("primary_expression -> string\n");}
+	| OPENPAR expression CLOSEPAR {handleProd("primary_expression -> OPENPAR expression CLOSEPAR\n");}
 	;
 
 argument_expression_list
-	: assignment_expression {prodStream << "argument_expression_list -> assignment_expression\n";}
-	| argument_expression_list COMMA assignment_expression {prodStream << "argument_expression_list -> argument_expression_list COMMA assignment_expression\n";}
+	: assignment_expression {handleProd("argument_expression_list -> assignment_expression\n");}
+	| argument_expression_list COMMA assignment_expression {handleProd("argument_expression_list -> argument_expression_list COMMA assignment_expression\n");}
 	;
 
 constant
-	: INTEGER_CONSTANT {prodStream << "constant -> INTEGER_CONSTANT\n";}
-	| CHARACTER_CONSTANT {prodStream << "constant -> CHARACTER_CONSTANT\n";}
-	| FLOATING_CONSTANT {prodStream << "constant -> FLOATING_CONSTANT\n";}
-	| ENUMERATION_CONSTANT {prodStream << "constant -> ENUMERATION_CONSTANT\n";}
+	: INTEGER_CONSTANT {handleProd("constant -> INTEGER_CONSTANT\n");}
+	| CHARACTER_CONSTANT {handleProd("constant -> CHARACTER_CONSTANT\n");}
+	| FLOATING_CONSTANT {handleProd("constant -> FLOATING_CONSTANT\n");}
+	| ENUMERATION_CONSTANT {handleProd("constant -> ENUMERATION_CONSTANT\n");}
 	;
 
 string
-	: STRING_LITERAL {prodStream << "string -> STRING_LITERAL\n";}
+	: STRING_LITERAL {handleProd("string -> STRING_LITERAL\n");}
 	;
 
 identifier
-	: IDENTIFIER {prodStream << "identifier -> IDENTIFIER\n";}
+	: IDENTIFIER {handleProd("identifier -> IDENTIFIER\n");}
 	;
 %%
 
@@ -523,15 +529,27 @@ void yyerror (char const* s)
 	return;
 }
 
+void handleProd (string prod)
+{
+    if(debug[3])
+    {
+        prodStream << prod;
+    }
+    ofstream pStream;
+
+    if(debug[4])
+        pStream.open(newOutputFile, ios::app);
+    else
+        pStream.open("list_file", ios::app);
+
+    pStream << prod;
+}
+
 int main(int argc, char **argv)
 {
-    //todo yyin file pointers
     SymbolTable symbolTable;
     table_ptr = &symbolTable;
-    ofstream ofs;
-    ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
-    ofs.close();
-    for(int i = 0; i < 4; i++) //initialize all debug options to false
+    for(int i = 0; i < 5; i++) //initialize all debug options to false
         debug[i] = false;
     if(argc > 1)
     {
@@ -546,8 +564,14 @@ int main(int argc, char **argv)
                         debug[1] = true;
                     else if(strcmp(argv[i],"-s") == 0)
                         debug[2] = true;
+                    else if(strcmp(argv[i],"-p") == 0)
+                        printProd = true;
                     else if(strcmp(argv[i],"-o") == 0)
-                        debug[3] = true;
+                    {
+                        debug[4] = true;
+                        newOutputFile = argv[i+1];
+                        i++;
+                    }
                     else
                         cout << argv[1] << " is not a valid command line argument." << endl;
                 }
@@ -565,6 +589,40 @@ int main(int argc, char **argv)
             }
 
     }
+
+    if(debug[4])
+    {
+        ofstream ofs;
+        ofs.open(newOutputFile, std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+    }
+    else
+    {
+        ofstream ofs;
+        ofs.open("list_file", std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+    }
+
+    if(debug[1] && debug[0])
+    {
+        ofstream ofs;
+        ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+    }
+    if(debug[2] && debug[0])
+    {
+        ofstream ofs;
+        ofs.open("SymDump.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.close();
+    }
 	yyparse();
+    if(printProd)
+    {
+        ofstream ofs;
+        ofs.open("productions.out", std::ofstream::out | std::ofstream::trunc);
+        ofs << prodStream.str();
+        ofs.close();
+    }
 	return 0;
 }
+
