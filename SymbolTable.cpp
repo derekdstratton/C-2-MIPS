@@ -117,6 +117,8 @@ bool SymbolTable::popLevel() {
  */
 ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
     os << "Symbol Table: (Stack size: " << symbolTable.table.size() << ")" << endl;
+    string k = symbolTable.getMode() ? "Insert" : "Lookup";
+    os << "Current Mode: " << k << endl;
     os << "Maps (From top to bottom):" << endl;
     int i = 0;
     for (auto& map : symbolTable.table) {
@@ -144,6 +146,6 @@ void SymbolTable::setMode(const bool& newMode) {
  *
  * @return True if in Insert Mode, False if in Lookup Mode
  */
-bool SymbolTable::getMode() {
+bool SymbolTable::getMode() const {
     return insertMode;
 }

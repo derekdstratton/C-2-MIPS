@@ -16,6 +16,7 @@
  * IDE CLion.
  *
  * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums.
+ * Also assuming no escape character octals or hex
  *
  * \section module Modules
  *
@@ -37,13 +38,15 @@
 
     \subsection run Running the Compiler
 
-    `./ScannerParser [options] [file_path]`
+    `./ScannerParser [options] file_path`
 
     options:
 
     - `-d`:
 
     - `-l`:
+
+    - `s`:
 
     - `-p`:
 
@@ -52,7 +55,6 @@
     file_path:
 
     - The path to the file being compiled.
-    If none is specified, it will default to the input stream.
  *
  */
 
@@ -68,9 +70,9 @@
  *
    \section test_symtable Testing the Symbol Table
 
-   The Symbol Table can be tested with the test driver SymbolTableDriver.cpp.
+   The Symbol Table can be tested with the test driver SymbolTableTest.cpp.
 
-  To run the test driver, run `%SymbolTable` in CLion.
+  To run the test driver, run `%SymbolTableTest` in CLion.
 
   To view the output, go to this file:
 

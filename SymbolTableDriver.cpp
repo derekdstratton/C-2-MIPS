@@ -1,277 +1,89 @@
 #include <iostream>
-#include <fstream>
 
 #include "SymbolTable.h"
-#include "Node.h"
 
 using namespace std;
-
-/**
- * Test #1
- * Tests that a one-level Symbol Table works properly.
- */
-void oneLevelTable() {
-    cout << "Tests that a one-level Symbol Table works properly." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.insert(item3);
-    cout << s;
-}
-
-/**
- * Test #2
- * Tests that a multiple-level Symbol Table works properly.
- */
-void multiLevelTable() {
-    cout << "Tests that a multiple-level Symbol Table works properly." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    cout << s;
-}
-
-/**
- * Test #3
- * Tests that the top level of the Symbol Table can be successfully popped.
- */
-void popTopLevel() {
-    cout << "Tests that the top level of the Symbol Table can be successfully popped." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    cout << s;
-    //Should be true, successfully pop top level.
-    cout << s.popLevel() << endl;
-    cout << s;
-}
-
-/**
- * Test #4
- * Tests that the Symbol Table will not pop off it's only level.
- */
-void failToPopLastLevel() {
-    cout << "Tests that the Symbol Table will not pop off it's only level.";
-    SymbolTable s;
-    cout << s;
-    //Should be false, fail to pop only level.
-    cout << s.popLevel() << endl;
-}
-
-/**
- * Test #5
- * Tests that the Symbol Table returns appropriate info for an insert conflict.
- */
-void insertConflict() {
-    cout << "Tests that the Symbol Table returns appropriate info for an insert conflict." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1",Node());
-    s.insert(item);
-    tuple<bool, bool> ret = s.insert(item);
-    cout << s;
-    bool successInsert, notShadowing;
-    tie(successInsert, notShadowing) = ret;
-    //Should be false, did not successfully insert.
-    cout << successInsert << endl;
-}
-
-/**
- * Test #6
- * Tests that the Symbol Table returns appropriate info for a shadowing variable.
- */
-void insertShadowing() {
-    cout << "Tests that the Symbol Table returns appropriate info for a shadowing variable." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    s.insert(item);
-    s.pushLevel();
-    tuple<bool, bool> ret =  s.insert(item);
-    cout << s;
-    bool successInsert, notShadowing;
-    tie(successInsert, notShadowing) = ret;
-    //Should be false, notShadowing is not true.
-    cout << notShadowing << endl;
-}
-
-/**
- * Test #7
- * Tests that the Symbol Table can find an element on the top scope and return that info.
- */
-void findOnTopScope() {
-    cout << "Tests that the Symbol Table can find an element on the top scope and return that info." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    cout << s;
-    tuple<map<string, Node>::iterator, string> ret = s.search("Item 3");
-    map<string, Node>::iterator it;
-    string status;
-    tie(it, status) = ret;
-    //Should print "top", for it being found on the top scope.
-    cout << status << endl;
-}
-
-/**
- * Test #8
- * Tests that the Symbol Table can find an element on the top scope and return that info.
- */
-void findOnLowerScope() {
-    cout << "Tests that the Symbol Table can find an element on the top scope and return that info." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    cout << s;
-    tuple<map<string, Node>::iterator, string> ret = s.search("Item 2");
-    map<string, Node>::iterator it;
-    string status;
-    tie(it, status) = ret;
-    //Should print "other", for it being found on another scope.
-    cout << status << endl;
-}
-
-/**
- * Test #9
- * Tests that the Symbol Table will return appropriate info that search didn't find an item.
- */
-void failToFind() {
-    cout << "Tests that the Symbol Table will return appropriate info that search didn't find an item." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    cout << s;
-    tuple<map<string, Node>::iterator, string> ret = s.search("Item 5");
-    map<string, Node>::iterator it;
-    string status;
-    tie(it, status) = ret;
-    //Should print "not", for not being found.
-    cout << status << endl;
-}
-
-/**
- * Test #10
- * Tests that the Symbol Table dumps info to a file. Currently called symbolTable.out.
- */
-void dumpToFile() {
-    cout << "Tests that the Symbol Table dumps info to a file. Currently called symbolTable.out." << endl;
-    SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node());
-    pair<string, Node> item2 = make_pair("Item 2", Node());
-    pair<string, Node> item3 = make_pair("Item 3", Node());
-    pair<string, Node> item4 = make_pair("Item 4", Node());
-    s.insert(item);
-    s.insert(item2);
-    s.pushLevel();
-    s.insert(item3);
-    s.insert(item4);
-    ofstream outputFile;
-    outputFile.open("symbolTable.out");
-    outputFile << s;
-    cout << s;
-}
-
-/**
- * Test #11
- * Tests that the Symbol Table can be set to insert or lookup mode.
- */
-void setInsertLookupMode() {
-    cout << "Tests that the Symbol Table can be set to insert or lookup mode." << endl;
-    SymbolTable s;
-    s.setMode(false);
-    // Switching to false switches to Insert Mode
-    cout << s.getMode() << endl;
-    s.setMode(true);
-    // Switching to true switches to Insert Mode
-    cout << s.getMode() << endl;
-}
-
 int main() {
+    SymbolTable s;
     int num;
     do {
-        cout << "Enter a test number (1-12), or 0 to exit." << endl;
+        cout << "Current Symbol Table: " << endl;
+        cout << s;
+        cout << "What would you like to do now (Type 0 to view options, type -1 to exit)?" << endl;
         cin >> num;
         switch (num) {
-            case 0:
-                num = 0;
-                break;
-            case 1:
-                oneLevelTable();
-                break;
-            case 2:
-                multiLevelTable();
-                break;
-            case 3:
-                popTopLevel();
-                break;
-            case 4:
-                failToPopLastLevel();
-                break;
-            case 5:
-                insertConflict();
-                break;
-            case 6:
-                insertShadowing();
-                break;
-            case 7:
-                findOnTopScope();
-                break;
-            case 8:
-                findOnLowerScope();
-                break;
-            case 9:
-                failToFind();
-                break;
-            case 10:
-                dumpToFile();
-                break;
-            case 11:
-                setInsertLookupMode();
-                break;
-            case 12:
-                break;
-            default:
-                cout << "Please enter a valid number." << endl;
+            case -1:
                 num = -1;
                 break;
+            case 0:
+                cout << "Option 1: Insert into Symbol Table." << endl;
+                cout << "Option 2: Search Symbol Table." << endl;
+                cout << "Option 3: Push Level onto Symbol Table." << endl;
+                cout << "Option 4: Pop Level off Symbol Table." << endl;
+                cout << "Option 5: Set mode of Symbol Table (insert/lookup)." << endl;
+                cout << "Option 6: Return current mode of Symbol Table." << endl;
+                break;
+            case 1: {
+                cout << "Type an identifier to insert (A default node will be generated):" << endl;
+                string a;
+                cin >> a;
+                tuple<bool, bool> ret = s.insert(make_pair(a, Node()));
+                bool insertSuccess, notShadowing;
+                tie(insertSuccess, notShadowing) = ret;
+                if (!insertSuccess) {
+                    cout << "Element already exists at top scope. Failed to insert." << endl;
+                }
+                if (!notShadowing) {
+                    cout << "Element successfully inserted, but is shadowing a lower level variable." << endl;
+                }
+                if (notShadowing) {
+                    cout << "Successfully inserted! " << endl;
+                }
+                break; }
+            case 2: {
+                cout << "Type an identifier to search for:" << endl;
+                string ab;
+                cin >> ab;
+                tuple<map<string, Node>::iterator, string> retr = s.search(ab);
+                map<string, Node>::iterator it;
+                string status;
+                tie(it, status) = retr;
+                if (status == "top") {
+                    cout << "Found on the top level." << endl;
+                } else if (status == "other") {
+                    cout << "Found on a lower level than the top." << endl;
+                } else if (status == "not") {
+                    cout << "Not found." << endl;
+                }
+                break; }
+            case 3: {
+                s.pushLevel();
+                cout << "Pushed a new level." << endl;
+                break; }
+            case 4: {
+                bool ret = s.popLevel();
+                if (!ret) {
+                    cout << "Failed to pop level, you're on the last level!" << endl;
+                } else {
+                    cout << "Popped the top level." << endl;
+                }
+                break; }
+            case 5: {
+                cout << "Enter 1 to set the mode to insert, 0 to set the mode to lookup." << endl;
+                int p;
+                cin >> p;
+                s.setMode(p);
+                cout << "Mode successfully set." << endl;
+                break; }
+            case 6: {
+                string k = s.getMode() ? "Insert" : "Lookup";
+                cout << "The Current Mode is: " << k << endl;
+                break; }
+            default:
+                cout << "Please enter a valid number." << endl;
+                break;
         }
-    } while (num != 0);
-
+        cout << "------" << endl;
+    } while (num != -1);
     return 0;
 }
