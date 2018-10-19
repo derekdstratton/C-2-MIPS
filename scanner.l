@@ -558,7 +558,7 @@ return {
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
-        for(int i = 0; i < yyleng+1; i++)
+        for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
         outputError("Too long", "Floating Constant too long.", true);
     }
@@ -572,7 +572,7 @@ return {
     string orig = yytext;
     string updated = to_string(num);
     if (orig != updated) {
-        for(int i = 0; i < yyleng+1; i++)
+        for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
         outputError("Too long", "Integer Constant too long.", true);
     }
@@ -607,7 +607,7 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
-            for(int i = 0; i < yyleng+1; i++) {
+            for(int i = 0; i < yyleng; i++) {
                 columnQueue.pop_back();
             }
                 to_token_file(ERROR, "ERROR");
@@ -620,7 +620,7 @@ return {
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
             if (!insertSuccess) {
-                for(int i = 0; i < yyleng+1; i++)
+                for(int i = 0; i < yyleng; i++)
                     columnQueue.pop_back();
                 to_token_file(ERROR, "ERROR");
                 outputError("Already exists", "Variable already exists on this scope.", false);
@@ -640,14 +640,13 @@ return {
         string status;
         tie(it, status) = result;
         if (status == "not") {
-            for(int i = 0; i < yyleng+1; i++)
+            for(int i = 0; i < yyleng; i++)
                 columnQueue.pop_back();
             to_token_file(ERROR, "ERROR");
             outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
-    to_token_file(IDENTIFIER, "IDENTIFIER");
     return ( IDENTIFIER );
 }
     /*return ( IDENTIFIER );}*/
@@ -655,7 +654,7 @@ return {
 . {
     for(int i = 0; i < yyleng; i++)
         columnQueue.pop_back();
-    to_token_file(ERROR, "ERROR");
+    to_token_file(ERROR, "ERROR1");
     outputError("Invalid", "Invalid character", false);
     exit(0);
   }
@@ -730,20 +729,38 @@ void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
  * @param token the token number to be output
  */
 void to_token_file(int token, string tokName) {
-    ofstream pStream;
+    if(tokName == "ERROR")
+    {
+        ofstream errStream;
+        errStream.open("tokens.out", ios::app);
+        errStream << "  ERROR" << endl;
+        errStream.close();
+    }
+    else if(tokName == "ERROR1")
+    {
+        ofstream errStream;
+        errStream.open("tokens.out", ios::app);
+        errStream << "  ERROR" << endl;
+        errStream.close();
+        for (int i = 0; i < yyleng; i++)
+            columnQueue.push_back(' ');
+    }
+    else {
+        ofstream pStream;
 
-    if(debug[4])
-        pStream.open(newOutputFile, ios::app);
-    else
-        pStream.open("list_file", ios::app);
+        if (debug[4])
+            pStream.open(newOutputFile, ios::app);
+        else
+            pStream.open("list_file", ios::app);
 
-    pStream << endl << yytext << endl << endl;
-    for(int i = 0; i < yyleng; i++)
-        columnQueue.push_back(' ');
-    if(debug[1] && debug[0]) {
-        ofstream tokenfile;
-        tokenfile.open("tokens.out", ios::app);
-        tokenfile << yytext << " " << tokName << " " << token << "\n";
-        tokenfile.close();
+        pStream << endl << yytext << endl << endl;
+        for (int i = 0; i < yyleng; i++)
+            columnQueue.push_back(' ');
+        if (debug[1] && debug[0]) {
+            ofstream tokenfile;
+            tokenfile.open("tokens.out", ios::app);
+            tokenfile << yytext << " " << tokName << " " << token << "\n";
+            tokenfile.close();
+        }
     }
 }
