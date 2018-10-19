@@ -533,8 +533,6 @@ int main(int argc, char **argv)
     ofs.close();
     for(int i = 0; i < 4; i++) //initialize all debug options to false
         debug[i] = false;
-    for(int i = 0; i < 4; i++)
-        cout << "debug[i] is " << debug[i] << endl;*/
     if(argc > 1)
     {
         for(int i = 1; i < argc; i++)
@@ -547,8 +545,6 @@ int main(int argc, char **argv)
                     debug[2] = true;
                 else if(strcmp(argv[i],"-o") == 0)
                     debug[3] = true;
-                else
-                    cout << argv[i] << " is not a valid command line argument." << endl;
             }
         yyin = fopen(argv[argc - 1], "r");
         if ( !yyin )
