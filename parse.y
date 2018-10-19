@@ -514,14 +514,11 @@ identifier
 	;
 %%
 
-//extern char yytext[];
 extern int column;
 
-//string s ("syntax error, I am going to die now.");
 //error function called when parsing fails, prints error to stderr stream thingy
 void yyerror (char const* s)
 {
-    //string s ("syntax error, I am going to die now.");
     cerr << s << " on line " << yylloc.first_line << endl;
 	return;
 }
@@ -534,53 +531,34 @@ int main(int argc, char **argv)
     ofstream ofs;
     ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
     ofs.close();
-    for(int i = 0; i < 4; i++)
+    for(int i = 0; i < 4; i++) //initialize all debug options to false
         debug[i] = false;
-    for(int i = 1; i < argc; i++)
-    {
-        if(strcmp(argv[i],"-d") == 0)
-            debug[0] = true;
-        else if(strcmp(argv[i],"-l") == 0)
-            debug[1] = true;
-        else if(strcmp(argv[i],"-s") == 0)
-            debug[2] = true;
-        else if(strcmp(argv[i],"-o") == 0)
-            debug[3] = true;
-    }
-    /*cout << "debug array is "<< endl;
     for(int i = 0; i < 4; i++)
         cout << "debug[i] is " << debug[i] << endl;*/
     if(argc > 1)
     {
+        for(int i = 1; i < argc; i++)
+            {
+                if(strcmp(argv[i],"-d") == 0)
+                    debug[0] = true;
+                else if(strcmp(argv[i],"-l") == 0)
+                    debug[1] = true;
+                else if(strcmp(argv[i],"-s") == 0)
+                    debug[2] = true;
+                else if(strcmp(argv[i],"-o") == 0)
+                    debug[3] = true;
+                else
+                    cout << argv[i] << " is not a valid command line argument." << endl;
+            }
         yyin = fopen(argv[argc - 1], "r");
         if ( !yyin )
         {
-            cout << "Opening file unsuccessful" << endl;
+            cout << "Opening file unsuccessful, aborting." << endl;
+            return(-1);
         }
-        fileName = argv[argc - 1];
+        else
+            fileName = argv[argc - 1];
     }
-    //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
-
-	//cout << "argv[1] is :" << argv[1] << endl;
-	if(argc > 1 && (string(argv[1]).compare("-p") == 0))
-	{
-	    ofstream myFile;
-	    myFile.open ("productions.txt");
-	    //cout << "Dumping prodStream\n";
-	    string str = prodStream.str();
-	    myFile << str;
-	    myFile.close();
-	}
 	return 0;
 }
-
-//SymbolTable * getTable() {
-//    return &symb;
-//}
-/*
-{
-	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
-}
- */

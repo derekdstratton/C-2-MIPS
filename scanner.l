@@ -1,7 +1,6 @@
 %{
 
 //TODO deal with comments /* */
-//TODO: output source code and do column numbers
 
 /* Headers */
 
@@ -12,15 +11,14 @@
 #include <sstream>
 #include <fstream>
 #include <stdlib.h>
-#include <fstream>
-
+#include <deque>
 #include "SymbolTable.h"
 #include "Node.h"
 #include "parser.hpp"
+
 extern bool debug[4];
-extern FILE * yyin;
 extern char* fileName;
-//TODO: output source code and do column numbers
+deque <char> columnQueue;
 SymbolTable * sym;
 bool isFunction; //true if function
 string type_specifier = "none";
@@ -29,18 +27,13 @@ string storage_class_specifier = "none";
 string signed_or_unsigned = "none";
 stringstream sourceStream;
 string currentLine;
-int first_column = 0;
 static bool insertModeFlag = false;
 
-extern FILE * yyin;
-
 /* Function Declarations */
-//todo probably combine these three into one function
 void outputError(string errmsg1, string errmsg2, bool errtype);
 void outputErrorWarningLine();
-void outputErrorWarningPosition(string errmsg);
-void outputErrorWarning(bool errtype, string errmsg);
-void processToken();
+int outputErrorWarningPosition(string errmsg);
+void outputErrorWarning(bool errtype, string errmsg, int columnNum);
 void to_token_file(int token);
 
 using namespace std;
@@ -56,8 +49,8 @@ void to_token_file(int token);
 
 /*White space*/
 newLine [\n]
-delim	[ \t\n]
-ws	{delim}+
+tab [\t]
+space [' ']
 
 /*Numbers*/
 digit	[0-9]
@@ -76,12 +69,15 @@ character_constant \'([^']|{escape_sequence})\'
 %%
 
 {newLine} {
-    first_column = 0;
-    currentLine.clear();
     yylloc.first_line++;
+    while(!columnQueue.empty())
+        columnQueue.pop_front();
     }
-{ws} {
-    processToken();
+{tab} {
+    columnQueue.push_back('\t');
+    }
+{space} {
+    columnQueue.push_back(' ');
     }
 
 "!!S" {
@@ -549,6 +545,8 @@ return {
 {identifier} {
     to_token_file(IDENTIFIER);
     if (yyleng > 31) {
+        for(int i = 0; i < yyleng; i++)
+            columnQueue.pop_back();
         outputError("too long buddy", "Identifier name too long.", true);
     }
     string s = yytext;
@@ -565,6 +563,8 @@ return {
             string status;
             tie(it, status) = result;
             if (status == "not") {
+            for(int i = 0; i < yyleng; i++)
+                columnQueue.pop_back();
                 outputError("Not found", "Identifier not defined.", false);
             }
         } else {
@@ -574,8 +574,12 @@ return {
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
             if (!insertSuccess) {
+                for(int i = 0; i < yyleng; i++)
+                    columnQueue.pop_back();
                 outputError("Already exists", "Variable already exists on this scope.", false);
             } else if (!notShadowing) {
+                for(int i = 0; i < yyleng; i++)
+                    columnQueue.pop_back();
                 outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
             }
         }
@@ -588,68 +592,70 @@ return {
         string status;
         tie(it, status) = result;
         if (status == "not") {
+            for(int i = 0; i < yyleng; i++)
+                columnQueue.pop_back();
             outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
     }
     return ( IDENTIFIER );}
 
-. { processToken();
-    /*while(string(yytext) != "\n")
-    {
-        cout << "yytext is " << string(yytext) << endl;
-        currentLine += yytext;
-        yylex();
-    }*/
-
+. {
     outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
-    return (ERROR);}
+    return (ERROR);
+  }
 
 
 %%
 
 void outputError(string errmsg1, string errmsg2, bool errtype) {
     outputErrorWarningLine();
-    outputErrorWarningPosition(errmsg1);
-    outputErrorWarning(errtype, errmsg2);
+    int columnNum = outputErrorWarningPosition(errmsg1);
+    outputErrorWarning(errtype, errmsg2, columnNum);
 }
 
 void outputErrorWarningLine(){
     ifstream errInput;
     errInput.open(fileName);
     for(int i = 0; i < yylineno - 1; i++)
-    {
         getline(errInput, currentLine);
+
+    deque <char> errQueue;
+    while(errInput.peek() != '\n')
+        errQueue.push_back(errInput.get());
+
+    while(!errQueue.empty()) {
+        cerr << errQueue.front();
+        errQueue.pop_front();
     }
-    getline(errInput, currentLine);
-    cerr << currentLine << endl;
-    //todo put this along with every error. except make a separate file pointer so it prints the whole line
+    cerr << endl;
 }
 
-void outputErrorWarningPosition(string errmsg) {
-    int tmp = first_column;
-    while(tmp-- > 1)
-        cerr << ' ';
-    //todo handle tab characters
+
+int outputErrorWarningPosition(string errmsg) {
+    int columnNum = columnQueue.size();
+    while(!columnQueue.empty()) {
+        if(columnQueue.front() == '\t')
+            cerr << columnQueue.front();
+        else
+            cerr << ' ';
+
+        columnQueue.pop_front();
+    }
     cerr << "^ " << errmsg << "\n";
+    return columnNum + 1;
 }
 
 //errtype true if its a warning, false if its an error
-void outputErrorWarning(bool errtype, string errmsg) {
+void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
     string s = errtype ? "Warning" : "Error";
-    cerr << s << " on line " << yylineno << ": " << errmsg << endl;
-}
-
-void processToken() //updates column number and outputs source code to file for each token
-{
-    first_column += yyleng;
-    currentLine += yytext;
+    cerr << s << " on line " << yylineno << " (column " << columnNum << "): " << errmsg << endl;
 }
 
 void to_token_file(int token) {
-    first_column += yyleng;
-    currentLine += yytext;
+    for(int i =0; i < yyleng; i++)
+        columnQueue.push_back(' ');
     ofstream tokenfile;
     tokenfile.open("tokens.out", ios::app);
     tokenfile << yytext << " " << token << "\n";
