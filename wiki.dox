@@ -15,6 +15,11 @@
  * Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
+ * Some assumptions for this phase include that the Symbol Table does not have to process structs,
+ * unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode
+ * escape characters are not input. The compiler is restricted to receiving a character stream
+ * from a file, and not from stdin.
+ *
  * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums.
  * Also assuming no escape character octals or hex
  *
@@ -68,15 +73,21 @@
  * to each identifier. For more information about the technical details of these classes,
  * view the SymbolTable or Node page.
  *
+ * \section drive_symtable Symbol Table Driver
+ *
+ * The Symbol Table can be run with the driver https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTableDriver.cpp.
+ *
+ * The prompt gives details of how to use the Symbol Table.
+ *
    \section test_symtable Testing the Symbol Table
 
-   The Symbol Table can be tested with the test driver SymbolTableTest.cpp.
+   The Symbol Table can be tested with the test driver https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTableTest.cpp.
 
   To run the test driver, run `%SymbolTableTest` in CLion.
 
   To view the output, go to this file:
 
-  -
+  - https://github.com/derekdstratton/Best-C-Compiler/blob/master/SymbolTableTestOutput.txt
 
   * Note, the Symbol Table test driver inputs default empty nodes. They have a default
   * line number of -1, default column number of -1, and type int.
