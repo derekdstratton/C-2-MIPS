@@ -3,10 +3,15 @@ project(Project)
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Symbol Table
+# Symbol Table Driver
 
-set(SYMBOL_TABLE SymbolTableTest.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
-add_executable(SymbolTableTest ${SYMBOL_TABLE})
+set(SYMBOL_TABLE_DRIVER SymbolTableDriver.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+add_executable(SymbolTableDriver.cpp ${SYMBOL_TABLE_DRIVER})
+
+# Symbol Table Test
+
+set(SYMBOL_TABLE_TEST SymbolTableTest.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+add_executable(SymbolTableTest ${SYMBOL_TABLE_TEST})
 
 # Scanner/Parser
 
