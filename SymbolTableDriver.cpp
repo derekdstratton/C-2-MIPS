@@ -6,8 +6,6 @@
 
 using namespace std;
 
-string specifiers [4] = {"int", "none", "none", "none"};
-
 /**
  * Test #1
  * Tests that a one-level Symbol Table works properly.
@@ -15,9 +13,9 @@ string specifiers [4] = {"int", "none", "none", "none"};
 void oneLevelTable() {
     cout << "Tests that a one-level Symbol Table works properly." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
     s.insert(item);
     s.insert(item2);
     s.insert(item3);
@@ -31,10 +29,10 @@ void oneLevelTable() {
 void multiLevelTable() {
     cout << "Tests that a multiple-level Symbol Table works properly." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();
@@ -50,10 +48,10 @@ void multiLevelTable() {
 void popTopLevel() {
     cout << "Tests that the top level of the Symbol Table can be successfully popped." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();
@@ -84,7 +82,7 @@ void failToPopLastLevel() {
 void insertConflict() {
     cout << "Tests that the Symbol Table returns appropriate info for an insert conflict." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
+    pair<string, Node> item = make_pair("Item 1",Node());
     s.insert(item);
     tuple<bool, bool> ret = s.insert(item);
     cout << s;
@@ -101,7 +99,7 @@ void insertConflict() {
 void insertShadowing() {
     cout << "Tests that the Symbol Table returns appropriate info for a shadowing variable." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
     s.insert(item);
     s.pushLevel();
     tuple<bool, bool> ret =  s.insert(item);
@@ -119,10 +117,10 @@ void insertShadowing() {
 void findOnTopScope() {
     cout << "Tests that the Symbol Table can find an element on the top scope and return that info." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();
@@ -144,10 +142,10 @@ void findOnTopScope() {
 void findOnLowerScope() {
     cout << "Tests that the Symbol Table can find an element on the top scope and return that info." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();
@@ -169,10 +167,10 @@ void findOnLowerScope() {
 void failToFind() {
     cout << "Tests that the Symbol Table will return appropriate info that search didn't find an item." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();
@@ -194,10 +192,10 @@ void failToFind() {
 void dumpToFile() {
     cout << "Tests that the Symbol Table dumps info to a file. Currently called symbolTable.out." << endl;
     SymbolTable s;
-    pair<string, Node> item = make_pair("Item 1", Node(4, specifiers));
-    pair<string, Node> item2 = make_pair("Item 2", Node(7, specifiers));
-    pair<string, Node> item3 = make_pair("Item 3", Node(12, specifiers));
-    pair<string, Node> item4 = make_pair("Item 4", Node(200, specifiers));
+    pair<string, Node> item = make_pair("Item 1", Node());
+    pair<string, Node> item2 = make_pair("Item 2", Node());
+    pair<string, Node> item3 = make_pair("Item 3", Node());
+    pair<string, Node> item4 = make_pair("Item 4", Node());
     s.insert(item);
     s.insert(item2);
     s.pushLevel();

@@ -15,7 +15,7 @@
  * Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
- * Assumptions and restrictions?
+ * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, or enums.
  *
  * \section module Modules
  *

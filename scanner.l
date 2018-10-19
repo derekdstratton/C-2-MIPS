@@ -23,10 +23,12 @@ extern char* fileName;
 //TODO: output source code and do column numbers
 SymbolTable * sym;
 bool isFunction; //true if function
-string type_specifier = "none";
-string type_qualifier = "none";
-string storage_class_specifier = "none";
-string signed_or_unsigned = "none";
+type_specifiers type_specifier = NoTS;
+type_qualifiers type_qualifier = NoTQ;
+storage_class_specifiers storage_class_specifier = NoSCS;
+signed_or_unsigneds signed_or_unsigned = NoSU;
+map<string, Node> struct_or_union_symbols;
+
 stringstream sourceStream;
 string currentLine;
 int first_column = 0;
@@ -102,51 +104,51 @@ typedef {
 extern {
     if (getTable()->getMode()) {
         insertModeFlag = true;
-        storage_class_specifier = "extern";
+        storage_class_specifier = Extern;
     }
     to_token_file(EXTERN);
     return ( EXTERN );}
 static {
     if (getTable()->getMode()) {
         insertModeFlag = true;
-        storage_class_specifier = "static";
+        storage_class_specifier = Static;
     }
     to_token_file(STATIC);
     return ( STATIC );}
 auto {
     if (getTable()->getMode()) {
-        storage_class_specifier = "auto";
+        storage_class_specifier = Auto;
         insertModeFlag = true;
     }
     to_token_file(AUTO);
     return ( AUTO );}
 register {
     if (getTable()->getMode()) {
-        storage_class_specifier = "register";
+        storage_class_specifier = Register;
         insertModeFlag = true;
     }
     to_token_file(REGISTER);
     return ( REGISTER );}
 char {
     if (getTable()->getMode()) {
-        type_specifier = "char";
+        type_specifier = Char;
         insertModeFlag = true;
     }
     to_token_file(CHAR);
     return ( CHAR );}
 short {
     if (getTable()->getMode()) {
-        type_specifier = "short";
+        type_specifier = Short;
         insertModeFlag = true;
     }
     to_token_file(SHORT);
     return ( SHORT );}
 int {
     if (getTable()->getMode()) {
-        if (type_specifier == "long" || type_specifier == "short") {
+        if (type_specifier == Long || type_specifier == Short) {
             //don't store int, keep it as "long" or "short"
         } else {
-            type_specifier = "int";
+            type_specifier = Int;
         }
         insertModeFlag = true;
     }
@@ -154,68 +156,70 @@ int {
     return ( INT );}
 long {
     if (getTable()->getMode()) {
-        type_specifier = "long";
+        type_specifier = Long;
         insertModeFlag = true;
     }
     to_token_file(LONG);
     return ( LONG );}
 signed {
     if (getTable()->getMode()) {
-        signed_or_unsigned = "signed";
+        signed_or_unsigned = Signed;
         insertModeFlag = true;
     }
     to_token_file(SIGNED);
     return ( SIGNED );}
 unsigned {
     if (getTable()->getMode()) {
-        signed_or_unsigned = "unsigned";
+        signed_or_unsigned = Unsigned;
         insertModeFlag = true;
     }
     to_token_file(UNSIGNED);
     return ( UNSIGNED );}
 float {
     if (getTable()->getMode()) {
-        type_specifier = "float";
+        type_specifier = Float;
         insertModeFlag = true;
     }
     to_token_file(FLOAT);
     return ( FLOAT );}
 double {
     if (getTable()->getMode()) {
-        type_specifier = "double";
+        type_specifier = Double;
         insertModeFlag = true;
     }
     to_token_file(DOUBLE);
     return ( DOUBLE );}
 const {
     if (getTable()->getMode()) {
-        type_qualifier = "const";
+        type_qualifier = Const;
         insertModeFlag = true;
     }
     to_token_file(CONST);
     return ( CONST );}
 volatile {
     if (getTable()->getMode()) {
-        type_qualifier = "none";
+        type_qualifier = Volatile;
         insertModeFlag = true;
     }
     to_token_file(VOLATILE);
     return ( VOLATILE );}
 void {
     if (getTable()->getMode()) {
-        type_specifier = "void";
+        type_specifier = Void;
         insertModeFlag = true;
     }
     to_token_file(VOID);
     return ( VOID );}
 struct {
     if (getTable()->getMode()) {
+        type_specifier = Struct;
         insertModeFlag = true;
     }
     to_token_file(STRUCT);
     return ( STRUCT );}
 union {
     if (getTable()->getMode()) {
+        type_specifier = Union;
         insertModeFlag = true;
     }
     to_token_file(UNION);
@@ -552,8 +556,13 @@ return {
         outputError("too long buddy", "Identifier name too long.", true);
     }
     string s = yytext;
-    string types[4] = {type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned};
-    Node x = Node(4, types);
+    Node x = Node();
+    x.setLineNumber(1); //todo
+    x.setColumnNumber(2); //todo
+    x.setTypeSpecifier(type_specifier);
+    x.setTypeQualifier(type_qualifier);
+    x.setStorageClassSpecifier(storage_class_specifier);
+    x.setSignedOrUnsigned(signed_or_unsigned);
     if (getTable()->getMode()) {
         //currently in insert mode
         if (!insertModeFlag) {
