@@ -550,10 +550,15 @@ int main(int argc, char **argv)
     /*cout << "debug array is "<< endl;
     for(int i = 0; i < 4; i++)
         cout << "debug[i] is " << debug[i] << endl;*/
-    yyin = fopen(argv[argc - 1], "r");
-    if ( !yyin )
-        cout << "Opening file unsuccessful" << endl;
-    fileName = argv[argc - 1];
+    if(argc > 1)
+    {
+        yyin = fopen(argv[argc - 1], "r");
+        if ( !yyin )
+        {
+            cout << "Opening file unsuccessful" << endl;
+        }
+        fileName = argv[argc - 1];
+    }
     //yypush_buffer_state(yy_create_buffer( yyin, YY_BUF_SIZE ));
 	yyparse();
 
