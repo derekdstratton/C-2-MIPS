@@ -4,16 +4,23 @@ For CS 460, Compiler Construction, Fall 2018
 
 ### Description:
 
-It compiles C code.
+This project is a C Compiler that translates ANSI C code into 
+MIPS Assembly code. The Compiler currently consists of a Symbol
+Table, Scanner, and Parser. The Symbol Table works with the Scanner
+and Parser to keep track of identifiers read from an input character 
+stream. The Scanner returns tokens from an input character stream. The
+Parser uses the tokens from the Scanner to generate productions based
+on the C Grammar. The compiler is written in C++ and uses Flex and Bison
+to scan and parse the input C code. More detailed project information can
+be found in the [wiki](https://derekdstratton.github.io/Best-C-Compiler/).
 
-### Team:
+### Team: Scan
 
 - Derek Stratton
-- Chris "Danger" Koh
+- Chris Koh
 
 ### Installation: 
 
-Installing on an ECC Machine:
 ```
 git clone https://github.com/derekdstratton/Best-C-Compiler
 cmake Best-C-Compiler
@@ -22,7 +29,7 @@ make
 
 ### Usage:
 
-- To run the Scanner/Parser, type `./ScannerParser`
+- To run the Scanner/Parser, type `./ScannerParser [options] [file_path]`
 - To run the Symbol Table driver, type `./SymbolTable`
 
 ### Wiki:
