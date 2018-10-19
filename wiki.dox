@@ -15,7 +15,7 @@
  * Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
- * Assumptions and restrictions?
+ * Assumptions and restrictions? Symbol Table/Scanner do not handle structs, unions, typedefs, or enums.
  *
  * \section module Modules
  *
@@ -71,6 +71,13 @@
    The Symbol Table can be tested with the test driver SymbolTableDriver.cpp.
 
   To run the test driver, run `%SymbolTable` in CLion.
+
+  To view the output, go to this file:
+
+  -
+
+  * Note, the Symbol Table test driver inputs default empty nodes. They have a default
+  * line number of -1, default column number of -1, and type int.
 
   From there, the program will prompt you to add a number corresponding to the
   desired test case. The numbers can be found in the documentation for SymbolTableDriver.cpp
