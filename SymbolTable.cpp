@@ -1,6 +1,3 @@
-/**
- *
- */
 #include <iostream>
 #include <fstream>
 #include <tuple>
@@ -29,10 +26,8 @@ tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
     tuple<map<string, Node>::iterator, string> tup = this->search(item.first);
     string retval = get<1>(tup);
     if (retval == "top") {
-        //cout << "error already defined" << endl;
         return make_tuple(false, false);
     } else if (retval == "other") {
-        //cout << "warning for shadowing" << endl;
         return make_tuple(true, false);
     }
 
@@ -70,7 +65,6 @@ tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key
         //not found
         status="not";
     }
-
     //full search
     if (!topLevelOnly && !found) {
         auto stack_ptr = table.begin()++; //points to the second level
@@ -90,7 +84,6 @@ tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key
             status="not";
         }
     }
-
     return make_tuple(node_iterator, status);
 }
 
@@ -104,11 +97,11 @@ void SymbolTable::pushLevel() {
 
 /**
  * Pops the top level from the stack
+ *
  * @return Returns true if the level is successfully popped, false otherwise.
  */
 bool SymbolTable::popLevel() {
     if (table.size() == 1) {
-        //cout << "popping the final level is bad, not gonna do it" << endl;
         return false;
     }
     table.pop_front();
@@ -116,10 +109,11 @@ bool SymbolTable::popLevel() {
 }
 
 /**
+ * An operator overload to output the Symbol Table to a stream.
  *
- * @param os
- * @param symbolTable
- * @return
+ * @param os The output stream
+ * @param symbolTable The Symbol Table object being output to a stream
+ * @return A reference to the ostream to allow for chaining
  */
 ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
     os << "Symbol Table: (Stack size: " << symbolTable.table.size() << ")" << endl;
@@ -136,16 +130,19 @@ ostream& operator<<(ostream& os, const SymbolTable& symbolTable) {
 }
 
 /**
+ * Sets the Symbol Table to either insert or lookup mode.
  *
- * @param newMode
+ * @param newMode The new mode being set to.
+ *  True corresponds to insert mode, false to lookup mode.
  */
 void SymbolTable::setMode(const bool& newMode) {
     insertMode = newMode;
 }
 
 /**
+ * Returns the current mode of the Symbol Table.
  *
- * @return
+ * @return True if in Insert Mode, False if in Lookup Mode
  */
 bool SymbolTable::getMode() {
     return insertMode;

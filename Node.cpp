@@ -1,8 +1,12 @@
-/**
- *
- */
 #include "Node.h"
 
+/**
+ * Constructor for a Node. Constructs with the line number and specifiers
+ *
+ * @param lineNum The line number of the symbol being inserted
+ * @param specifiers An array of strings corresponding to the type specifier, type
+ * qualifier, storage class specifier, and if it is signed or unsigned
+ */
 Node::Node(int lineNum, string * specifiers) {
     lineNumber = lineNum;
     type_specifier = specifiers[0];
@@ -11,6 +15,13 @@ Node::Node(int lineNum, string * specifiers) {
     signed_or_unsigned = specifiers[3];
 }
 
+/**
+ * The operator << overload for Node so it can be output to files or stdout
+ *
+ * @param os The output stream being put to.
+ * @param node The node being output.
+ * @return A reference to the ostream to allow for chaining.
+ */
 ostream& operator<<(ostream& os, const Node& node) {
     os << "Line Number: " << node.lineNumber << ", ";
     os << "Declaration Specifiers: ";

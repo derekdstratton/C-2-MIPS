@@ -522,7 +522,8 @@ return {
         outputErrorWarning(true, "Identifier name too long.");
     }
     string s = yytext;
-    Node x = Node(4, type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned);
+    string types[4] = {type_specifier, type_qualifier, storage_class_specifier, signed_or_unsigned};
+    Node x = Node(4, types);
     if (getTable()->getMode()) {
         //currently in insert mode
         if (!insertModeFlag) {
@@ -570,7 +571,7 @@ return {
 . { processToken();
     outputErrorWarningLine();
     outputErrorWarningPosition("Unexpected Character");
-    return (ERROR);}
+    return (ERROR); }
 
 %%
 

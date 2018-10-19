@@ -1,6 +1,3 @@
-/**
- * The test driver for the Symbol Table
- */
 #include <iostream>
 #include <fstream>
 
