@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ne_5fop',['NE_OP',['../parser_8cpp.html#a15c9f7bd2f0e9686df5d9df4f3314aa9a3b08c224b7bf164b1fb28b7b37c2071b',1,'NE_OP():&#160;parser.cpp'],['../parser_8hpp.html#a15c9f7bd2f0e9686df5d9df4f3314aa9a3b08c224b7bf164b1fb28b7b37c2071b',1,'NE_OP():&#160;parser.hpp']]],
-  ['newline',['NEWLINE',['../parser_8cpp.html#a15c9f7bd2f0e9686df5d9df4f3314aa9a59d02b47a666732cc6577f158272b099',1,'NEWLINE():&#160;parser.cpp'],['../parser_8hpp.html#a15c9f7bd2f0e9686df5d9df4f3314aa9a59d02b47a666732cc6577f158272b099',1,'NEWLINE():&#160;parser.hpp']]]
+  ['typedef',['Typedef',['../_node_8h.html#a1d7616a95b013a6e7f8fbe47dfad3290ab89b0f7db47fe540bd7d636f0b4fe4cd',1,'Node.h']]],
+  ['typedefname',['TypedefName',['../_node_8h.html#a609af7e79694833e6dec688969d7d916a74a5afb8c9a61b270d35b571ae5246cd',1,'Node.h']]]
 ];

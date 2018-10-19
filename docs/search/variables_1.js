@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['x',['x',['../test__shadowing_8c.html#a6150e0515f7202e2fb518f7206ed97dc',1,'test_shadowing.c']]]
+  ['specifiers',['Specifiers',['../_symbol_table_test_output_8txt.html#a33bc6223b86d2ec596e5dd62af5ae81e',1,'SymbolTableTestOutput.txt']]]
 ];
