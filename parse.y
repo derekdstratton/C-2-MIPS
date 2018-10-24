@@ -102,7 +102,6 @@ int yylex();
 %%
 
 translation_unit
-	/*: TYPEDEF {handleProd("translation_unit -> TYPEDEF"\n);}*/
 	: external_declaration {handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;

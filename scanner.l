@@ -649,7 +649,6 @@ return {
     }
     return ( IDENTIFIER );
 }
-    /*return ( IDENTIFIER );}*/
 
 . {
     for(int i = 0; i < yyleng; i++)
@@ -663,24 +662,14 @@ return {
 %%
 
 /**
- * Outputs an Error or Warnign Message
+ * Outputs an Error or Warning Message
  *
  * @param errmsg1 the error message right next to the ^
  * @param errmsg2 the error message on the following line
  * @param errtype true if its a warning, false if its an error
  */
 void outputError(string errmsg1, string errmsg2, bool errtype) {
-    outputErrorWarningLine();
-    int columnNum = outputErrorWarningPosition(errmsg1);
-    outputErrorWarning(errtype, errmsg2, columnNum);
-    if(!errtype)
-        exit(0);
-}
 
-/**
- * Outputs the preceding line from source code for the error
- */
-void outputErrorWarningLine(){
     ifstream errInput;
     errInput.open(fileName);
     for(int i = 0; i < yylineno - 1; i++)
@@ -695,15 +684,8 @@ void outputErrorWarningLine(){
         errQueue.pop_front();
     }
     cerr << endl;
-}
 
-/**
- * Outputs the position of the error with a ^ pointer
- * @param errmsg the message that goes next to it
- * @return The error position
- */
-int outputErrorWarningPosition(string errmsg) {
-    int columnNum = columnQueue.size();
+    int columnNum = columnQueue.size() + 1;
     while(!columnQueue.empty()) {
         if(columnQueue.front() == '\t')
             cerr << columnQueue.front();
@@ -712,16 +694,11 @@ int outputErrorWarningPosition(string errmsg) {
 
         columnQueue.pop_front();
     }
-    cerr << "^ " << errmsg << "\n";
-    return columnNum + 1;
-}
+    cerr << "^ " << errmsg1 << "\n";
 
-/**
- * Outputs the actual cerr message
- */
-void outputErrorWarning(bool errtype, string errmsg, int columnNum) {
-    string s = errtype ? "Warning" : "Error";
-    cerr << s << " on line " << yylineno << " (column " << columnNum << "): " << errmsg << endl;
+    cerr << (errtype ? "Warning" : "Error") << " on line " << yylineno << " (column " << columnNum << "): " << errmsg2 << endl;
+    if(!errtype)
+        exit(0);
 }
 
 /**
