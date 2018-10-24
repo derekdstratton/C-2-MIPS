@@ -24,6 +24,20 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
 
+# AST
+set(BOOST_ROOT C:/Apps/boost_1_67_0)
+
+find_package(Boost)
+IF (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIR})
+endif()
+
+add_executable(Tree tree.cpp)
+
+TARGET_LINK_LIBRARIES( Tree LINK_PUBLIC ${Boost_LIBRARIES} )
+
+# https://dreampuf.github.io/GraphvizOnline/
+
 # copy over the test files
 file(GLOB TEST_CASES
         "tests/*.c"
