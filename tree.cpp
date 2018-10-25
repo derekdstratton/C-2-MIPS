@@ -1,29 +1,20 @@
-#include <iostream>
-#include <string>
-#include <fstream>
+#include "include/tree.hh"
+#include "include/tree_util.hh"
 
-//#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/undirected_graph.hpp>
-#include <boost/graph/graphviz.hpp>
-
-typedef boost::undirected_graph<boost::no_property> Graph;
-
-int main(int argc, char*argv[])
+int main()
 {
-    if(argc < 2)
-    {
-        std::cerr << "Required: filename.dot" << std::endl;
-        return -1;
-    }
-    std::string filename = argv[1];
-    std::ofstream fout(filename.c_str());
+    tree<int> t;
+    auto top = t.begin();
+    auto next = t.insert(top, 3);
+    //t.insert(next, 4);
+    t.append_child(next, 5);
+    auto here = t.append_child(next, 6);
+    t.append_child(here, 7);
+    auto deeper = t.insert(here, 8);
+    t.append_child(deeper, 44);
 
-    Graph g;
-    Graph::vertex_descriptor v0 = g.add_vertex();
-    Graph::vertex_descriptor v1 = g.add_vertex();
-    boost::add_edge(v0,v1,g);
+    //t.insert(top, 10);
 
-    boost::write_graphviz(fout,g);
-
+    kptree::print_tree_bracketed(t);
     return 0;
 }
