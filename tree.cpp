@@ -12,7 +12,7 @@ int main()
     t.append_child(here, 4);
     auto deeper = t.insert(here, 3);
     t.append_child(deeper, 5);
-
+ 
     //t.insert(top, 10);
 
     kptree::print_tree_bracketed(t);
