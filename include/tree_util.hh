@@ -28,7 +28,11 @@
 #define tree_util_hh_
 
 #include <iostream>
+#include <fstream>
 #include "tree.hh"
+
+int counter = 0;
+//int parent;
 
 namespace kptree {
 
@@ -37,7 +41,7 @@ namespace kptree {
 
     template<class T>
     void print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator iRoot,
-                                 std::ostream& str=std::cout);
+                                 std::ostream& str=std::cout, int parent=0);
 
 
 
@@ -47,28 +51,50 @@ namespace kptree {
     template<class T>
     void print_tree_bracketed(const tree<T>& t, std::ostream& str)
     {
+        std::ofstream ofs;
+        ofs.open("ast.dot", std::ofstream::out | std::ofstream::trunc);
+        ofs << "graph G {" << std::endl;
+        ofs.close();
         int headCount = t.number_of_siblings(t.begin());
         int headNum = 0;
         for(typename tree<T>::sibling_iterator iRoots = t.begin(); iRoots != t.end(); ++iRoots, ++headNum) {
-            print_subtree_bracketed(t,iRoots,str);
+            print_subtree_bracketed(t,iRoots,str, 0);
             if (headNum != headCount) {
                 str << std::endl;
             }
         }
+        ofs.open("ast.dot", std::ios::app);
+        ofs << "}" << std::endl;
+        ofs.close();
     }
 
 
 // Print everything under this root in a flat, bracketed structure.
 
     template<class T>
-    void print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator iRoot, std::ostream& str)
+    void print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator iRoot, std::ostream& str, int parent)
     {
+        std::ofstream ofile;
+        ofile.open("ast.dot", std::ios::app);
         if(t.empty()) return;
         if (t.number_of_children(iRoot) == 0) {
+            //ofile << counter << ";" << std::endl;
+            ofile << counter << "[label=" << *iRoot << "];" << std::endl;
             str << *iRoot;
+            if (counter != 0) {
+                ofile << parent << "--" << counter << ";" << std::endl;
+            }
+            counter++;
         }
         else {
             // parent
+            //ofile << counter << ";" << std::endl;
+            ofile << counter << "[label=" << *iRoot << "];" << std::endl;
+            int new_parent = counter;
+            if (counter != 0) {
+                ofile << parent << "--" << counter << ";" << std::endl;
+            }
+            counter++;
             str << *iRoot;
             str << "(";
             // child1, ..., childn
@@ -77,7 +103,8 @@ namespace kptree {
             typename tree<T>::sibling_iterator iChildren;
             for (iChildren = t.begin(iRoot), siblingNum = 0; iChildren != t.end(iRoot); ++iChildren, ++siblingNum) {
                 // recursively print child
-                print_subtree_bracketed(t,iChildren,str);
+                print_subtree_bracketed(t,iChildren,str, new_parent);
+
                 // comma after every child except the last one
                 if (siblingNum != siblingCount ) {
                     str << ", ";
