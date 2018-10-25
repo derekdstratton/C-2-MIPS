@@ -80,8 +80,8 @@ namespace kptree {
         if(t.empty()) return;
         if (t.number_of_children(iRoot) == 0) {
             //ofile << counter << ";" << std::endl;
-            ofile << counter << "[label=" << *iRoot << "];" << std::endl;
-            str << *iRoot;
+            ofile << counter << "[label=" << **iRoot << "];" << std::endl;
+            str << **iRoot;
             if (counter != 0) {
                 ofile << parent << "--" << counter << ";" << std::endl;
             }
@@ -90,13 +90,13 @@ namespace kptree {
         else {
             // parent
             //ofile << counter << ";" << std::endl;
-            ofile << counter << "[label=" << *iRoot << "];" << std::endl;
+            ofile << counter << "[label=" << **iRoot << "];" << std::endl;
             int new_parent = counter;
             if (counter != 0) {
                 ofile << parent << "--" << counter << ";" << std::endl;
             }
             counter++;
-            str << *iRoot;
+            str << **iRoot;
             str << "(";
             // child1, ..., childn
             int siblingCount = t.number_of_siblings(t.begin(iRoot));

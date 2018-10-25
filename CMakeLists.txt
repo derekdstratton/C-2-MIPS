@@ -28,6 +28,8 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 add_executable(Tree tree.cpp)
 
+add_executable(Tree2 tree2.cpp)
+
 # https://dreampuf.github.io/GraphvizOnline/
 
 # copy over the test files
