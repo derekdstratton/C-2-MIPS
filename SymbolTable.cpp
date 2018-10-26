@@ -21,9 +21,9 @@ SymbolTable::SymbolTable() {
  * @return First bool: true if successfully inserted, false otherwise.
  *      Second bool: True if no error/warning, False if shadowing
  */
-tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
+tuple<bool, bool> SymbolTable::insert(const pair<string, SymbolTableNode>& item) {
 
-    tuple<map<string, Node>::iterator, string> tup = this->search(item.first);
+    tuple<map<string, SymbolTableNode>::iterator, string> tup = this->search(item.first);
     string retval = get<1>(tup);
     if (retval == "top") {
         return make_tuple(false, false);
@@ -49,8 +49,8 @@ tuple<bool, bool> SymbolTable::insert(const pair<string, Node>& item) {
  *          "other"- found at a level other than the top
  *          "not"- not found at all
  */
-tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key, bool topLevelOnly) {
-    map<string, Node>::iterator node_iterator;
+tuple<map<string, SymbolTableNode>::iterator, string> SymbolTable::search(const string &key, bool topLevelOnly) {
+    map<string, SymbolTableNode>::iterator node_iterator;
     string status;
     bool found = false;
 
@@ -92,7 +92,7 @@ tuple<map<string, Node>::iterator, string> SymbolTable::search(const string &key
  * Pushes a new level on the stack
  */
 void SymbolTable::pushLevel() {
-    map<string, Node> newMap;
+    map<string, SymbolTableNode> newMap;
     table.push_front(newMap);
 }
 

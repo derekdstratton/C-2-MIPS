@@ -1,11 +1,11 @@
 #include "include/tree.hh"
 #include "include/tree_util.hh"
 
-class Node {
+class SymbolTableNode {
 public:
-    Node() : x(3){};
+    SymbolTableNode() : x(3){};
     int x;
-    friend std::ostream& operator<<(std::ostream& os, const Node& node) {
+    friend std::ostream& operator<<(std::ostream& os, const SymbolTableNode& node) {
         node.print(os);
         return os;
     }
@@ -14,7 +14,7 @@ public:
     }
 };
 
-class Subnode : public Node{
+class Subnode : public SymbolTableNode{
 public:
     Subnode() : j('a'){std::cout << "this happened";};
     char j;
@@ -46,11 +46,11 @@ int main()
     kptree::print_tree_bracketed(t);
 
     //inheritance test
-    tree<Node*> t2;
+    tree<SymbolTableNode*> t2;
     auto top2 = t2.begin();
-    Node * x = new Node();
+    SymbolTableNode * x = new SymbolTableNode();
     auto next2 = t2.insert(top2, x);
-    Node * y = new Subnode();
+    SymbolTableNode * y = new Subnode();
     t2.append_child(next2, y);
     kptree::print_tree_bracketed(t2);
 
