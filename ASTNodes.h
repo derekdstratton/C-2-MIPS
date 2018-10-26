@@ -1,9 +1,15 @@
 #ifndef PROJECT_ASTNODES_H
 #define PROJECT_ASTNODES_H
 
+#include <list>
+#include <iostream>
+
+using namespace std;
+
 class ASTNode {
 public:
-    ASTNode(string label, int line, int col, list<Node*> children);
+    ASTNode();
+    ASTNode(string label, int line, int col, list<ASTNode*> children);
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node) {
         node.printNode(os);
         return os;

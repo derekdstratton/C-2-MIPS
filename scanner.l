@@ -16,7 +16,9 @@
 #include "SymbolTable.h"
 #include "SymbolTableNode.h"
 #include "parser.hpp"
+#include "ASTNodes.cpp"
 
+#define YYSTYPE ASTNode
 /* Global Variables */
 
 extern bool debug[5];
@@ -28,7 +30,7 @@ type_specifiers type_specifier = Int; //default type specifier of "int" for ever
 type_qualifiers type_qualifier = NoTQ;
 storage_class_specifiers storage_class_specifier = NoSCS;
 signed_or_unsigneds signed_or_unsigned = NoSU;
-map<string, Node> struct_or_union_symbols;
+map<string, SymbolTableNode> struct_or_union_symbols;
 
 stringstream sourceStream;
 extern string newOutputFile;
@@ -588,7 +590,7 @@ return {
     }
     string s = yytext;
     //Constructing a Symbol Table node
-    Node x = Node();
+    SymbolTableNode x = SymbolTableNode();
     x.setLineNumber(yylineno);
     x.setColumnNumber(columnQueue.size() - yyleng + 1);
     x.setTypeSpecifier(type_specifier);
@@ -602,8 +604,8 @@ return {
             //todo check to see if you're a typedef
             getTable()->setMode(false); //now you're in lookup mode
             //lookup mode operations
-            tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
-            map<string, Node>::iterator it;
+            tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
+            map<string, SymbolTableNode>::iterator it;
             string status;
             tie(it, status) = result;
             if (status == "not") {
@@ -615,7 +617,7 @@ return {
             }
         } else {
             //this is a normal insert
-            pair<string, Node> entry = make_pair(s,x);
+            pair<string, SymbolTableNode> entry = make_pair(s,x);
             tuple<bool, bool> result = getTable()->insert(entry);
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
@@ -635,8 +637,8 @@ return {
         //currently in lookup mode
         //lookup mode operations
         //Lookup Mode
-        tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
-        map<string, Node>::iterator it;
+        tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
+        map<string, SymbolTableNode>::iterator it;
         string status;
         tie(it, status) = result;
         if (status == "not") {

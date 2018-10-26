@@ -15,6 +15,7 @@
 #include <deque>
 
 #include "SymbolTable.h"
+#include "ASTNodes.cpp"
 SymbolTable * table_ptr;
 
 /* Global Variables */
@@ -45,6 +46,7 @@ stringstream prodStream;
 int yylex();
 %}
 
+/*
 %union {
     long ival;
     float fval;
@@ -52,7 +54,8 @@ int yylex();
     char * sval;
     //
     void * vval;
-}
+    ASTNode;
+}*/
 
 %code provides {
     // A function that returns a pointer to the table, for communicating with the Scanner
@@ -69,9 +72,9 @@ int yylex();
 }
 
 %token IDENTIFIER
-%token<ival> INTEGER_CONSTANT
-%token<fval> FLOATING_CONSTANT
-%token<cval> CHARACTER_CONSTANT
+%token INTEGER_CONSTANT
+%token FLOATING_CONSTANT
+%token CHARACTER_CONSTANT
 %token ENUMERATION_CONSTANT
 %token STRING_LITERAL
 %token SIZEOF
@@ -102,12 +105,14 @@ int yylex();
 %%
 
 translation_unit
-	: external_declaration {handleProd("translation_unit -> external_declaration\n");}
+	: external_declaration {$$ = $1;
+                            handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
 
 external_declaration
-	: function_definition {handleProd("external_declaration -> function_definition\n");}
+	: function_definition { $$ = $1;
+                            handleProd("external_declaration -> function_definition\n");}
 	| declaration {handleProd("external_declaration -> declaration\n");}
 	;
 
