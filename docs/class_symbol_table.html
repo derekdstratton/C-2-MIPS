@@ -73,9 +73,9 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a1fbe6cec5594463b766db0ac58c9aa1d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a1fbe6cec5594463b766db0ac58c9aa1d">SymbolTable</a> ()</td></tr>
 <tr class="separator:a1fbe6cec5594463b766db0ac58c9aa1d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afff93e49f2f86d85c33692bbf8f02583"><td class="memItemLeft" align="right" valign="top">tuple&lt; bool, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#afff93e49f2f86d85c33692bbf8f02583">insert</a> (const pair&lt; string, <a class="el" href="class_node.html">Node</a> &gt; &amp;item)</td></tr>
+<tr class="memitem:afff93e49f2f86d85c33692bbf8f02583"><td class="memItemLeft" align="right" valign="top">tuple&lt; bool, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#afff93e49f2f86d85c33692bbf8f02583">insert</a> (const pair&lt; string, <a class="el" href="class_node.html">SymbolTableNode</a> &gt; &amp;item)</td></tr>
 <tr class="separator:afff93e49f2f86d85c33692bbf8f02583"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c9c6a8d8d472c6c1e4689940babe1fb"><td class="memItemLeft" align="right" valign="top">tuple&lt; map&lt; string, <a class="el" href="class_node.html">Node</a> &gt;::iterator, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a4c9c6a8d8d472c6c1e4689940babe1fb">search</a> (const string &amp;key, bool topLevelOnly=false)</td></tr>
+<tr class="memitem:a4c9c6a8d8d472c6c1e4689940babe1fb"><td class="memItemLeft" align="right" valign="top">tuple&lt; map&lt; string, <a class="el" href="class_node.html">SymbolTableNode</a> &gt;::iterator, string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a4c9c6a8d8d472c6c1e4689940babe1fb">search</a> (const string &amp;key, bool topLevelOnly=false)</td></tr>
 <tr class="separator:a4c9c6a8d8d472c6c1e4689940babe1fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ae4c247e136cd9d13224ba952fccb88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_symbol_table.html#a4ae4c247e136cd9d13224ba952fccb88">pushLevel</a> ()</td></tr>
 <tr class="separator:a4ae4c247e136cd9d13224ba952fccb88"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -139,7 +139,7 @@ Friends</h2></td></tr>
         <tr>
           <td class="memname">tuple&lt; bool, bool &gt; SymbolTable::insert </td>
           <td>(</td>
-          <td class="paramtype">const pair&lt; string, <a class="el" href="class_node.html">Node</a> &gt; &amp;&#160;</td>
+          <td class="paramtype">const pair&lt; string, <a class="el" href="class_node.html">SymbolTableNode</a> &gt; &amp;&#160;</td>
           <td class="paramname"><em>item</em></td><td>)</td>
           <td></td>
         </tr>
@@ -201,7 +201,7 @@ Friends</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">tuple&lt; map&lt; string, <a class="el" href="class_node.html">Node</a> &gt;::iterator, string &gt; SymbolTable::search </td>
+          <td class="memname">tuple&lt; map&lt; string, <a class="el" href="class_node.html">SymbolTableNode</a> &gt;::iterator, string &gt; SymbolTable::search </td>
           <td>(</td>
           <td class="paramtype">const string &amp;&#160;</td>
           <td class="paramname"><em>key</em>, </td>

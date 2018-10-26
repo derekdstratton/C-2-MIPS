@@ -1,10 +1,10 @@
-#include "Node.h"
+#include "SymbolTableNode.h"
 
 /**
  * Default Constructor for a Node. Sets default values. Other values must be manually set.
  *
  */
-Node::Node() : lineNumber(-1), columnNumber(-1), type_specifier(Int), type_qualifier(NoTQ),
+SymbolTableNode::SymbolTableNode() : lineNumber(-1), columnNumber(-1), type_specifier(Int), type_qualifier(NoTQ),
     storage_class_specifier(NoSCS), signed_or_unsigned(NoSU){
 }
 
@@ -15,7 +15,7 @@ Node::Node() : lineNumber(-1), columnNumber(-1), type_specifier(Int), type_quali
  * @param node The node being output.
  * @return A reference to the ostream to allow for chaining.
  */
-ostream& operator<<(ostream& os, const Node& node) {
+ostream& operator<<(ostream& os, const SymbolTableNode& node) {
     os << "Line Number: " << node.lineNumber << ", ";
     os << "Column Number: " << node.columnNumber << ", ";
     os << "Declaration Specifiers: ";
@@ -112,58 +112,58 @@ ostream& operator<<(ostream& os, const Node& node) {
     return os;
 }
 
-int Node::getLineNumber() {
+int SymbolTableNode::getLineNumber() {
     return lineNumber;
 }
 
-int Node::getColumnNumber() {
+int SymbolTableNode::getColumnNumber() {
     return columnNumber;
 }
 
-type_specifiers Node::getTypeSpecifier() {
+type_specifiers SymbolTableNode::getTypeSpecifier() {
     return type_specifier;
 }
 
-type_qualifiers Node::getTypeQualifier() {
+type_qualifiers SymbolTableNode::getTypeQualifier() {
     return type_qualifier;
 }
 
-storage_class_specifiers Node::getStorageClassSpecifier() {
+storage_class_specifiers SymbolTableNode::getStorageClassSpecifier() {
     return storage_class_specifier;
 }
 
-signed_or_unsigneds Node::getSignedOrUnsigned() {
+signed_or_unsigneds SymbolTableNode::getSignedOrUnsigned() {
     return signed_or_unsigned;
 }
 
-map<string, Node> Node::getStructOrUnionSymbols() {
+map<string, SymbolTableNode> SymbolTableNode::getStructOrUnionSymbols() {
     return struct_or_union_symbols;
 }
 
-void Node::setLineNumber(int lineNum) {
+void SymbolTableNode::setLineNumber(int lineNum) {
     lineNumber = lineNum;
 }
 
-void Node::setColumnNumber(int colNum) {
+void SymbolTableNode::setColumnNumber(int colNum) {
     columnNumber = colNum;
 }
 
-void Node::setTypeSpecifier(type_specifiers ts) {
+void SymbolTableNode::setTypeSpecifier(type_specifiers ts) {
     type_specifier = ts;
 }
 
-void Node::setTypeQualifier(type_qualifiers tq) {
+void SymbolTableNode::setTypeQualifier(type_qualifiers tq) {
     type_qualifier = tq;
 }
 
-void Node::setStorageClassSpecifier(storage_class_specifiers scs) {
+void SymbolTableNode::setStorageClassSpecifier(storage_class_specifiers scs) {
     storage_class_specifier = scs;
 }
 
-void Node::setSignedOrUnsigned(signed_or_unsigneds sou) {
+void SymbolTableNode::setSignedOrUnsigned(signed_or_unsigneds sou) {
     signed_or_unsigned = sou;
 }
 
-void Node::setStructOrUnionSymbols(map<string, Node> sou) {
+void SymbolTableNode::setStructOrUnionSymbols(map<string, SymbolTableNode> sou) {
     struct_or_union_symbols = sou;
 }

@@ -5,12 +5,12 @@ set(CMAKE_CXX_STANDARD 11)
 
 # Symbol Table Driver
 
-set(SYMBOL_TABLE_DRIVER SymbolTableDriver.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+set(SYMBOL_TABLE_DRIVER SymbolTableDriver.cpp SymbolTableNode.cpp SymbolTableNode.h SymbolTable.cpp SymbolTable.h )
 add_executable(SymbolTableDriver.cpp ${SYMBOL_TABLE_DRIVER})
 
 # Symbol Table Test
 
-set(SYMBOL_TABLE_TEST SymbolTableTest.cpp Node.cpp Node.h SymbolTable.cpp SymbolTable.h )
+set(SYMBOL_TABLE_TEST SymbolTableTest.cpp SymbolTableNode.cpp SymbolTableNode.h SymbolTable.cpp SymbolTable.h )
 add_executable(SymbolTableTest ${SYMBOL_TABLE_TEST})
 
 # Scanner/Parser
@@ -38,7 +38,7 @@ file(GLOB TEST_CASES
         )
 file(COPY ${TEST_CASES} DESTINATION ${PROJECT_BINARY_DIR}/tests)
 
-add_executable(ScannerParser SymbolTable.cpp SymbolTable.h Node.cpp Node.h
+add_executable(ScannerParser SymbolTable.cpp SymbolTable.h SymbolTableNode.cpp SymbolTableNode.h
 ${BISON_MyParser_OUTPUTS}
 ${FLEX_MyScanner_OUTPUTS}
 )

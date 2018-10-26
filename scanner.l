@@ -14,7 +14,7 @@
 #include <deque>
 
 #include "SymbolTable.h"
-#include "Node.h"
+#include "SymbolTableNode.h"
 #include "parser.hpp"
 
 /* Global Variables */
