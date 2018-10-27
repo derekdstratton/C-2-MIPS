@@ -5,7 +5,11 @@
 
 class ASTNode {
 public:
-    ASTNode(string label, int line, int col, list<Node*> children) {
+    ASTNode() {
+        nodeLabel = "NA";
+        //cout << "default";
+    }
+    ASTNode(string label, int line, int col, list<ASTNode*> children) {
         nodeLabel = label;
         lineNum = line;
         colNum = col;
@@ -15,7 +19,7 @@ public:
         node.printNode(os);
         return os;
     }
-private:
+protected:
     string nodeLabel;
     int lineNum;
     int colNum;
@@ -26,56 +30,20 @@ private:
     }
 };
 
-class IntNode : ASTNode {
+class TypeValueNode : ASTNode {
 public:
-    IntNode(string label, int line, int col, list<Node*> children, int val) {
-        ASTNode(string label, int line, int col, list<Node*> children);
+    TypeValueNode(string label, int line, int col, list<ASTNode*> children, int val, string type) {
+        nodeLabel = label;
+        lineNum = line;
+        colNum = col;
+        childrenNodes = children;
         nodeVal = val;
+        //todo deal with type using enum
     };
 private:
     int nodeVal;
     virtual void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " nodeVal;
-    }
-};
-
-class CharNode : ASTNode {
-public:
-    CharNode(string label, int line, int col, list<Node*> children, char val) {
-        ASTNode(string label, int line, int col, list<Node*> children);
-        nodeVal = val;
-    };
-private:
-    char nodeVal;
-    virtual void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " nodeVal;
-    }
-};
-
-class FloatNode : ASTNode {
-public:
-    FloatNode(string label, int line, int col, list<Node*> children, float val) {
-        ASTNode(string label, int line, int col, list<Node*> children);
-        nodeVal = val;
-    };
-private:
-    float nodeVal;
-    virtual void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " nodeVal;
-    }
-};
-
-class StringNode : ASTNode {
-public:
-    StringNode(string label, int line, int col, list<Node*> children, char * val) {
-        ASTNode(string label, int line, int col, list<Node*> children);
-        nodeVal = val; //todo be careful about this line with char *. Account for in lex file
-        //we'll need a deep copy, not a shallow, which requires memory
-    };
-private:
-    char * nodeVal;
-    virtual void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " nodeVal;
+        os << nodeLabel << ": " << nodeVal;
     }
 };
 

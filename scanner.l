@@ -15,6 +15,7 @@
 
 #include "SymbolTable.h"
 #include "SymbolTableNode.h"
+#include "ASTNodes.h"
 #include "parser.hpp"
 
 /* Global Variables */
@@ -28,7 +29,7 @@ type_specifiers type_specifier = Int; //default type specifier of "int" for ever
 type_qualifiers type_qualifier = NoTQ;
 storage_class_specifiers storage_class_specifier = NoSCS;
 signed_or_unsigneds signed_or_unsigned = NoSU;
-map<string, Node> struct_or_union_symbols;
+map<string, SymbolTableNode> struct_or_union_symbols;
 
 stringstream sourceStream;
 extern string newOutputFile;
@@ -472,34 +473,43 @@ return {
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
             case 'n':
-                yylval.cval = '\n';
+                //yylval.cval = '\n';
+                yylval.node = new ASTNode();
                 break;
             case 'a':
-                yylval.cval = '\a';
+                //yylval.cval = '\a';
+                yylval.node = new ASTNode();
                 break;
             case 'b':
-                yylval.cval = '\b';
+                //yylval.cval = '\b';
+                yylval.node = new ASTNode();
                 break;
             case 'f':
-                yylval.cval = '\f';
+                //yylval.cval = '\f';
+                yylval.node = new ASTNode();
                 break;
             case 'r':
-                yylval.cval = '\r';
+                //yylval.cval = '\r';
+                yylval.node = new ASTNode();
                 break;
             case 't':
-                yylval.cval = '\t';
+                //yylval.cval = '\t';
+                yylval.node = new ASTNode();
                 break;
             case 'v':
-                yylval.cval = '\v';
+                //yylval.cval = '\v';
+                yylval.node = new ASTNode();
                 break;
                 //todo deal with octal, hex, weird stuff
             default:
-                yylval.cval = yytext[2];
+                //yylval.cval = yytext[2];
+                yylval.node = new ASTNode();
                 break;
         }
     }
     else {
-        yylval.cval = yytext[1];
+        //yylval.cval = yytext[1];
+        yylval.node = new ASTNode();
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
@@ -550,7 +560,8 @@ return {
         lag++;
     }
     *lag = '\0';
-    yylval.sval = strstart;
+    yylval.node = new ASTNode();
+    //yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
     float num = atof(yytext);
@@ -563,7 +574,8 @@ return {
         outputError("Too long", "Floating Constant too long.", true);
     }
     //todo check size
-    yylval.fval = atof(yytext);
+    yylval.node = new ASTNode();
+    //yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
@@ -577,7 +589,8 @@ return {
         outputError("Too long", "Integer Constant too long.", true);
     }
     //todo check size for a long, c string compare
-    yylval.ival = atol(yytext);
+    //yylval.ival = atol(yytext);
+    yylval.node = new ASTNode();
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");
@@ -588,7 +601,7 @@ return {
     }
     string s = yytext;
     //Constructing a Symbol Table node
-    Node x = Node();
+    SymbolTableNode x = SymbolTableNode();
     x.setLineNumber(yylineno);
     x.setColumnNumber(columnQueue.size() - yyleng + 1);
     x.setTypeSpecifier(type_specifier);
@@ -602,8 +615,8 @@ return {
             //todo check to see if you're a typedef
             getTable()->setMode(false); //now you're in lookup mode
             //lookup mode operations
-            tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
-            map<string, Node>::iterator it;
+            tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
+            map<string, SymbolTableNode>::iterator it;
             string status;
             tie(it, status) = result;
             if (status == "not") {
@@ -615,7 +628,7 @@ return {
             }
         } else {
             //this is a normal insert
-            pair<string, Node> entry = make_pair(s,x);
+            pair<string, SymbolTableNode> entry = make_pair(s,x);
             tuple<bool, bool> result = getTable()->insert(entry);
             bool insertSuccess, notShadowing;
             tie(insertSuccess, notShadowing) = result;
@@ -635,8 +648,8 @@ return {
         //currently in lookup mode
         //lookup mode operations
         //Lookup Mode
-        tuple<map<string, Node>::iterator, string> result = getTable()->search(s);
-        map<string, Node>::iterator it;
+        tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
+        map<string, SymbolTableNode>::iterator it;
         string status;
         tie(it, status) = result;
         if (status == "not") {
