@@ -30,7 +30,7 @@ add_executable(Tree tree.cpp)
 
 add_executable(Tree2 tree2.cpp)
 
-# https://dreampuf.github.io/GraphvizOnline/
+# http://www.webgraphviz.com/
 
 # copy over the test files
 file(GLOB TEST_CASES
