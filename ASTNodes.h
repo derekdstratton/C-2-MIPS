@@ -2,19 +2,24 @@
 #define PROJECT_ASTNODES_H
 
 #include <list>
-#include <iostream>
-
-using namespace std;
 
 class ASTNode {
 public:
-    ASTNode();
-    ASTNode(string label, int line, int col, list<ASTNode*> children);
+    ASTNode() {
+        nodeLabel = "NA";
+        //cout << "default";
+    }
+    ASTNode(string label, int line, int col, list<ASTNode*> children) {
+        nodeLabel = label;
+        lineNum = line;
+        colNum = col;
+        childrenNodes = children;
+    }
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node) {
         node.printNode(os);
         return os;
     }
-private:
+protected:
     string nodeLabel;
     int lineNum;
     int colNum;
@@ -22,6 +27,23 @@ private:
     //source code?
     virtual void printNode(std::ostream& os) const {
         os << nodeLabel;
+    }
+};
+
+class TypeValueNode : ASTNode {
+public:
+    TypeValueNode(string label, int line, int col, list<ASTNode*> children, int val, string type) {
+        nodeLabel = label;
+        lineNum = line;
+        colNum = col;
+        childrenNodes = children;
+        nodeVal = val;
+        //todo deal with type using enum
+    };
+private:
+    int nodeVal;
+    virtual void printNode(std::ostream& os) const {
+        os << nodeLabel << ": " << nodeVal;
     }
 };
 
