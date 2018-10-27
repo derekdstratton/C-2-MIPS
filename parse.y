@@ -1205,8 +1205,16 @@ int main(int argc, char **argv)
         ofs.close();
     }
     tree<ASTNode*> ast;
-    auto top = ast.begin();
-    ast.insert(top, root_ptr);
+    /* testing the tree, delete this later
+    list<ASTNode*> childrenTesting;
+    list<ASTNode*> emptyList;
+    childrenTesting.push_back(new ASTNode("b", 1, 1, emptyList));
+    childrenTesting.push_back(new ASTNode("c", 1, 1, emptyList));
+    childrenTesting.push_back(new ASTNode("d", 1, 1, emptyList));
+    childrenTesting.push_back(new ASTNode("e", 1, 1, childrenTesting));
+    root_ptr = new ASTNode("a", 1, 1, childrenTesting);
+    */
+    ASTNode::copyTree(root_ptr, ast);
     //todo make a function that copies my tree into the tree.hh tree. Should be an easy pre-order
     kptree::print_tree_bracketed(ast);
 	return 0;
