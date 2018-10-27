@@ -16,6 +16,8 @@
 
 #include "SymbolTable.h"
 #include "ASTNodes.h"
+#include "include/tree.hh"
+#include "include/tree_util2.hh"
 
 SymbolTable * table_ptr;
 
@@ -56,10 +58,7 @@ int yylex();
     //float fval;
     //char cval;
     //char * sval;
-    //
-    //void * vval;
     ASTNode * node;
-    //int node;
 }
 
 %type <node> translation_unit external_declaration function_definition declaration
@@ -131,7 +130,7 @@ int yylex();
 
 translation_unit
 	: external_declaration {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //todo make sure to use the better constructor so node knows name/children
 	root_ptr = $$;
 	handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {handleProd("translation_unit -> translation_unit external_declaration\n");}
@@ -1140,7 +1139,11 @@ int main(int argc, char **argv)
         ofs << prodStream.str();
         ofs.close();
     }
-
+    tree<ASTNode*> ast;
+    auto top = ast.begin();
+    ast.insert(top, root_ptr);
+    //todo make a function that copies my tree into the tree.hh tree. Should be an easy pre-order
+    kptree::print_tree_bracketed(ast);
 	return 0;
 }
 
