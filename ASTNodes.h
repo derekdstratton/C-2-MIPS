@@ -2,6 +2,10 @@
 #define PROJECT_ASTNODES_H
 
 #include <list>
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 class ASTNode {
 public:
@@ -30,7 +34,7 @@ protected:
     }
 };
 
-class TypeValueNode : ASTNode {
+class TypeValueNode : public ASTNode {
 public:
     TypeValueNode(string label, int line, int col, list<ASTNode*> children, int val, string type) {
         nodeLabel = label;

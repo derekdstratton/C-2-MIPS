@@ -17,11 +17,12 @@
 #include "SymbolTableNode.h"
 #include "ASTNodes.h"
 #include "parser.hpp"
-#include "ASTNodes.cpp"
+#include "ASTNodes.h"
 
 #define YYSTYPE ASTNode
 /* Global Variables */
 
+list <ASTNode*> empty;
 extern bool debug[5];
 extern char* fileName;
 deque <char> columnQueue;
@@ -169,6 +170,7 @@ int {
         insertModeFlag = true;
     }
     to_token_file(INT, "INT");
+    yylval.node = new ASTNode("INT", yylineno, columnQueue.size() - yyleng + 1, empty);
     return ( INT );}
 long {
     if (getTable()->getMode()) {
@@ -592,7 +594,7 @@ return {
     }
     //todo check size for a long, c string compare
     //yylval.ival = atol(yytext);
-    yylval.node = new ASTNode();
+    yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");
