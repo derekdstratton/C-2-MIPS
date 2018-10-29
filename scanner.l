@@ -564,8 +564,8 @@ return {
         lag++;
     }
     *lag = '\0';
-    yylval.node = new ASTNode();
-    //yylval.sval = strstart;
+    //yylval.node = new ASTNode();
+    yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
     float num = atof(yytext);
