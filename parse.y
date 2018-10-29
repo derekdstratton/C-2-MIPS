@@ -55,9 +55,8 @@ int yylex();
 
 %union {
 //todo this should be YYSTYPE node *, no stupid union overhead
-    //long ival;
-    //float fval;
-    //char cval;
+    float fval;
+    char cval;
     SymbolTableNode * symtblnode;
     ASTNode * node;
     int ival;
@@ -98,9 +97,9 @@ int yylex();
 }
 
 %token<symtblnode> IDENTIFIER
-%token<node> INTEGER_CONSTANT
-%token<node> FLOATING_CONSTANT
-%token<node> CHARACTER_CONSTANT
+%token<ival> INTEGER_CONSTANT
+%token<fval> FLOATING_CONSTANT
+%token<cval> CHARACTER_CONSTANT
 %token ENUMERATION_CONSTANT
 %token STRING_LITERAL
 %token SIZEOF
@@ -577,7 +576,8 @@ statement
 	$$ = new ASTNode();
 	handleProd("statement -> compound_statement\n");}
 	| expression_statement {
-	$$ = new ASTNode();
+	$$ = $1;
+	//$$ = new ASTNode();
 	handleProd("statement -> expression_statement\n");}
 	| selection_statement {
 	$$ = new ASTNode();
@@ -609,7 +609,7 @@ expression_statement
 	$$ = new ASTNode();
 	handleProd("expression_statement -> SEMI\n");}
 	| expression SEMI {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("expression_statement -> expression SEMI\n");}
 	;
 
@@ -618,15 +618,19 @@ compound_statement
 	$$ = new ASTNode();
 	handleProd("compound_statement -> OPENCUR CLOSCUR\n");}
 	| OPENCUR statement_list CLOSCUR {
-	list <ASTNode*> tempList;
-    tempList.push_back($2);
-    $$ = new ASTNode("compound_statement", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	//list <ASTNode*> tempList;
+    //tempList.push_back($2);
+    //$$ = new ASTNode("compound_statement", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+    $$ = $2; //todo should I just set this to statement_list?
 	handleProd("compound_statement -> OPENCUR statement_list CLOSCUR\n");}
 	| OPENCUR declaration_list CLOSCUR {
 	$$ = new ASTNode();
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
-	$$ = new ASTNode();
+	list <ASTNode*> tempList;
+    tempList.push_back($2);
+    tempList.push_back($3);
+    $$ = new SeqNode(tempList);
 	handleProd("compound_statement -> OPENCUR declaration_list statement_list CLOSCUR\n");}
 	;
 
@@ -637,7 +641,10 @@ statement_list
     $$ = new ASTNode("statement_list", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
 	handleProd("statement_list -> statement\n");}
 	| statement_list statement {
-	$$ = new ASTNode();
+	list <ASTNode*> tempList;
+    tempList.push_back($1);
+    tempList.push_back($2);
+	$$ = new SeqNode(tempList);
 	handleProd("statement_list -> statement_list statement\n");}
 	;
 
@@ -708,9 +715,7 @@ jump_statement
 
 expression
 	: assignment_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("expression -> assignment_expression\n");}
 	| expression COMMA assignment_expression {
 	$$ = new ASTNode();
@@ -719,12 +724,12 @@ expression
 
 assignment_expression
 	: conditional_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("assignment_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
+	//list <ASTNode*> tempList;
+    //tempList.push_back($1);
+    //$$ = new ASTNode("assignment_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
 	handleProd("assignment_expression -> conditional_expression\n");}
 	| unary_expression assignment_operator assignment_expression {
-	//$$ = new ASTNode();
 	list <ASTNode*> tempList;
 	tempList.push_back($1); //lvalue
 	tempList.push_back($3); //rvalue
@@ -776,9 +781,7 @@ assignment_operator
 
 conditional_expression
 	: logical_or_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("conditional_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("conditional_expression -> logical_or_expression\n");}
 	| logical_or_expression TERNARY expression COLON conditional_expression {
 	$$ = new ASTNode();
@@ -793,9 +796,7 @@ constant_expression
 
 logical_or_expression
 	: logical_and_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("logical_or_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("logical_or_expression -> logical_and_expression\n");}
 	| logical_or_expression OR_OP logical_and_expression {
 	$$ = new ASTNode();
@@ -804,9 +805,7 @@ logical_or_expression
 
 logical_and_expression
 	: inclusive_or_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("logical_and_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("logical_and_expression -> inclusive_or_expression\n");}
 	| logical_and_expression AND_OP inclusive_or_expression {
 	$$ = new ASTNode();
@@ -815,9 +814,7 @@ logical_and_expression
 
 inclusive_or_expression
 	: exclusive_or_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("inclusive_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("inclusive_or_expression -> exclusive_or_expression\n");}
 	| inclusive_or_expression BAR exclusive_or_expression {
 	$$ = new ASTNode();
@@ -826,9 +823,7 @@ inclusive_or_expression
 
 exclusive_or_expression
 	: and_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("exclusive_or_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("exclusive_or_expression -> and_expression\n");}
 	| exclusive_or_expression XOR and_expression {
 	$$ = new ASTNode();
@@ -837,9 +832,7 @@ exclusive_or_expression
 
 and_expression
 	: equality_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("and_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("and_expression -> equality_expression\n");}
 	| and_expression AND equality_expression {
 	$$ = new ASTNode();
@@ -848,9 +841,7 @@ and_expression
 
 equality_expression
 	: relational_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("equality_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("equality_expression -> relational_expression\n");}
 	| equality_expression EQ_OP relational_expression {
 	$$ = new ASTNode();
@@ -862,9 +853,7 @@ equality_expression
 
 relational_expression
 	: shift_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("relational_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("relational_expression -> shift_expression\n");}
 	| relational_expression LESSTH shift_expression {
 	$$ = new ASTNode();
@@ -882,9 +871,7 @@ relational_expression
 
 shift_expression
 	: additive_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("shift_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("shift_expression -> additive_expression\n");}
 	| shift_expression LEFT_OP additive_expression {
 	$$ = new ASTNode();
@@ -896,9 +883,7 @@ shift_expression
 
 additive_expression
 	: multiplicative_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("additive_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("additive_expression -> multiplicative_expression\n");}
 	| additive_expression PLUS multiplicative_expression {
 	$$ = new ASTNode();
@@ -910,9 +895,7 @@ additive_expression
 
 multiplicative_expression
 	: cast_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("multiplicative_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("multiplicative_expression -> cast_expression\n");}
 	| multiplicative_expression STAR cast_expression {
 	$$ = new ASTNode();
@@ -927,9 +910,7 @@ multiplicative_expression
 
 cast_expression
 	: unary_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("cast_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
 	handleProd("cast_expression -> unary_expression\n");}
 	| OPENPAR type_name CLOSEPAR cast_expression {
 	$$ = new ASTNode();
@@ -938,9 +919,6 @@ cast_expression
 
 unary_expression
 	: postfix_expression {
-	//list <ASTNode*> tempList;
-    //tempList.push_back($1);
-    //$$ = new ASTNode("unary_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
@@ -1013,17 +991,13 @@ postfix_expression
 
 primary_expression
 	: identifier {
-	//$$ = new IdentifierNode($1.yytext, $1.yylval);
 	$$ = $1;
 	handleProd("primary_expression -> identifier\n");}
-	//todo okay so this should construct the node based on the symbol table pointer
-	//we need the symbol table node and the string. passing it over will be a nightmare.
-	//maybe yylval can be the symbol table pointer and yytext will be the string identifier.
-	//that's my best idea...
 	| constant {
-	list <ASTNode*> tempList;
-	tempList.push_back($1);
-	$$ = new ASTNode("primary_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1;
+	//list <ASTNode*> tempList;
+	//tempList.push_back($1);
+	//$$ = new ASTNode("primary_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
 	handleProd("primary_expression -> constant\n");}
 	| string {
 	$$ = new ASTNode();
@@ -1044,15 +1018,13 @@ argument_expression_list
 
 constant
 	: INTEGER_CONSTANT {
-    list <ASTNode*> tempList;
-    tempList.push_back(yylval.node);
-	$$ = new ASTNode("constant", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = new IntNode($1);
 	handleProd("constant -> INTEGER_CONSTANT\n");}
 	| CHARACTER_CONSTANT {
-	$$ = new ASTNode();
+	$$ = new CharNode($1);
 	handleProd("constant -> CHARACTER_CONSTANT\n");}
 	| FLOATING_CONSTANT {
-	$$ = new ASTNode();
+	$$ = new FloatNode($1);
 	handleProd("constant -> FLOATING_CONSTANT\n");}
 	| ENUMERATION_CONSTANT {
 	$$ = new ASTNode();
@@ -1068,9 +1040,11 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode("tempBS", $1);
-	//list <ASTNode*> tempList;
-    //tempList.push_back($1);
-    //$$ = new ASTNode("identifier", yylloc.first_line, columnQueue.size() - yyleng + 1, empty); //todo use actual value
+	//tempBS should be yytext, or just the name of the identifier
+	    //todo okay so this should construct the node based on the symbol table pointer
+    	//we need the symbol table node and the string. passing it over will be a nightmare.
+    	//maybe yylval can be the symbol table pointer and yytext will be the string identifier.
+    	//that's my best idea...
 	handleProd("identifier -> IDENTIFIER\n");}
 	;
 %%

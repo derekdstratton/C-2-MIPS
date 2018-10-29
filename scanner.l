@@ -477,43 +477,43 @@ return {
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
             case 'n':
-                //yylval.cval = '\n';
-                yylval.node = new ASTNode();
+                yylval.cval = '\n';
+                //yylval.node = new ASTNode();
                 break;
             case 'a':
-                //yylval.cval = '\a';
-                yylval.node = new ASTNode();
+                yylval.cval = '\a';
+                //yylval.node = new ASTNode();
                 break;
             case 'b':
-                //yylval.cval = '\b';
-                yylval.node = new ASTNode();
+                yylval.cval = '\b';
+                //yylval.node = new ASTNode();
                 break;
             case 'f':
-                //yylval.cval = '\f';
-                yylval.node = new ASTNode();
+                yylval.cval = '\f';
+                //yylval.node = new ASTNode();
                 break;
             case 'r':
-                //yylval.cval = '\r';
-                yylval.node = new ASTNode();
+                yylval.cval = '\r';
+                //yylval.node = new ASTNode();
                 break;
             case 't':
-                //yylval.cval = '\t';
-                yylval.node = new ASTNode();
+                yylval.cval = '\t';
+                //yylval.node = new ASTNode();
                 break;
             case 'v':
-                //yylval.cval = '\v';
-                yylval.node = new ASTNode();
+                yylval.cval = '\v';
+                //yylval.node = new ASTNode();
                 break;
                 //todo deal with octal, hex, weird stuff
             default:
-                //yylval.cval = yytext[2];
-                yylval.node = new ASTNode();
+                yylval.cval = yytext[2];
+                //yylval.node = new ASTNode();
                 break;
         }
     }
     else {
-        //yylval.cval = yytext[1];
-        yylval.node = new ASTNode();
+        yylval.cval = yytext[1];
+        //yylval.node = new ASTNode();
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
@@ -578,8 +578,8 @@ return {
         outputError("Too long", "Floating Constant too long.", true);
     }
     //todo check size
-    yylval.node = new ASTNode();
-    //yylval.fval = atof(yytext);
+    //yylval.node = new ASTNode();
+    yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
@@ -593,8 +593,8 @@ return {
         outputError("Too long", "Integer Constant too long.", true);
     }
     //todo check size for a long, c string compare
-    //yylval.ival = atol(yytext);
-    yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
+    yylval.ival = atol(yytext);
+    //yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");

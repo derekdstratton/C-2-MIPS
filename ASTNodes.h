@@ -113,6 +113,20 @@ private:
     }
 };
 
+/**
+ * Sequence of statements
+ */
+class SeqNode : public ASTNode {
+public:
+    SeqNode(list<ASTNode*> children) {
+        childrenNodes = children;
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "STATEMENTS";
+    }
+};
+
 class IdentifierNode : public ASTNode {
 public:
     IdentifierNode(string id, SymbolTableNode * symtblnode) {
@@ -126,6 +140,42 @@ private:
     string identifier;
     void printNode(std::ostream& os) const {
         os << "VARIABLE_" << identifier;
+    }
+};
+
+class IntNode : public ASTNode {
+public:
+    IntNode(int val) {
+        nodeVal = val;
+    };
+private:
+    int nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "INT_" << nodeVal;
+    }
+};
+
+class CharNode : public ASTNode {
+public:
+    CharNode(char val) {
+        nodeVal = val;
+    };
+private:
+    char nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "CHAR_" << nodeVal;
+    }
+};
+
+class FloatNode : public ASTNode {
+public:
+    FloatNode(float val) {
+        nodeVal = val;
+    };
+private:
+    float nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "FLOAT_" << nodeVal;
     }
 };
 
