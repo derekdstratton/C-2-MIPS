@@ -16,6 +16,7 @@ SymbolTableNode::SymbolTableNode() : lineNumber(-1), columnNumber(-1), type_spec
  * @return A reference to the ostream to allow for chaining.
  */
 ostream& operator<<(ostream& os, const SymbolTableNode& node) {
+    os << "Identifier: " << node.name << ", ";
     os << "Line Number: " << node.lineNumber << ", ";
     os << "Column Number: " << node.columnNumber << ", ";
     os << "Declaration Specifiers: ";
@@ -166,4 +167,12 @@ void SymbolTableNode::setSignedOrUnsigned(signed_or_unsigneds sou) {
 
 void SymbolTableNode::setStructOrUnionSymbols(map<string, SymbolTableNode> sou) {
     struct_or_union_symbols = sou;
+}
+
+string SymbolTableNode::getName() {
+    return name;
+}
+
+void SymbolTableNode::setName(string new_name) {
+    name = new_name;
 }

@@ -88,23 +88,6 @@ private:
     }
 };
 
-class TypeValueNode : public ASTNode {
-public:
-    TypeValueNode(string label, int line, int col, list<ASTNode*> children, int val, string type) {
-        nodeLabel = label;
-        lineNum = line;
-        colNum = col;
-        childrenNodes = children;
-        nodeVal = val;
-        //todo deal with type using enum
-    };
-private:
-    int nodeVal;
-    void printNode(std::ostream& os) const {
-        os << nodeLabel;
-    }
-};
-
 /**
  * Reprsented 3 address code:
  * ASSIGN op1 op2 op3, op3 := op1
@@ -178,9 +161,9 @@ private:
 
 class IdentifierNode : public ASTNode {
 public:
-    IdentifierNode(string id, SymbolTableNode * symtblnode) {
-        identifier = id;
+    IdentifierNode(SymbolTableNode * symtblnode) {
         symbolTableNode = *symtblnode;
+        identifier = symbolTableNode.getName();
         //childrenNodes = children; should not have any children
 
     };

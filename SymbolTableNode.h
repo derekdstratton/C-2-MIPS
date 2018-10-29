@@ -22,6 +22,7 @@ class SymbolTableNode {
     storage_class_specifiers getStorageClassSpecifier();
     signed_or_unsigneds getSignedOrUnsigned();
     map<string, SymbolTableNode> getStructOrUnionSymbols();
+    string getName();
     void setLineNumber(int lineNum);
     void setColumnNumber(int colNum);
     void setTypeSpecifier(type_specifiers ts);
@@ -29,7 +30,9 @@ class SymbolTableNode {
     void setStorageClassSpecifier(storage_class_specifiers scs);
     void setSignedOrUnsigned(signed_or_unsigneds sou);
     void setStructOrUnionSymbols(map<string, SymbolTableNode> sou);
+    void setName(string new_name);
   private:
+    string name;
     int lineNumber;
     int columnNumber;
     type_specifiers type_specifier;
