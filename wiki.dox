@@ -3,15 +3,18 @@
  *
  * This is the formal documentation for the Compilers project. This was written by
  * Derek Stratton and Chris Koh for CS 460. This is published for the demonstration on
- * October 19, 2018. The compiler's end goal is to translate source code in ANSI C
+ * November 9, 2018. The compiler's end goal is to translate source code in ANSI C
  * to target code in MIPS Assembler code. Currently, the project contains a scanner
- * and a parser integrated with a Symbol Table, and it can output tokens or productions.
+ * and a parser integrated with a Symbol Table, and it can output tokens and productions.
+ * It works with the parser to produce an Abstract Syntax Tree that performs semantic
+ * analysis on the code that it parses.
  *
  * The compiler is written in C++. The Symbol Table is implemented as a class
  * that integrates with the scanner and parser. The scanner is implemented as a Lex (.l)
  * file that processes an input character stream and returns tokens. The parser is
  * implemented as a Yacc (.l) file that processes tokens from the scanner and returns
  * productions. The scanner uses Flex and the parser uses Bison for compilation. The
+ * Abstract Syntax Tree is built as a tree from the n-ary tree library tree.hh. The
  * Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
@@ -28,6 +31,8 @@
  * \ref scanner : The Scanner for the compiler.
  *
  * \ref parser : The Parser for the compiler.
+ *
+ * \ref ast : The Abstract Syntax Tree for the compiler.
  *
  * \section run_instr Instructions for Running the Compiler
  *
@@ -52,7 +57,14 @@
     file_path:
 
     - The path to the file being compiled.
- *
+
+    \subsection links Relevant Links
+    Flex: https://www.gnu.org/software/flex/
+
+    Bison: https://www.gnu.org/software/bison/
+
+    tree.hh: http://tree.phi-sci.com/
+
  */
 
  //Symbol Table:
@@ -197,6 +209,25 @@
   Parser Yacc File:
 
   - https://github.com/derekdstratton/C-2-MIPS/blob/master/parse.y
+*/
+
+//Parser:
+/*! \page ast Abstract Syntax Tree
+ *
+  todo
+
+  \section test_ast Testing the Abstract Syntax Tree
+
+  todo
+
+  \section tech_details Technical Details
+
+  todo
+
+  \section links_ast Links
+
+  todo
+
 */
 
 //Reference:

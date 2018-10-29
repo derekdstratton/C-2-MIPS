@@ -40,12 +40,7 @@ public:
 
     }
 
-    virtual int getType(){
-        //todo this should not be a int, it should be an enum
-        //also this should throw some type of error if called, only for derived
-        return -1; //fail
-    };
-    //todo make a virtual get value function for returning the value. what type should it be?
+    //todo make a virtual function that returns the type of node being looked at
 
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node) {
@@ -80,6 +75,19 @@ protected:
     }
 };
 
+class DeclSpecsNode : public ASTNode {
+public:
+    //todo it should definitely take more than 1 arg
+    DeclSpecsNode(int x) {
+        nodeType = x;
+    };
+private:
+    int nodeType;
+    void printNode(std::ostream& os) const {
+        os << "DECL_SPECIFIERS_" << nodeType;
+    }
+};
+
 class TypeValueNode : public ASTNode {
 public:
     TypeValueNode(string label, int line, int col, list<ASTNode*> children, int val, string type) {
@@ -93,7 +101,204 @@ public:
 private:
     int nodeVal;
     void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " << nodeVal;
+        os << nodeLabel;
+    }
+};
+
+/**
+ * Reprsented 3 address code:
+ * ASSIGN op1 op2 op3, op3 := op1
+ *
+ * 2 Children of the node
+ * Child 1 is the lvalue, op3
+ * Child 2 is the rvalue, op1
+ * (op2 is blank)
+ */
+class AssignNode : public ASTNode {
+public:
+    AssignNode(ASTNode * lvalue, ASTNode * rvalue) {
+        list <ASTNode*> tempList;
+        tempList.push_back(lvalue);
+        tempList.push_back(rvalue);
+        childrenNodes = tempList;
+    };
+private:
+    int nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "ASSIGN";
+    }
+};
+
+/**
+ * Represents an empty node. Used for empty/not used statements
+ */
+class NoneNode : public ASTNode {
+public:
+    NoneNode() {
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "NONE";
+    }
+};
+
+/**
+ * Declaration. First is a node of decl specifiers, second is the thing being declared
+ */
+class DeclNode : public ASTNode {
+public:
+    DeclNode(ASTNode * first, ASTNode * second) {
+        list<ASTNode*> tmpList;
+        tmpList.push_back(first);
+        tmpList.push_back(second);
+        childrenNodes = tmpList;
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "DECLARATION";
+    }
+};
+
+/**
+ * Sequence of statements, left to right
+ */
+class SeqNode : public ASTNode {
+public:
+    SeqNode(ASTNode * first, ASTNode * second) {
+        list<ASTNode*> tmpList;
+        tmpList.push_back(first);
+        tmpList.push_back(second);
+        childrenNodes = tmpList;
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "STATEMENTS";
+    }
+};
+
+class IdentifierNode : public ASTNode {
+public:
+    IdentifierNode(string id, SymbolTableNode * symtblnode) {
+        identifier = id;
+        symbolTableNode = *symtblnode;
+        //childrenNodes = children; should not have any children
+
+    };
+private:
+    SymbolTableNode symbolTableNode;
+    string identifier;
+    void printNode(std::ostream& os) const {
+        os << "VARIABLE_" << identifier;
+    }
+};
+
+class IntNode : public ASTNode {
+public:
+    IntNode(int val) {
+        nodeVal = val;
+    };
+private:
+    int nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "INT_" << nodeVal;
+    }
+};
+
+class CharNode : public ASTNode {
+public:
+    CharNode(char val) {
+        nodeVal = val;
+    };
+private:
+    char nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "CHAR_" << nodeVal;
+    }
+};
+
+class FloatNode : public ASTNode {
+public:
+    FloatNode(float val) {
+        nodeVal = val;
+    };
+private:
+    float nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "FLOAT_" << nodeVal;
+    }
+};
+
+class StringNode : public ASTNode {
+public:
+    StringNode(char * val) {
+        nodeVal = val;
+    };
+private:
+    string nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "FLOAT_" << nodeVal;
+    }
+};
+
+/*
+ * Simple math operators: +, -, *, /, %
+ */
+class BinaryMathNode : public ASTNode {
+public:
+    BinaryMathNode(char type, ASTNode * left, ASTNode * right) {
+        operationType = type;
+        //todo don't forget to check the types on left and right
+        list<ASTNode*> tmplist;
+        tmplist.push_back(left);
+        tmplist.push_back(right);
+        childrenNodes = tmplist;
+    };
+private:
+    char operationType;
+    void printNode(std::ostream& os) const {
+        string printable;
+        switch(operationType) {
+            case '+':
+                printable = "PLUS";
+                break;
+            case '-':
+                printable = "MINUS";
+                break;
+            case '*':
+                printable = "MUL";
+                break;
+            case '/':
+                printable = "DIV";
+                break;
+            case '%':
+                printable = "MODULO";
+                break;
+            default:
+                printable = "CACTUS";
+                break;
+        }
+        os << "OPERATION_" << printable;
+    }
+};
+
+//todo could/should this be generalized to other control flow breaks?
+//this is more a question to be answered when getting into functions
+class ReturnNode : public ASTNode {
+public:
+    ReturnNode(ASTNode* child) {
+        if (child == NULL) {
+            list<ASTNode*> emptyList;
+            childrenNodes = emptyList;
+        } else {
+            list<ASTNode*> tmp;
+            tmp.push_back(child);
+            childrenNodes = tmp;
+        }
+
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "RETURN";
     }
 };
 

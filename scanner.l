@@ -477,43 +477,43 @@ return {
     if (yytext[1] == '\\') {
         switch(yytext[2]) {
             case 'n':
-                //yylval.cval = '\n';
-                yylval.node = new ASTNode();
+                yylval.cval = '\n';
+                //yylval.node = new ASTNode();
                 break;
             case 'a':
-                //yylval.cval = '\a';
-                yylval.node = new ASTNode();
+                yylval.cval = '\a';
+                //yylval.node = new ASTNode();
                 break;
             case 'b':
-                //yylval.cval = '\b';
-                yylval.node = new ASTNode();
+                yylval.cval = '\b';
+                //yylval.node = new ASTNode();
                 break;
             case 'f':
-                //yylval.cval = '\f';
-                yylval.node = new ASTNode();
+                yylval.cval = '\f';
+                //yylval.node = new ASTNode();
                 break;
             case 'r':
-                //yylval.cval = '\r';
-                yylval.node = new ASTNode();
+                yylval.cval = '\r';
+                //yylval.node = new ASTNode();
                 break;
             case 't':
-                //yylval.cval = '\t';
-                yylval.node = new ASTNode();
+                yylval.cval = '\t';
+                //yylval.node = new ASTNode();
                 break;
             case 'v':
-                //yylval.cval = '\v';
-                yylval.node = new ASTNode();
+                yylval.cval = '\v';
+                //yylval.node = new ASTNode();
                 break;
                 //todo deal with octal, hex, weird stuff
             default:
-                //yylval.cval = yytext[2];
-                yylval.node = new ASTNode();
+                yylval.cval = yytext[2];
+                //yylval.node = new ASTNode();
                 break;
         }
     }
     else {
-        //yylval.cval = yytext[1];
-        yylval.node = new ASTNode();
+        yylval.cval = yytext[1];
+        //yylval.node = new ASTNode();
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
@@ -564,8 +564,8 @@ return {
         lag++;
     }
     *lag = '\0';
-    yylval.node = new ASTNode();
-    //yylval.sval = strstart;
+    //yylval.node = new ASTNode();
+    yylval.sval = strstart;
     return (STRING_LITERAL); }
 {real} {
     float num = atof(yytext);
@@ -578,8 +578,8 @@ return {
         outputError("Too long", "Floating Constant too long.", true);
     }
     //todo check size
-    yylval.node = new ASTNode();
-    //yylval.fval = atof(yytext);
+    //yylval.node = new ASTNode();
+    yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
     to_token_file(INTEGER_CONSTANT, "INTEGER_CONSTANT");
@@ -593,8 +593,8 @@ return {
         outputError("Too long", "Integer Constant too long.", true);
     }
     //todo check size for a long, c string compare
-    //yylval.ival = atol(yytext);
-    yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
+    yylval.ival = atol(yytext);
+    //yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");
@@ -630,6 +630,7 @@ return {
                 to_token_file(ERROR, "ERROR");
                 outputError("Not found", "Identifier not defined.", false);
             }
+            yylval.symtblnode = new SymbolTableNode(it->second);
         } else {
             //this is a normal insert
             pair<string, SymbolTableNode> entry = make_pair(s,x);
@@ -646,6 +647,12 @@ return {
                     columnQueue.pop_back();
                 outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
             }
+            //todo this is just sloppy, this should be returned in the insert tuple.
+            tuple<map<string, SymbolTableNode>::iterator, string> result2 = getTable()->search(s);
+            map<string, SymbolTableNode>::iterator it;
+            string status;
+            tie(it, status) = result2;
+            yylval.symtblnode = new SymbolTableNode(it->second);
         }
     } else {
         //cout << "going else" << endl;
@@ -663,6 +670,7 @@ return {
             outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
+        yylval.symtblnode = new SymbolTableNode(it->second); //todo this might need to be new SymbolTableNode(), deep copy
     }
     return ( IDENTIFIER );
 }
