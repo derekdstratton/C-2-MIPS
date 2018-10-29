@@ -1011,7 +1011,7 @@ string
 
 identifier
 	: IDENTIFIER {
-	$$ = new IdentifierNode("tempBS", $1);
+	$$ = new IdentifierNode($1);
 	//tempBS should be yytext, or just the name of the identifier
 	    //todo okay so this should construct the node based on the symbol table pointer
     	//we need the symbol table node and the string. passing it over will be a nightmare.

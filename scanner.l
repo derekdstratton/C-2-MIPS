@@ -594,7 +594,6 @@ return {
     }
     //todo check size for a long, c string compare
     yylval.ival = atol(yytext);
-    //yylval.node = new TypeValueNode("INTEGER_CONSTANT", yylineno, columnQueue.size() - yyleng + 1, empty, atol(yytext), "int");
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");
@@ -606,6 +605,7 @@ return {
     string s = yytext;
     //Constructing a Symbol Table node
     SymbolTableNode x = SymbolTableNode();
+    x.setName(s);
     x.setLineNumber(yylineno);
     x.setColumnNumber(columnQueue.size() - yyleng + 1);
     x.setTypeSpecifier(type_specifier);
