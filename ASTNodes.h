@@ -40,12 +40,7 @@ public:
 
     }
 
-    virtual int getType(){
-        //todo this should not be a int, it should be an enum
-        //also this should throw some type of error if called, only for derived
-        return -1; //fail
-    };
-    //todo make a virtual get value function for returning the value. what type should it be?
+    //todo make a virtual function that returns the type of node being looked at
 
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node) {
@@ -93,7 +88,44 @@ public:
 private:
     int nodeVal;
     void printNode(std::ostream& os) const {
-        os << nodeLabel << ": " << nodeVal;
+        os << nodeLabel;
+    }
+};
+
+/**
+ * Reprsented 3 address code:
+ * ASSIGN op1 op2 op3, op3 := op1
+ *
+ * 2 Children in the node
+ * Child 1 is the lvalue, op3
+ * Child 2 is the rvalue, op1
+ * (op2 is blank)
+ */
+class AssignNode : public ASTNode {
+public:
+    AssignNode(list<ASTNode*> children) {
+        childrenNodes = children;
+    };
+private:
+    int nodeVal;
+    void printNode(std::ostream& os) const {
+        os << "ASSIGN";
+    }
+};
+
+class IdentifierNode : public ASTNode {
+public:
+    IdentifierNode(string id, SymbolTableNode * symtblnode) {
+        identifier = id;
+        symbolTableNode = *symtblnode;
+        //childrenNodes = children; should not have any children
+
+    };
+private:
+    SymbolTableNode symbolTableNode;
+    string identifier;
+    void printNode(std::ostream& os) const {
+        os << "VARIABLE_" << identifier;
     }
 };
 

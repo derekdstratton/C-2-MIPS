@@ -58,8 +58,9 @@ int yylex();
     //long ival;
     //float fval;
     //char cval;
-    //char * sval;
+    SymbolTableNode * symtblnode;
     ASTNode * node;
+    int ival;
 }
 
 %type <node> translation_unit external_declaration function_definition declaration
@@ -73,14 +74,14 @@ int yylex();
 %type <node> abstract_declarator direct_abstract_declarator statement labeled_statement
 %type <node> expression_statement compound_statement statement_list selection_statement
 %type <node> iteration_statement jump_statement expression assignment_expression
-%type <node> assignment_operator conditional_expression constant_expression logical_or_expression
+%type <node> conditional_expression constant_expression logical_or_expression
 %type <node> logical_and_expression inclusive_or_expression exclusive_or_expression and_expression
 %type <node> equality_expression relational_expression shift_expression additive_expression
 %type <node> multiplicative_expression cast_expression unary_expression unary_operator
 %type <node> postfix_expression primary_expression argument_expression_list constant
 %type <node> string identifier
 
-
+%type <ival> assignment_operator
 
 %code provides {
     // A function that returns a pointer to the table, for communicating with the Scanner
@@ -96,7 +97,7 @@ int yylex();
     }
 }
 
-%token IDENTIFIER
+%token<symtblnode> IDENTIFIER
 %token<node> INTEGER_CONSTANT
 %token<node> FLOATING_CONSTANT
 %token<node> CHARACTER_CONSTANT
@@ -723,43 +724,53 @@ assignment_expression
     $$ = new ASTNode("assignment_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
 	handleProd("assignment_expression -> conditional_expression\n");}
 	| unary_expression assignment_operator assignment_expression {
-	$$ = new ASTNode();
+	//$$ = new ASTNode();
+	list <ASTNode*> tempList;
+	tempList.push_back($1); //lvalue
+	tempList.push_back($3); //rvalue
+	switch ($2) {
+	    case ASSIGN:
+            $$ = new AssignNode(tempList);
+	    default:
+	        //todo Addnodes, Multiplynodes, etc.
+	        break;
+	}
 	handleProd("assignment_expression -> unary_expression assignment_operator assignment_expression\n");}
 	;
 
 assignment_operator
 	: ASSIGN {
-	$$ = new ASTNode();
+	$$ = ASSIGN;
 	handleProd("assignment_operator -> ASSIGN\n");}
 	| MUL_ASSIGN {
-	$$ = new ASTNode();
+	$$ = MUL_ASSIGN;
 	handleProd("assignment_operator -> MUL_ASSIGN\n");}
 	| DIV_ASSIGN {
-	$$ = new ASTNode();
+	$$ = DIV_ASSIGN;
 	handleProd("assignment_operator -> DIV_ASSIGN\n");}
 	| MOD_ASSIGN {
-	$$ = new ASTNode();
+	$$ = MOD_ASSIGN;
 	handleProd("assignment_operator -> MOD_ASSIGN\n");}
 	| ADD_ASSIGN {
-	$$ = new ASTNode();
+	$$ = ADD_ASSIGN;
 	handleProd("assignment_operator -> ADD_ASSIGN\n");}
 	| SUB_ASSIGN {
-	$$ = new ASTNode();
+	$$ = SUB_ASSIGN;
 	handleProd("assignment_operator -> SUB_ASSIGN\n");}
 	| LEFT_ASSIGN {
-	$$ = new ASTNode();
+	$$ = LEFT_ASSIGN;
 	handleProd("assignment_operator -> LEFT_ASSIGN\n");}
 	| RIGHT_ASSIGN {
-	$$ = new ASTNode();
+	$$ = RIGHT_ASSIGN;
 	handleProd("assignment_operator -> RIGHT_ASSIGN\n");}
 	| AND_ASSIGN {
-	$$ = new ASTNode();
+	$$ = AND_ASSIGN;
 	handleProd("assignment_operator -> AND_ASSIGN\n");}
 	| XOR_ASSIGN {
-	$$ = new ASTNode();
+	$$ = XOR_ASSIGN;
 	handleProd("assignment_operator -> XOR_ASSIGN\n");}
 	| OR_ASSIGN {
-	$$ = new ASTNode();
+	$$ = OR_ASSIGN;
 	handleProd("assignment_operator -> OR_ASSIGN\n");}
 	;
 
@@ -927,9 +938,10 @@ cast_expression
 
 unary_expression
 	: postfix_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("unary_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	//list <ASTNode*> tempList;
+    //tempList.push_back($1);
+    //$$ = new ASTNode("unary_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+    $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
 	$$ = new ASTNode();
@@ -971,9 +983,10 @@ unary_operator
 
 postfix_expression
 	: primary_expression {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("postfix_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	//list <ASTNode*> tempList;
+    //tempList.push_back($1);
+    //$$ = new ASTNode("postfix_expression", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+    $$ = $1;
 	handleProd("postfix_expression -> primary_expression\n");}
 	| postfix_expression OPENSQ expression CLOSSQ {
 	$$ = new ASTNode();
@@ -1000,8 +1013,13 @@ postfix_expression
 
 primary_expression
 	: identifier {
-	$$ = new ASTNode();
+	//$$ = new IdentifierNode($1.yytext, $1.yylval);
+	$$ = $1;
 	handleProd("primary_expression -> identifier\n");}
+	//todo okay so this should construct the node based on the symbol table pointer
+	//we need the symbol table node and the string. passing it over will be a nightmare.
+	//maybe yylval can be the symbol table pointer and yytext will be the string identifier.
+	//that's my best idea...
 	| constant {
 	list <ASTNode*> tempList;
 	tempList.push_back($1);
@@ -1049,9 +1067,10 @@ string
 
 identifier
 	: IDENTIFIER {
+	$$ = new IdentifierNode("tempBS", $1);
 	//list <ASTNode*> tempList;
     //tempList.push_back($1);
-    $$ = new ASTNode("identifier", yylloc.first_line, columnQueue.size() - yyleng + 1, empty); //todo use actual value
+    //$$ = new ASTNode("identifier", yylloc.first_line, columnQueue.size() - yyleng + 1, empty); //todo use actual value
 	handleProd("identifier -> IDENTIFIER\n");}
 	;
 %%

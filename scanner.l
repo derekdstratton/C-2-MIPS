@@ -630,6 +630,7 @@ return {
                 to_token_file(ERROR, "ERROR");
                 outputError("Not found", "Identifier not defined.", false);
             }
+            yylval.symtblnode = new SymbolTableNode(it->second);
         } else {
             //this is a normal insert
             pair<string, SymbolTableNode> entry = make_pair(s,x);
@@ -646,6 +647,12 @@ return {
                     columnQueue.pop_back();
                 outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
             }
+            //todo this is just sloppy, this should be returned in the insert tuple.
+            tuple<map<string, SymbolTableNode>::iterator, string> result2 = getTable()->search(s);
+            map<string, SymbolTableNode>::iterator it;
+            string status;
+            tie(it, status) = result2;
+            yylval.symtblnode = new SymbolTableNode(it->second);
         }
     } else {
         //cout << "going else" << endl;
@@ -663,6 +670,7 @@ return {
             outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
+        yylval.symtblnode = new SymbolTableNode(it->second); //todo this might need to be new SymbolTableNode(), deep copy
     }
     return ( IDENTIFIER );
 }
