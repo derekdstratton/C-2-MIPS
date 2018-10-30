@@ -320,7 +320,7 @@ init_declarator
 	$$ = $1;
 	handleProd("init_declarator -> declarator\n");}
 	| declarator ASSIGN initializer {
-	$$ = new ASTNode();
+	$$ = new AssignNode($1, $3);
 	handleProd("init_declarator -> declarator ASSIGN initializer\n");}
 	;
 
@@ -401,7 +401,8 @@ declarator
 	$$ = $1;
 	handleProd("declarator -> direct_declarator\n");}
 	| pointer direct_declarator {
-	$$ = new ASTNode();handleProd("declarator -> pointer direct_declarator\n");}
+	$$ = new ASTNode(); //PointerNode
+	handleProd("declarator -> pointer direct_declarator\n");}
 	;
 
 direct_declarator
@@ -409,23 +410,22 @@ direct_declarator
 	$$ = $1;
 	handleProd("direct_declarator -> identifier\n");}
 	| OPENPAR declarator CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = $2;
 	handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
 	| direct_declarator OPENSQ CLOSSQ {
-	$$ = new ASTNode();
+	$$ = new ArrayNode($1, new NoneNode());
 	handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
 	| direct_declarator OPENSQ constant_expression CLOSSQ {
-	$$ = new ASTNode();
+	$$ = new ArrayNode($1, $3);
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("direct_declarator", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1; //functions
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //functions
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
+	//throw an error, because it's legacy code and bad.
 	$$ = new ASTNode();
 	handleProd("direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n");}
 	;
@@ -585,7 +585,7 @@ statement
 
 labeled_statement
 	: identifier COLON statement {
-	$$ = new ASTNode(); //i looked this up, this is for bitfields. crazy!
+	$$ = new ASTNode(); //this is for a goto, no symbol table, just dump
 	handleProd("labeled_statement -> identifier COLON statement\n");}
 	| CASE constant_expression COLON statement {
 	$$ = new ASTNode();
@@ -816,10 +816,10 @@ equality_expression
 	$$ = $1;
 	handleProd("equality_expression -> relational_expression\n");}
 	| equality_expression EQ_OP relational_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(EQ_OP, $1, $3);
 	handleProd("equality_expression -> equality_expression EQ_OP relational_expression\n");}
 	| equality_expression NE_OP relational_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(NE_OP, $1, $3);
 	handleProd("equality_expression -> equality_expression NE_OP relational_expression\n");}
 	;
 
@@ -828,16 +828,16 @@ relational_expression
 	$$ = $1;
 	handleProd("relational_expression -> shift_expression\n");}
 	| relational_expression LESSTH shift_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(LESSTH, $1, $3);
 	handleProd("relational_expression -> relational_expression LESSTH shift_expression\n");}
 	| relational_expression GREATH shift_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(GREATH, $1, $3);
 	handleProd("relational_expression -> relational_expression GREATH shift_expression\n");}
 	| relational_expression LE_OP shift_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(LE_OP, $1, $3);
 	handleProd("relational_expression -> relational_expression LE_OP shift_expression\n");}
 	| relational_expression GE_OP shift_expression {
-	$$ = new ASTNode();
+	$$ = new RelationalNode(GE_OP, $1, $3);
 	handleProd("relational_expression -> relational_expression GE_OP shift_expression\n");}
 	;
 
@@ -858,10 +858,10 @@ additive_expression
 	$$ = $1;
 	handleProd("additive_expression -> multiplicative_expression\n");}
 	| additive_expression PLUS multiplicative_expression {
-	$$ = new BinaryMathNode('+', $1, $3);
+	$$ = new BinaryMathNode(PLUS, $1, $3);
 	handleProd("additive_expression -> additive_expression PLUS multiplicative_expression\n");}
 	| additive_expression MINUS multiplicative_expression {
-	$$ = new BinaryMathNode('-', $1, $3);
+	$$ = new BinaryMathNode(MINUS, $1, $3);
 	handleProd("additive_expression -> additive_expression MINUS multiplicative_expression\n");}
 	;
 
@@ -870,13 +870,13 @@ multiplicative_expression
 	$$ = $1;
 	handleProd("multiplicative_expression -> cast_expression\n");}
 	| multiplicative_expression STAR cast_expression {
-	$$ = new BinaryMathNode('*', $1, $3);
+	$$ = new BinaryMathNode(STAR, $1, $3);
 	handleProd("multiplicative_expression -> multiplicative_expression STAR cast_expression\n");}
 	| multiplicative_expression SLASH cast_expression {
-	$$ = new BinaryMathNode('/', $1, $3);
+	$$ = new BinaryMathNode(SLASH, $1, $3);
 	handleProd("multiplicative_expression -> multiplicative_expression SLASH cast_expression\n");}
 	| multiplicative_expression MODULO cast_expression {
-	$$ = new BinaryMathNode('%', $1, $3);
+	$$ = new BinaryMathNode(MODULO, $1, $3);
 	handleProd("multiplicative_expression -> multiplicative_expression MODULO cast_expression\n");}
 	;
 
@@ -894,10 +894,10 @@ unary_expression
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
-	$$ = new BinaryMathNode('+', $2, new IntNode(1));
+	$$ = new BinaryMathNode(PLUS, $2, new IntNode(1));
 	handleProd("unary_expression -> INC_OP unary_expression\n");}
 	| DEC_OP unary_expression {
-	$$ = new BinaryMathNode('-', $2, new IntNode(1));
+	$$ = new BinaryMathNode(MINUS, $2, new IntNode(1));
 	handleProd("unary_expression -> DEC_OP unary_expression\n");}
 	| unary_operator cast_expression {
 	switch($1) {
