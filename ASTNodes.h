@@ -7,6 +7,7 @@
 
 using namespace std;
 #include "include/tree.hh"
+#include "SymbolTable.h"
 
 class ASTNode {
 public:
@@ -72,6 +73,53 @@ protected:
                 copyTreeHelper(child, ast, newRoot);
             }
         }
+    }
+};
+
+class UnaryNode : public ASTNode {
+public:
+    UnaryNode(int x, ASTNode* child) {
+        list <ASTNode*> tempList;
+        tempList.push_back(child);
+        nodeType = x;
+    }
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "UNARY_" << nodeType;
+    }
+};
+
+//does not include tilde
+class BitwiseNode : public ASTNode {
+public:
+    BitwiseNode(int x, ASTNode* left, ASTNode* right) {
+        list <ASTNode *> tempList;
+        tempList.push_back(left);
+        tempList.push_back(right);
+        childrenNodes = tempList;
+        nodeType = x;
+    }
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "BITWISE_" << nodeType;
+    }
+};
+
+class LogicalNode : public ASTNode {
+public:
+    LogicalNode(int x, ASTNode* left, ASTNode* right){
+        list <ASTNode*> tempList;
+        tempList.push_back(left);
+        tempList.push_back(right);
+        childrenNodes = tempList;
+        nodeType = x;
+    };
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "LOGICAL_" << nodeType;
     }
 };
 
