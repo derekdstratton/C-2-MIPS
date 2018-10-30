@@ -320,7 +320,7 @@ init_declarator
 	$$ = $1;
 	handleProd("init_declarator -> declarator\n");}
 	| declarator ASSIGN initializer {
-	$$ = new ASTNode();
+	$$ = new AssignNode($1, $3);
 	handleProd("init_declarator -> declarator ASSIGN initializer\n");}
 	;
 
@@ -401,7 +401,8 @@ declarator
 	$$ = $1;
 	handleProd("declarator -> direct_declarator\n");}
 	| pointer direct_declarator {
-	$$ = new ASTNode();handleProd("declarator -> pointer direct_declarator\n");}
+	$$ = new ASTNode(); //PointerNode
+	handleProd("declarator -> pointer direct_declarator\n");}
 	;
 
 direct_declarator
@@ -409,21 +410,19 @@ direct_declarator
 	$$ = $1;
 	handleProd("direct_declarator -> identifier\n");}
 	| OPENPAR declarator CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = $2;
 	handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
 	| direct_declarator OPENSQ CLOSSQ {
-	$$ = new ASTNode();
+	$$ = new ArrayNode($1, new NoneNode());
 	handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
 	| direct_declarator OPENSQ constant_expression CLOSSQ {
-	$$ = new ASTNode();
+	$$ = new ArrayNode($1, $3);
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    $$ = new ASTNode("direct_declarator", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+	$$ = $1; //functions
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //functions
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
 	//throw an error, because it's legacy code and bad.

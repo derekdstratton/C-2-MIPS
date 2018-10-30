@@ -256,7 +256,7 @@ private:
                 printable = "EQ_OP";
                 break;
             case 273:
-                printbale = "NE_OP";
+                printable = "NE_OP";
                 break;
             default:
                 printable = "sauce";
@@ -326,6 +326,24 @@ public:
 private:
     void printNode(std::ostream& os) const {
         os << "RETURN";
+    }
+};
+
+/**
+ * Left is the declarator, right is either none (nothing) or the size (based on an expression)
+ */
+class ArrayNode : public ASTNode {
+public:
+    ArrayNode(ASTNode* left, ASTNode * right) {
+        list<ASTNode*> tmplist;
+        tmplist.push_back(left);
+        tmplist.push_back(right);
+        childrenNodes = tmplist;
+
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "ARRAY";
     }
 };
 
