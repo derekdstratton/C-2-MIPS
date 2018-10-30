@@ -223,37 +223,81 @@ private:
     }
 };
 
-/*
- * Simple math operators: +, -, *, /, %
+/**
+ * Nodes for relations
  */
-class BinaryMathNode : public ASTNode {
+class RelationalNode : public ASTNode {
 public:
-    BinaryMathNode(char type, ASTNode * left, ASTNode * right) {
+    RelationalNode(int type, ASTNode * left, ASTNode * right) {
         operationType = type;
-        //todo don't forget to check the types on left and right
         list<ASTNode*> tmplist;
         tmplist.push_back(left);
         tmplist.push_back(right);
         childrenNodes = tmplist;
     };
 private:
-    char operationType;
+    int operationType;
+    void printNode(std::ostream& os) const {
+        string printable;
+        switch(operationType){
+            case 336:
+                printable = "LESSTH";
+                break;
+            case 337:
+                printable = "GREATH";
+                break;
+            case 270:
+                printable = "LE_OP";
+                break;
+            case 271:
+                printable = "GE_OP";
+                break;
+            case 272:
+                printable = "EQ_OP";
+                break;
+            case 273:
+                printbale = "NE_OP";
+                break;
+            default:
+                printable = "sauce";
+                break;
+
+
+        }
+        os << "RELATIONAL_" << printable;
+    }
+};
+
+/*
+ * Simple math operators: +, -, *, /, %
+ */
+class BinaryMathNode : public ASTNode {
+public:
+    BinaryMathNode(int type, ASTNode * left, ASTNode * right) {
+        operationType = type;
+        list<ASTNode*> tmplist;
+        tmplist.push_back(left);
+        tmplist.push_back(right);
+        childrenNodes = tmplist;
+    };
+private:
+    int operationType;
     void printNode(std::ostream& os) const {
         string printable;
         switch(operationType) {
-            case '+':
+            case 338:
                 printable = "PLUS";
                 break;
-            case '-':
+            case 339:
                 printable = "MINUS";
                 break;
-            case '*':
+            case 329:
                 printable = "MUL";
                 break;
-            case '/':
+            case 340:
                 printable = "DIV";
                 break;
-            case '%':
+            case 341:
                 printable = "MODULO";
                 break;
             default:
