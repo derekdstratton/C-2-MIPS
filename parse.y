@@ -920,7 +920,7 @@ unary_expression
 	        $$ = new UnaryNode(BANG, $2);
 	        break;
 	    default:
-	        stderr << "Something went wrong with unary nodes." << endl;
+	        cout << "Something went wrong with unary nodes." << endl;
 	        break;
 	}
 	$$ = new ASTNode();
