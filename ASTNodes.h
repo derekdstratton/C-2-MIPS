@@ -8,7 +8,6 @@
 using namespace std;
 #include "include/tree.hh"
 #include "SymbolTable.h"
-//#include "parser.hpp"
 
 class ASTNode {
 public:
@@ -140,22 +139,22 @@ private:
         os << "UNARY_";
         switch(nodeType)
         {
-            case AND:
+            case 335:
                 os << "AND";
                 break;
-            case STAR:
+            case 329:
                 os << "STAR";
                 break;
-            case PLUS:
+            case 338:
                 os << "PLUS";
                 break;
-            case MINUS:
+            case 339:
                 os << "MINUS";
                 break;
-            case TILDE:
+            case 342:
                 os << "TILDE";
                 break;
-            case BANG:
+            case 343:
                 os << "BANG";
                 break;
             default:
@@ -181,13 +180,13 @@ private:
         os << "BITWISE_";
         switch(nodeType)
         {
-            case BAR:
+            case 333:
                 os << "BAR";
                 break;
-            case XOR:
+            case 334:
                 os << "XOR";
                 break;
-            case AND:
+            case 335:
                 os << "AND";
                 break;
             default:
