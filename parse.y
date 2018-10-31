@@ -332,13 +332,19 @@ struct_declaration
 
 specifier_qualifier_list
 	: type_specifier {
-	$$ = new ASTNode();
+	list<int> tmp;
+	tmp.push_back($1);
+	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_specifier\n");}
 	| type_specifier specifier_qualifier_list {
-	$$ = new ASTNode();
+	list<int> x = *(list<int>*) ($2->get());
+	x.push_back($1);
+	$$ = new TypeNode(x);
 	handleProd("specifier_qualifier_list -> type_specifier specifier_qualifier_list\n");}
 	| type_qualifier {
-	$$ = new ASTNode();
+	list<int> tmp;
+	tmp.push_back($1);
+	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_qualifier\n");}
 	| type_qualifier specifier_qualifier_list {
 	$$ = new ASTNode();
@@ -492,13 +498,13 @@ identifier_list
 
 initializer
 	: assignment_expression {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("initializer -> assignment_expression\n");}
 	| OPENCUR initializer_list CLOSCUR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array
 	handleProd("initializer -> OPENCUR initializer_list CLOSCUR\n");}
 	| OPENCUR initializer_list COMMA CLOSCUR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array
 	handleProd("initializer -> OPENCUR initializer_list COMMA CLOSCUR\n");}
 	;
 
@@ -513,7 +519,7 @@ initializer_list
 
 type_name
 	: specifier_qualifier_list {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("type_name -> specifier_qualifier_list\n");}
 	| specifier_qualifier_list abstract_declarator {
 	$$ = new ASTNode();
@@ -885,7 +891,7 @@ cast_expression
 	$$ = $1;
 	handleProd("cast_expression -> unary_expression\n");}
 	| OPENPAR type_name CLOSEPAR cast_expression {
-	$$ = new ASTNode();
+	$$ = new CastNode($2, $4);
 	handleProd("cast_expression -> OPENPAR type_name CLOSEPAR cast_expression\n");}
 	;
 

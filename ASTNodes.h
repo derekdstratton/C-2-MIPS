@@ -12,7 +12,7 @@ using namespace std;
 class ASTNode {
 public:
     ASTNode() {
-        nodeLabel = "NA";
+        nodeLabel = "NOT_PROGRAMMED";
         //os << "default";
     }
     ASTNode(string label, int line, int col, list<ASTNode*> children) {
@@ -42,6 +42,10 @@ public:
     }
 
     //todo make a virtual function that returns the type of node being looked at
+    virtual void * get() {
+        cout << "IF YOU'RE SEEING THIS DIE" << endl;
+        return NULL;
+    }
 
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node) {
@@ -445,6 +449,20 @@ private:
     }
 };
 
+class CastNode : public ASTNode {
+public:
+    CastNode(ASTNode * type, ASTNode *nodeToCast) {
+        list<ASTNode *> tmplist;
+        tmplist.push_back(type);
+        tmplist.push_back(nodeToCast);
+        childrenNodes = tmplist;
+    };
+private:
+    void printNode(std::ostream& os) const {
+        os << "CAST";
+    }
+};
+
 //todo could/should this be generalized to other control flow breaks?
 //this is more a question to be answered when getting into functions
 class ReturnNode : public ASTNode {
@@ -467,6 +485,29 @@ private:
 };
 
 /**
+ * In the future this might contain other things like pointers or [], see abstract_declarator
+ */
+class TypeNode : public ASTNode {
+public:
+    TypeNode(list<int>& type) {
+        types = type;
+
+    };
+
+    void * get() {
+        return &types;
+    }
+private:
+    list<int> types;
+    void printNode(std::ostream& os) const {
+        os << "TYPE_";
+        for (int i : types) {
+            os << i; //todo should be viusal
+        }
+    }
+};
+
+/**
  * Left is the declarator, right is either none (nothing) or the size (based on an expression)
  */
 class ArrayNode : public ASTNode {
@@ -478,6 +519,7 @@ public:
         childrenNodes = tmplist;
 
     };
+
 private:
     void printNode(std::ostream& os) const {
         os << "ARRAY";
