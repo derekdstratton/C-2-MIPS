@@ -630,10 +630,10 @@ statement_list
 
 selection_statement
 	: IF OPENPAR expression CLOSEPAR statement {
-	$$ = new ASTNode();
+	$$ = new IfNode($3, $5);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement\n");}
 	| IF OPENPAR expression CLOSEPAR statement ELSE statement {
-	$$ = new ASTNode();
+	$$ = new IfNode($3, $5, $7);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement ELSE statement\n");}
 	| SWITCH OPENPAR expression CLOSEPAR statement {
 	$$ = new ASTNode();
@@ -642,10 +642,10 @@ selection_statement
 
 iteration_statement
 	: WHILE OPENPAR expression CLOSEPAR statement {
-	$$ = new ASTNode();
+	$$ = new WhileNode($3, $5, false);
 	handleProd("iteration_statement -> WHILE OPENPAR expression CLOSEPAR statement\n");}
 	| DO statement WHILE OPENPAR expression CLOSEPAR SEMI {
-	$$ = new ASTNode();
+	$$ = new WhileNode($5, $2, true);
 	handleProd("iteration_statement -> DO statement WHILE OPENPAR expression CLOSEPAR SEMI\n");}
 	| FOR OPENPAR SEMI SEMI CLOSEPAR statement {
 	$$ = new ASTNode();

@@ -77,6 +77,56 @@ protected:
     }
 };
 
+class WhileNode : public ASTNode{
+public:
+    WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo){
+        list<ASTNode*> tempList;
+        tempList.push_back(expr);
+        tempList.push_back(stmt);
+        childrenNodes = tempList;
+        doo = dooo;
+    }
+private:
+    bool doo;
+    void printNode(std:: ostream& os) const{
+        if(doo){
+            os << "DO_WHILE";
+        }
+        else{
+            os << "WHILE";
+        }
+    }
+};
+
+class IfNode : public ASTNode {
+public:
+    IfNode(ASTNode* expr, ASTNode* stmt){
+        list<ASTNode*> tempList;
+        tempList.push_back(expr);
+        tempList.push_back(stmt);
+        childrenNodes = tempList;
+        flag = 0;
+    }
+    IfNode(ASTNode* expr, ASTNode* stmt, ASTNode* stmt2){
+        list<ASTNode*> tempList;
+        tempList.push_back(expr);
+        tempList.push_back(stmt);
+        tempList.push_back(stmt2);
+        childrenNodes = tempList;
+        flag = 1;
+    }
+private:
+    bool flag;
+    void printNode(std:: ostream& os) const{
+        if(flag){
+            os << "IF_NODE";
+        }
+        else{
+            os << "IF_ELSE_NODE";
+        }
+    }
+};
+
 class UnaryNode : public ASTNode {
 public:
     UnaryNode(int x, ASTNode* child) {
