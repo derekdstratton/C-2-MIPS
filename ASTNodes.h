@@ -8,13 +8,13 @@
 using namespace std;
 #include "include/tree.hh"
 #include "SymbolTable.h"
-#include "parser.hpp"
+//#include "parser.hpp"
 
 class ASTNode {
 public:
     ASTNode() {
         nodeLabel = "NA";
-        //cout << "default";
+        //os << "default";
     }
     ASTNode(string label, int line, int col, list<ASTNode*> children) {
         nodeLabel = label;
@@ -69,7 +69,7 @@ protected:
         //Node has children, insert them
         if (src_node->getChildren().size() != 0) {
             for (auto &child : src_node->getChildren()) {
-                cout << *child;
+                //os << *child;
                 auto newRoot = ast.append_child(iRoot, child);
                 copyTreeHelper(child, ast, newRoot);
             }
@@ -141,25 +141,25 @@ private:
         switch(nodeType)
         {
             case AND:
-                cout << "AND";
+                os << "AND";
                 break;
             case STAR:
-                cout << "STAR";
+                os << "STAR";
                 break;
             case PLUS:
-                cout << "PLUS";
+                os << "PLUS";
                 break;
             case MINUS:
-                cout << "MINUS";
+                os << "MINUS";
                 break;
             case TILDE:
-                cout << "TILDE";
+                os << "TILDE";
                 break;
             case BANG:
-                cout << "BANG";
+                os << "BANG";
                 break;
             default:
-                cout << "MONTANA" << endl;
+                os << "MONTANA" << endl;
                 break;
         }
     }
@@ -182,16 +182,16 @@ private:
         switch(nodeType)
         {
             case BAR:
-                cout << "BAR";
+                os << "BAR";
                 break;
             case XOR:
-                cout << "XOR";
+                os << "XOR";
                 break;
             case AND:
-                cout << "AND";
+                os << "AND";
                 break;
             default:
-                cout << "BURRITO" << endl;
+                os << "BURRITO" << endl;
                 break;
         }
     }
@@ -357,7 +357,7 @@ public:
 private:
     string nodeVal;
     void printNode(std::ostream& os) const {
-        os << "FLOAT_" << nodeVal;
+        os << "STRING_" << nodeVal;
     }
 };
 
