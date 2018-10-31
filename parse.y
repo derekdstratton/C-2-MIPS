@@ -771,7 +771,7 @@ logical_or_expression
 	$$ = $1;
 	handleProd("logical_or_expression -> logical_and_expression\n");}
 	| logical_or_expression OR_OP logical_and_expression {
-	$$ = new ASTNode();
+	$$ = new LogicalNode(OR_OP, $1, $3);
 	handleProd("logical_or_expression -> logical_or_expression OR_OP logical_and_expression\n");}
 	;
 
@@ -780,7 +780,7 @@ logical_and_expression
 	$$ = $1;
 	handleProd("logical_and_expression -> inclusive_or_expression\n");}
 	| logical_and_expression AND_OP inclusive_or_expression {
-	$$ = new ASTNode();
+	$$ = new LogicalNode(AND_OP, $1, $3);
 	handleProd("logical_and_expression -> logical_and_expression AND_OP inclusive_or_expression\n");}
 	;
 
@@ -789,7 +789,7 @@ inclusive_or_expression
 	$$ = $1;
 	handleProd("inclusive_or_expression -> exclusive_or_expression\n");}
 	| inclusive_or_expression BAR exclusive_or_expression {
-	$$ = new ASTNode();
+	$$ = new BitwiseNode(BAR, $1, $3);
 	handleProd("inclusive_or_expression -> inclusive_or_expression BAR exclusive_or_expression\n");}
 	;
 
@@ -798,7 +798,7 @@ exclusive_or_expression
 	$$ = $1;
 	handleProd("exclusive_or_expression -> and_expression\n");}
 	| exclusive_or_expression XOR and_expression {
-	$$ = new ASTNode();
+	$$ = new BitwiseNode(XOR, $1, $3);
 	handleProd("exclusive_or_expression -> exclusive_or_expression XOR and_expression\n");}
 	;
 
@@ -807,7 +807,7 @@ and_expression
 	$$ = $1;
 	handleProd("and_expression -> equality_expression\n");}
 	| and_expression AND equality_expression {
-	$$ = new ASTNode();
+	$$ = new BitwiseNode(AND, $1, $3);
 	handleProd("and_expression -> and_expression AND equality_expression\n");}
 	;
 
@@ -846,10 +846,10 @@ shift_expression
 	$$ = $1;
 	handleProd("shift_expression -> additive_expression\n");}
 	| shift_expression LEFT_OP additive_expression {
-	$$ = new ASTNode();
+	$$ = new BitwiseNode(LEFT_OP, $1, $3);
 	handleProd("shift_expression -> shift_expression LEFT_OP additive_expression\n");}
 	| shift_expression RIGHT_OP additive_expression {
-	$$ = new ASTNode();
+	$$ = new BitwiseNode(RIGHT_OP, $1, $3);
 	handleProd("shift_expression -> shift_expression RIGHT_OP additive_expression\n");}
 	;
 
@@ -902,9 +902,26 @@ unary_expression
 	| unary_operator cast_expression {
 	switch($1) {
 	    case AND:
+	        $$ = new UnaryNode(AND, $2);
+	        break;
+	    case STAR:
+	        $$ = new UnaryNode(STAR, $2);
+	        break;
+	    case PLUS:
+	        $$ = new UnaryNode(PLUS, $2);
+	        break;
+	    case MINUS:
+	        $$ = new UnaryNode(MINUS, $2);
+	        break;
+	    case TILDE:
+	        $$ = new UnaryNode(TILDE, $2);
+	        break;
+	    case BANG:
+	        $$ = new UnaryNode(BANG, $2);
 	        break;
 	    default:
-	        break; //todo
+	        stderr << "Something went wrong with unary nodes." << endl;
+	        break;
 	}
 	$$ = new ASTNode();
 	handleProd("unary_expression -> unary_operator cast_expression\n");}

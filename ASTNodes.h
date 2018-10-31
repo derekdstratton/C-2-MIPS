@@ -7,6 +7,8 @@
 
 using namespace std;
 #include "include/tree.hh"
+#include "SymbolTable.h"
+#include "parser.hpp"
 
 class ASTNode {
 public:
@@ -72,6 +74,92 @@ protected:
                 copyTreeHelper(child, ast, newRoot);
             }
         }
+    }
+};
+
+class UnaryNode : public ASTNode {
+public:
+    UnaryNode(int x, ASTNode* child) {
+        list <ASTNode*> tempList;
+        tempList.push_back(child);
+        nodeType = x;
+    }
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "UNARY_";
+        switch(nodeType)
+        {
+            case AND:
+                cout << "AND";
+                break;
+            case STAR:
+                cout << "STAR";
+                break;
+            case PLUS:
+                cout << "PLUS";
+                break;
+            case MINUS:
+                cout << "MINUS";
+                break;
+            case TILDE:
+                cout << "TILDE";
+                break;
+            case BANG:
+                cout << "BANG";
+                break;
+            default:
+                cout << "MONTANA" << endl;
+                break;
+        }
+    }
+};
+
+//does not include tilde
+class BitwiseNode : public ASTNode {
+public:
+    BitwiseNode(int x, ASTNode* left, ASTNode* right) {
+        list <ASTNode *> tempList;
+        tempList.push_back(left);
+        tempList.push_back(right);
+        childrenNodes = tempList;
+        nodeType = x;
+    }
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "BITWISE_";
+        switch(nodeType)
+        {
+            case BAR:
+                cout << "BAR";
+                break;
+            case XOR:
+                cout << "XOR";
+                break;
+            case AND:
+                cout << "AND";
+                break;
+            default:
+                cout << "BURRITO" << endl;
+                break;
+        }
+    }
+};
+
+class LogicalNode : public ASTNode {
+public:
+    LogicalNode(int x, ASTNode* left, ASTNode* right){
+        list <ASTNode*> tempList;
+        tempList.push_back(left);
+        tempList.push_back(right);
+        childrenNodes = tempList;
+        nodeType = x;
+    };
+private:
+    int nodeType;
+    void printNode(std:: ostream& os) const{
+        os << "LOGICAL_" << nodeType;
     }
 };
 
