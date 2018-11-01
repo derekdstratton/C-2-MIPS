@@ -170,7 +170,6 @@ int {
         insertModeFlag = true;
     }
     to_token_file(INT, "INT");
-    yylval.node = new ASTNode("INT", yylineno, columnQueue.size() - yyleng + 1, empty);
     return ( INT );}
 long {
     if (getTable()->getMode()) {

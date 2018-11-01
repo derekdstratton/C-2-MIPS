@@ -136,6 +136,7 @@ translation_unit
 	handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {
 	$$ = new SeqNode($1, $2);
+	root_ptr = $$;
 	handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
 
@@ -160,7 +161,7 @@ function_definition
     tempList.push_back($1);
     tempList.push_back($2);
     tempList.push_back($3);
-    $$ = new ASTNode("function_definition", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
+    $$ = new SeqNode($2, $3); //todo temp make a function Node
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
 	| declaration_specifiers declarator declaration_list compound_statement {
 	$$ = new ASTNode();
@@ -187,22 +188,34 @@ declaration_list
 
 declaration_specifiers
 	: storage_class_specifier {
-	$$ = new DeclSpecsNode($1);
+	set<int> tmp;
+    tmp.insert($1);
+    $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> storage_class_specifier\n");}
 	| storage_class_specifier declaration_specifiers {
-	$$ = new ASTNode();
+	set<int> x = *(set<int>*) ($2->get());
+    x.insert($1);
+    $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> storage_class_specifier declaration_specifiers\n");}
 	| type_specifier {
-	$$ = new DeclSpecsNode($1);
+	set<int> tmp;
+    tmp.insert($1);
+    $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_specifier\n");}
 	| type_specifier declaration_specifiers {
-	$$ = new ASTNode();
+	set<int> x = *(set<int>*) ($2->get());
+    x.insert($1);
+    $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> type_specifier declaration_specifiers\n");}
 	| type_qualifier {
-	$$ = new DeclSpecsNode($1);
+	set<int> tmp;
+    tmp.insert($1);
+    $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_qualifier\n");}
 	| type_qualifier declaration_specifiers {
-	$$ = new ASTNode();
+	set<int> x = *(set<int>*) ($2->get());
+    x.insert($1);
+    $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> type_qualifier declaration_specifiers\n");}
 	;
 
@@ -236,9 +249,6 @@ type_specifier
 	handleProd("type_specifier -> SHORT\n");}
 	| INT {
 	$$ = INT;
-	//list <ASTNode*> tempList;
-    //tempList.push_back(yylval.node);
-    //$$ = new ASTNode("type_specifier", yylloc.first_line, columnQueue.size() - yyleng + 1, tempList);
 	handleProd("type_specifier -> INT\n");}
 	| LONG {
 	$$ = LONG;
@@ -331,13 +341,19 @@ struct_declaration
 
 specifier_qualifier_list
 	: type_specifier {
-	$$ = new ASTNode();
+	set<int> tmp;
+	tmp.insert($1);
+	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_specifier\n");}
 	| type_specifier specifier_qualifier_list {
-	$$ = new ASTNode();
+	set<int> x = *(set<int>*) ($2->get());
+	x.insert($1);
+	$$ = new TypeNode(x);
 	handleProd("specifier_qualifier_list -> type_specifier specifier_qualifier_list\n");}
 	| type_qualifier {
-	$$ = new ASTNode();
+	set<int> tmp;
+	tmp.insert($1);
+	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_qualifier\n");}
 	| type_qualifier specifier_qualifier_list {
 	$$ = new ASTNode();
@@ -494,10 +510,10 @@ initializer
 	$$ = $1;
 	handleProd("initializer -> assignment_expression\n");}
 	| OPENCUR initializer_list CLOSCUR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array
 	handleProd("initializer -> OPENCUR initializer_list CLOSCUR\n");}
 	| OPENCUR initializer_list COMMA CLOSCUR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array
 	handleProd("initializer -> OPENCUR initializer_list COMMA CLOSCUR\n");}
 	;
 
@@ -512,7 +528,7 @@ initializer_list
 
 type_name
 	: specifier_qualifier_list {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("type_name -> specifier_qualifier_list\n");}
 	| specifier_qualifier_list abstract_declarator {
 	$$ = new ASTNode();
@@ -884,7 +900,7 @@ cast_expression
 	$$ = $1;
 	handleProd("cast_expression -> unary_expression\n");}
 	| OPENPAR type_name CLOSEPAR cast_expression {
-	$$ = new ASTNode();
+	$$ = new CastNode($2, $4);
 	handleProd("cast_expression -> OPENPAR type_name CLOSEPAR cast_expression\n");}
 	;
 
