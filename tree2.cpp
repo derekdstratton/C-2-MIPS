@@ -1,6 +1,7 @@
 #include "include/tree.hh"
 #include "include/tree_util2.hh"
-
+#include <set>
+using namespace std;
 class SymbolTableNode {
 public:
     SymbolTableNode() : x(3){};
@@ -47,6 +48,14 @@ int main()
     SymbolTableNode * y = new Subnode();
     t2.append_child(next2, y);
     kptree::print_tree_bracketed(t2);
+
+    set<int> a;
+    a.insert(1);
+    a.insert(2);
+    set<int> g;
+    g.insert(1);
+    //g.insert(2);
+    cout << endl << a.count(1) << endl;
 
     return 0;
 }
