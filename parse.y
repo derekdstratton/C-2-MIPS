@@ -176,8 +176,6 @@ declaration
 	handleProd("declaration -> declaration_specifiers SEMI\n");}
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
-	//this handles the case where init_declarator_list is a single identifier node
-        //not a safe assumption! Doesn't work with arrays, pointers, etc
     set<int> x = $1->getTypes();
     SymbolTableNode2 s = SymbolTableNode2(name, x);
     idNode->setSymbolNode(s);
@@ -1088,6 +1086,9 @@ identifier
     tie(it, status) = result;
     if (status != "not") {
         $$->setSymbolNode(it->second);
+        //cout << *$1 << " found" << endl;
+    } else {
+        //cout << *$1 << " not found " << endl;
     }
 
 	handleProd("identifier -> IDENTIFIER\n");}

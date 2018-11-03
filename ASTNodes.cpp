@@ -243,11 +243,38 @@ void UnaryNode::printNode(std::ostream &os) const {
 }
 
 BitwiseNode::BitwiseNode(int x, ASTNode *left, ASTNode *right) {
-    list <ASTNode *> tempList;
-    tempList.push_back(left);
-    tempList.push_back(right);
-    childrenNodes = tempList;
     nodeType = x;
+    list<ASTNode*> tmplist;
+
+    ASTNode * newLeft;
+    ASTNode * newRight;
+
+    set<int> leftSet = left->getTypes();
+    set<int> rightSet = right->getTypes();
+    int ret = compareForCast(leftSet, rightSet);
+    if (ret < 0) {
+        //Cast the node on the left to the type of the right node
+        ASTNode * newtype = new TypeNode(rightSet);
+        newLeft = new CastNode(newtype, left);
+        newRight = right;
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        types = rightSet;
+    } else if (ret > 0) {
+        //Cast the node on the right to the type of the left node
+        ASTNode * newtype = new TypeNode(leftSet);
+        newRight = new CastNode(newtype, right);
+        newLeft = left;
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        types = leftSet;
+    } else {
+        tmplist.push_back(left);
+        tmplist.push_back(right);
+        types = leftSet;
+    }
+
+    childrenNodes = tmplist;
 }
 
 LogicalNode::LogicalNode(int x, ASTNode *left, ASTNode *right) {
@@ -263,37 +290,13 @@ void LogicalNode::printNode(std::ostream &os) const {
 }
 
 AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
-    ASTNode * newLeft;
-    ASTNode * newRight;
-
     list <ASTNode*> tmplist;
 
     set<int> leftSet = lvalue->getTypes();
-    set<int> rightSet = rvalue->getTypes();
-    int ret = compareForCast(leftSet, rightSet);
-    if (ret < 0) {
-        //Force the node on the right to the size of the smaller node (and throw warning)
-        ASTNode * newtype = new TypeNode(leftSet);
-        newRight = new CastNode(newtype, rvalue);
-        newLeft = lvalue;
-        tmplist.push_back(newLeft);
-        tmplist.push_back(newRight);
-        cerr << "Warning: Incompatible types" << endl; //todo make this error properly formatted
-        types = rightSet;
-    } else if (ret > 0) {
-        //Cast the node on the right to the type of the left node
-        ASTNode * newtype = new TypeNode(leftSet);
-        newRight = new CastNode(newtype, rvalue);
-        newLeft = lvalue;
-        tmplist.push_back(newLeft);
-        tmplist.push_back(newRight);
-        types = leftSet;
-    } else {
-        tmplist.push_back(lvalue);
-        tmplist.push_back(rvalue);
-        types = leftSet;
-    }
+    types = leftSet;
 
+    tmplist.push_back(lvalue);
+    tmplist.push_back(rvalue);
     childrenNodes = tmplist;
 }
 
@@ -390,6 +393,7 @@ CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
     tmplist.push_back(type);
     tmplist.push_back(nodeToCast);
     childrenNodes = tmplist;
+    types = type->getTypes();
 }
 
 void CastNode::printNode(std::ostream &os) const {

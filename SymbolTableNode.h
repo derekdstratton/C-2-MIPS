@@ -55,6 +55,11 @@ public:
         types = typeArr;
         identifier = name;
     }
+    SymbolTableNode2& operator=(SymbolTableNode2 const & other) {
+        types = other.types;
+        identifier = other.identifier;
+        return *this;
+    }
     friend ostream& operator<<(ostream& os, const SymbolTableNode2& node);
 //private:
     set<int> types;
