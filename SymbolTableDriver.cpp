@@ -27,7 +27,7 @@ int main() {
                 cout << "Type an identifier to insert (A default node will be generated):" << endl;
                 string a;
                 cin >> a;
-                tuple<bool, bool> ret = s.insert(make_pair(a, SymbolTableNode()));
+                tuple<bool, bool> ret = s.insert(make_pair(a, SymbolTableNode2()));
                 bool insertSuccess, notShadowing;
                 tie(insertSuccess, notShadowing) = ret;
                 if (!insertSuccess) {
@@ -44,8 +44,8 @@ int main() {
                 cout << "Type an identifier to search for:" << endl;
                 string ab;
                 cin >> ab;
-                tuple<map<string, SymbolTableNode>::iterator, string> retr = s.search(ab);
-                map<string, SymbolTableNode>::iterator it;
+                tuple<map<string, SymbolTableNode2>::iterator, string> retr = s.search(ab);
+                map<string, SymbolTableNode2>::iterator it;
                 string status;
                 tie(it, status) = retr;
                 if (status == "top") {

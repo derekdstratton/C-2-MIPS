@@ -176,3 +176,8 @@ string SymbolTableNode::getName() {
 void SymbolTableNode::setName(string new_name) {
     name = new_name;
 }
+
+ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
+    os << "testing123";
+    return os;
+}

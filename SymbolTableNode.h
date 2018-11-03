@@ -4,6 +4,7 @@
 #include <ostream>
 #include <map>
 #include <string>
+#include <set>
 
 using namespace std;
 
@@ -41,6 +42,23 @@ class SymbolTableNode {
     signed_or_unsigneds signed_or_unsigned;
     map<string, SymbolTableNode> struct_or_union_symbols;
     friend ostream& operator<<(ostream& os, const SymbolTableNode& node);
+};
+
+class SymbolTableNode2 {
+public:
+    SymbolTableNode2() {
+        set<int> fail;
+        types = fail;
+        identifier = "";
+    }
+    SymbolTableNode2(string name, set<int> typeArr) {
+        types = typeArr;
+        identifier = name;
+    }
+    friend ostream& operator<<(ostream& os, const SymbolTableNode2& node);
+//private:
+    set<int> types;
+    string identifier;
 };
 
 
