@@ -107,6 +107,11 @@ string ASTNode::getName() {
     return nullptr;
 }
 
+list<ASTNode*> ASTNode::getSizes() {
+    list<ASTNode*> empty;
+    return empty;
+}
+
 void ASTNode::setSymbolNode(SymbolTableNode2 symtblnd2) {
     cout << "IF YOURE SEEING THIS RAVIOLI" << endl;
 }
@@ -470,13 +475,16 @@ void ReturnNode::printNode(std::ostream &os) const {
     os << "RETURN";
 }
 
-ArrayNode::ArrayNode(ASTNode *left, ASTNode *right) {
+ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
     list<ASTNode*> tmplist;
-    tmplist.push_back(left);
-    tmplist.push_back(right);
+    tmplist = sizes;
+    tmplist.push_front(var);
+    sizeList = sizes;
     childrenNodes = tmplist;
-    types = left->getTypes();
+}
 
+list<ASTNode*> ArrayNode::getSizes() {
+    return sizeList;
 }
 
 void ArrayNode::printNode(std::ostream &os) const {

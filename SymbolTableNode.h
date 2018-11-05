@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include <set>
+#include <list>
 
 using namespace std;
 
@@ -51,10 +52,10 @@ public:
         types = fail;
         identifier = "";
     }
-    SymbolTableNode2(string name, set<int> typeArr, int arr_dimensions) {
+    SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list) {
         types = typeArr;
         identifier = name;
-        arr_dims = arr_dimensions;
+        sizeList = size_decl_list;
     }
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) {
         types = other.types;
@@ -65,7 +66,7 @@ public:
 //private:
     set<int> types;
     string identifier;
-    int arr_dims; //set to 0 if it's not an array, 1 for 1D array, etc.
+    list<int> sizeList; //list of sizes for each dimension
 };
 
 

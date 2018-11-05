@@ -31,7 +31,7 @@ extern list<ASTNode*> empty;
 ASTNode * idNode;
 //list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
 
-int arr_dim = 0; //number of dimensions for the array
+list<int> size_decl_list;
 
 extern deque <char> columnQueue;
 string newOutputFile;
@@ -179,8 +179,8 @@ declaration
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
-    SymbolTableNode2 s = SymbolTableNode2(name, x, arr_dim);
-    arr_dim = 0; //reset it now
+    SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list);
+    size_decl_list.clear(); //reset this too
     idNode->setSymbolNode(s);
     /*for (auto &d : typesNotDeclaredYet) {
         d->setSymbolNode(s);
@@ -446,13 +446,17 @@ direct_declarator
 	$$ = $2;
 	handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
 	| direct_declarator OPENSQ CLOSSQ {
-	$$ = new ArrayNode($1, new NoneNode());
-	arr_dim += 1;
+	list<ASTNode *> empty;
+	$$ = new ArrayNode(idNode, empty);
+	//todo what should i put in the size_decl_list? nothing because it's not declared. should i worry about this case?
 	handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
 	| direct_declarator OPENSQ constant_expression CLOSSQ {
-	$$ = new ArrayNode($1, $3);
-	//todo this should probably invoke getChildren to flatten it into proper node
-	arr_dim += 1;
+	list<ASTNode*> sizes = $1->getSizes(); //only returns a list with contents if good, otherwise returns empty list
+	sizes.push_back($3);
+	$$ = new ArrayNode(idNode, sizes);
+	//the following assumes that $3 is an integer constant when declaring the array. other constant
+	//expressions will break, and thus should throw an error todo
+	size_decl_list.push_back($3->getVal()); //this butter work
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
 	$$ = $1; //functions
