@@ -47,10 +47,6 @@ void outputErrorWarning(bool errtype, string errmsg, int columnNum);
 void to_token_file(int token, string tokName);
 
 using namespace std;
-    //note: i'm shoving all my comments up here for lack of better space
-    //enumeration constant? i don't think that's even used;
-
-
 %}
 
 %option noyywrap
@@ -121,122 +117,101 @@ typedef {
 extern {
     if (getTable()->getMode()) {
         insertModeFlag = true;
-        storage_class_specifier = Extern;
     }
     to_token_file(EXTERN, "EXTERN");
     return ( EXTERN );}
 static {
     if (getTable()->getMode()) {
         insertModeFlag = true;
-        storage_class_specifier = Static;
     }
     to_token_file(STATIC, "STATIC");
     return ( STATIC );}
 auto {
     if (getTable()->getMode()) {
-        storage_class_specifier = Auto;
         insertModeFlag = true;
     }
     to_token_file(AUTO, "AUTO");
     return ( AUTO );}
 register {
     if (getTable()->getMode()) {
-        storage_class_specifier = Register;
         insertModeFlag = true;
     }
     to_token_file(REGISTER, "REGISTER");
     return ( REGISTER );}
 char {
     if (getTable()->getMode()) {
-        type_specifier = Char;
         insertModeFlag = true;
     }
     to_token_file(CHAR, "CHAR");
     return ( CHAR );}
 short {
     if (getTable()->getMode()) {
-        type_specifier = Short;
         insertModeFlag = true;
     }
     to_token_file(SHORT, "SHORT");
     return ( SHORT );}
 int {
     if (getTable()->getMode()) {
-        if (type_specifier == Long || type_specifier == Short) {
-            //don't store int, keep it as "long" or "short"
-        } else {
-            type_specifier = Int;
-        }
         insertModeFlag = true;
     }
     to_token_file(INT, "INT");
     return ( INT );}
 long {
     if (getTable()->getMode()) {
-        type_specifier = Long;
         insertModeFlag = true;
     }
     to_token_file(LONG, "LONG");
     return ( LONG );}
 signed {
     if (getTable()->getMode()) {
-        signed_or_unsigned = Signed;
         insertModeFlag = true;
     }
     to_token_file(SIGNED, "SIGNED");
     return ( SIGNED );}
 unsigned {
     if (getTable()->getMode()) {
-        signed_or_unsigned = Unsigned;
         insertModeFlag = true;
     }
     to_token_file(UNSIGNED, "UNSIGNED");
     return ( UNSIGNED );}
 float {
     if (getTable()->getMode()) {
-        type_specifier = Float;
         insertModeFlag = true;
     }
     to_token_file(FLOAT, "FLOAT");
     return ( FLOAT );}
 double {
     if (getTable()->getMode()) {
-        type_specifier = Double;
         insertModeFlag = true;
     }
     to_token_file(DOUBLE, "DOUBLE");
     return ( DOUBLE );}
 const {
     if (getTable()->getMode()) {
-        type_qualifier = Const;
         insertModeFlag = true;
     }
     to_token_file(CONST, "CONST");
     return ( CONST );}
 volatile {
     if (getTable()->getMode()) {
-        type_qualifier = Volatile;
         insertModeFlag = true;
     }
     to_token_file(VOLATILE, "VOLATILE");
     return ( VOLATILE );}
 void {
     if (getTable()->getMode()) {
-        type_specifier = Void;
         insertModeFlag = true;
     }
     to_token_file(VOID, "VOID");
     return ( VOID );}
 struct {
     if (getTable()->getMode()) {
-        type_specifier = Struct;
         insertModeFlag = true;
     }
     to_token_file(STRUCT, "STRUCT");
     return ( STRUCT );}
 union {
     if (getTable()->getMode()) {
-        type_specifier = Union;
         insertModeFlag = true;
     }
     to_token_file(UNION, "UNION");
@@ -287,17 +262,9 @@ return {
 
 
 ";" {
-    //Important for differentiating statements
     if (!insertModeFlag) {
         //move to lookup mode
         getTable()->setMode(false);
-    } else {
-        //still in insert mode, reset all this for next declaration check
-        type_specifier = Int; //default to int
-        type_qualifier = NoTQ;
-        storage_class_specifier = NoSCS;
-        signed_or_unsigned = NoSU;
-        struct_or_union_symbols.clear();
     }
     insertModeFlag = false;
     to_token_file(SEMI, "SEMI");
@@ -313,12 +280,6 @@ return {
         SymDump.close();
     }
     getTable()->setMode(true);
-    //flip to insert mode, make sure all this is reset
-    type_specifier = Int; //default to int
-    type_qualifier = NoTQ;
-    storage_class_specifier = NoSCS;
-    signed_or_unsigned = NoSU;
-    struct_or_union_symbols.clear();
     insertModeFlag = false;
     to_token_file(OPENCUR, "OPENCUR");
     return (OPENCUR);}
@@ -474,49 +435,40 @@ return {
     to_token_file(CHARACTER_CONSTANT, "CHARACTER_CONSTANT");
     //passing escape characters
     if (yytext[1] == '\\') {
+        //todo export this switch to its own function
         switch(yytext[2]) {
             case 'n':
                 yylval.cval = '\n';
-                //yylval.node = new ASTNode();
                 break;
             case 'a':
                 yylval.cval = '\a';
-                //yylval.node = new ASTNode();
                 break;
             case 'b':
                 yylval.cval = '\b';
-                //yylval.node = new ASTNode();
                 break;
             case 'f':
                 yylval.cval = '\f';
-                //yylval.node = new ASTNode();
                 break;
             case 'r':
                 yylval.cval = '\r';
-                //yylval.node = new ASTNode();
                 break;
             case 't':
                 yylval.cval = '\t';
-                //yylval.node = new ASTNode();
                 break;
             case 'v':
                 yylval.cval = '\v';
-                //yylval.node = new ASTNode();
                 break;
                 //todo deal with octal, hex, weird stuff
             default:
                 yylval.cval = yytext[2];
-                //yylval.node = new ASTNode();
                 break;
         }
     }
     else {
         yylval.cval = yytext[1];
-        //yylval.node = new ASTNode();
     }
     return (CHARACTER_CONSTANT); }
 {string_literal} {
-    //to_token_file(STRING_LITERAL);
     //run through the string to search for escape characters
     //This way, yylval will contain the proper values
     to_token_file(STRING_LITERAL, "STRING_LITERAL");
@@ -529,6 +481,7 @@ return {
         //Dealing with escape characters
         if (*lead == '\\') {
             lead++;
+            //todo export this switch to its own function
             switch(*lead) {
                 case 'n':
                     *lag = '\n';
@@ -563,8 +516,7 @@ return {
         lag++;
     }
     *lag = '\0';
-    //yylval.node = new ASTNode();
-    yylval.sval = strstart;
+    yylval.sval = new string(strstart);
     return (STRING_LITERAL); }
 {real} {
     float num = atof(yytext);
@@ -600,7 +552,7 @@ return {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
         outputError("Too long", "Identifier name too long.", true);
-    }
+    }/*
     string s = yytext;
     //Constructing a Symbol Table node
     SymbolTableNode x = SymbolTableNode();
@@ -669,8 +621,9 @@ return {
             outputError("Not found", "Identifier not defined.", false);
         }
         //todo what are we supposed to do with the iterator, yylval?
-        yylval.symtblnode = new SymbolTableNode(it->second); //todo this might need to be new SymbolTableNode(), deep copy
-    }
+        //yylval.symtblnode = new SymbolTableNode(it->second); //todo this might need to be new SymbolTableNode(), deep copy
+    }*/
+    yylval.sval = new string(yytext);
     return ( IDENTIFIER );
 }
 

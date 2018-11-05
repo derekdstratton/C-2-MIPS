@@ -27,6 +27,8 @@ using namespace std;
 
 /* Global Variables */
 //SymbolTable * table_ptr;
+ASTNode * idNode;
+//list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
 
 extern deque <char> columnQueue;
 string newOutputFile;
@@ -55,9 +57,8 @@ int yylex();
 %union {
     float fval;
     char cval;
-    SymbolTableNode * symtblnode;
     ASTNode * node;
-    char * sval;
+    string * sval;
     int ival;
 }
 
@@ -67,7 +68,7 @@ int yylex();
 %type <node> init_declarator_list init_declarator struct_declaration specifier_qualifier_list
 %type <node> struct_declarator_list struct_declarator enum_specifier enumerator_list
 %type <node> enumerator declarator direct_declarator pointer
-%type <node> type_qualifier_list parameter_type_list parameter_list parameter_declaration
+%type <node> parameter_type_list parameter_list parameter_declaration
 %type <node> identifier_list initializer initializer_list type_name
 %type <node> abstract_declarator direct_abstract_declarator statement labeled_statement
 %type <node> expression_statement compound_statement statement_list selection_statement
@@ -79,7 +80,7 @@ int yylex();
 %type <node> postfix_expression primary_expression argument_expression_list constant
 %type <node> string identifier
 
-%type <ival> assignment_operator unary_operator struct_or_union
+%type <ival> assignment_operator unary_operator struct_or_union type_qualifier_list
 %type <ival> type_specifier type_qualifier storage_class_specifier
 
 %code provides {
@@ -96,7 +97,7 @@ int yylex();
     }
 }
 
-%token<symtblnode> IDENTIFIER
+%token<sval> IDENTIFIER
 %token<ival> INTEGER_CONSTANT
 %token<fval> FLOATING_CONSTANT
 %token<cval> CHARACTER_CONSTANT
@@ -173,6 +174,17 @@ declaration
 	$$ = $1; //this is an incredibly strange and useless line
 	handleProd("declaration -> declaration_specifiers SEMI\n");}
 	| declaration_specifiers init_declarator_list SEMI {
+	string name = idNode->getName();
+    set<int> x = $1->getTypes();
+    SymbolTableNode2 s = SymbolTableNode2(name, x);
+    idNode->setSymbolNode(s);
+    /*for (auto &d : typesNotDeclaredYet) {
+        d->setSymbolNode(s);
+    }*/
+    //now insert it into the symbol table
+    pair<string, SymbolTableNode2> entry = make_pair(name,s);
+    tuple<bool, bool> result = getTable()->insert(entry);
+    //now you also need to make sure the identifier node has the symbol table node stuff
 	$$ = new DeclNode($1, $2);
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
@@ -193,7 +205,7 @@ declaration_specifiers
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> storage_class_specifier\n");}
 	| storage_class_specifier declaration_specifiers {
-	set<int> x = *(set<int>*) ($2->get());
+	set<int> x = $2->getTypes();
     x.insert($1);
     $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> storage_class_specifier declaration_specifiers\n");}
@@ -203,7 +215,7 @@ declaration_specifiers
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_specifier\n");}
 	| type_specifier declaration_specifiers {
-	set<int> x = *(set<int>*) ($2->get());
+	set<int> x = $2->getTypes();
     x.insert($1);
     $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> type_specifier declaration_specifiers\n");}
@@ -213,7 +225,7 @@ declaration_specifiers
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_qualifier\n");}
 	| type_qualifier declaration_specifiers {
-	set<int> x = *(set<int>*) ($2->get());
+	set<int> x = $2->getTypes();
     x.insert($1);
     $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> type_qualifier declaration_specifiers\n");}
@@ -320,7 +332,7 @@ init_declarator_list
 	$$ = $1;
 	handleProd("init_declarator_list -> init_declarator\n");}
 	| init_declarator_list COMMA init_declarator {
-	$$ = new SeqNode($1, $3);
+	$$ = new SeqNode($1, $3); //I'm pretty sure this doesn't work with the Symbol Table
 	handleProd("init_declarator_list -> init_declarator_list COMMA init_declarator\n");}
 	;
 
@@ -346,7 +358,7 @@ specifier_qualifier_list
 	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_specifier\n");}
 	| type_specifier specifier_qualifier_list {
-	set<int> x = *(set<int>*) ($2->get());
+	set<int> x = $2->getTypes();
 	x.insert($1);
 	$$ = new TypeNode(x);
 	handleProd("specifier_qualifier_list -> type_specifier specifier_qualifier_list\n");}
@@ -356,7 +368,9 @@ specifier_qualifier_list
 	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_qualifier\n");}
 	| type_qualifier specifier_qualifier_list {
-	$$ = new ASTNode();
+	set<int> x = $2->getTypes();
+    x.insert($1);
+    $$ = new TypeNode(x);
 	handleProd("specifier_qualifier_list -> type_qualifier specifier_qualifier_list\n");}
 	;
 
@@ -416,7 +430,7 @@ declarator
 	$$ = $1;
 	handleProd("declarator -> direct_declarator\n");}
 	| pointer direct_declarator {
-	$$ = new ASTNode(); //PointerNode
+	$$ = new ASTNode(); //Pointer
 	handleProd("declarator -> pointer direct_declarator\n");}
 	;
 
@@ -462,7 +476,7 @@ pointer
 
 type_qualifier_list
 	: type_qualifier {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("type_qualifier_list -> type_qualifier\n");}
 	;
 
@@ -498,10 +512,10 @@ parameter_declaration
 
 identifier_list
 	: identifier {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("identifier_list -> identifier\n");}
 	| identifier_list COMMA identifier {
-	$$ = new ASTNode();
+	$$ = new SeqNode($1, $3);
 	handleProd("identifier_list -> identifier_list COMMA identifier\n");}
 	;
 
@@ -510,19 +524,19 @@ initializer
 	$$ = $1;
 	handleProd("initializer -> assignment_expression\n");}
 	| OPENCUR initializer_list CLOSCUR {
-	$$ = new ASTNode(); //array
+	$$ = new ASTNode(); //array init
 	handleProd("initializer -> OPENCUR initializer_list CLOSCUR\n");}
 	| OPENCUR initializer_list COMMA CLOSCUR {
-	$$ = new ASTNode(); //array
+	$$ = new ASTNode(); //array init
 	handleProd("initializer -> OPENCUR initializer_list COMMA CLOSCUR\n");}
 	;
 
 initializer_list
 	: initializer {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array init
 	handleProd("initializer_list -> initializer\n");}
 	| initializer_list COMMA initializer {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //array init
 	handleProd("initializer_list -> initializer_list COMMA initializer\n");}
 	;
 
@@ -531,7 +545,7 @@ type_name
 	$$ = $1;
 	handleProd("type_name -> specifier_qualifier_list\n");}
 	| specifier_qualifier_list abstract_declarator {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //$1 is a TypeNode. Add the type from abstract to it (pointer or array)
 	handleProd("type_name -> specifier_qualifier_list abstract_declarator\n");}
 	;
 
@@ -627,7 +641,7 @@ compound_statement
     $$ = $2;
 	handleProd("compound_statement -> OPENCUR statement_list CLOSCUR\n");}
 	| OPENCUR declaration_list CLOSCUR {
-	$$ = new ASTNode();
+	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
     $$ = new SeqNode($2, $3);
@@ -723,8 +737,24 @@ assignment_expression
 	switch ($2) {
 	    case ASSIGN:
             $$ = new AssignNode($1, $3);
+            break;
+        case MUL_ASSIGN:
+            $$ = new AssignNode($1, new BinaryMathNode(STAR, $1, $3));
+            break;
+        case DIV_ASSIGN:
+            $$ = new AssignNode($1, new BinaryMathNode(SLASH, $1, $3));
+            break;
+        case MOD_ASSIGN:
+            $$ = new AssignNode($1, new BinaryMathNode(MODULO, $1, $3));
+            break;
+        case ADD_ASSIGN:
+            $$ = new AssignNode($1, new BinaryMathNode(PLUS, $1, $3));
+            break;
+        case SUB_ASSIGN:
+            $$ = new AssignNode($1, new BinaryMathNode(MINUS, $1, $3));
+            break;
+        //todo bitwise assigns
 	    default:
-	        //todo Addnodes, Multiplynodes, etc.
 	        break;
 	}
 	handleProd("assignment_expression -> unary_expression assignment_operator assignment_expression\n");}
@@ -771,7 +801,7 @@ conditional_expression
 	$$ = $1;
 	handleProd("conditional_expression -> logical_or_expression\n");}
 	| logical_or_expression TERNARY expression COLON conditional_expression {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //this should be an if node
 	handleProd("conditional_expression -> logical_or_expression TERNARY expression COLON conditional_expression \n");}
 	;
 
@@ -936,9 +966,10 @@ unary_expression
 	        break;
 	    default:
 	        cout << "Something went wrong with unary nodes." << endl;
+	        $$ = new ASTNode();
 	        break;
 	}
-	$$ = new ASTNode();
+	//$$ = new ASTNode();
 	handleProd("unary_expression -> unary_operator cast_expression\n");}
 	| SIZEOF unary_expression {
 	$$ = new ASTNode();
@@ -974,25 +1005,25 @@ postfix_expression
     $$ = $1;
 	handleProd("postfix_expression -> primary_expression\n");}
 	| postfix_expression OPENSQ expression CLOSSQ {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //arrays
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 	| postfix_expression OPENPAR CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //function calls
 	handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
 	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //function calls with args
 	handleProd("postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n");}
 	| postfix_expression PERIOD identifier {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //structs
 	handleProd("postfix_expression -> postfix_expression PERIOD identifier\n");}
 	| postfix_expression PTR_OP identifier {
-	$$ = new ASTNode();
+	$$ = new ASTNode(); //pointers
 	handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
 	| postfix_expression INC_OP {
-	$$ = new ASTNode();
+	$$ = new BinaryMathNode(PLUS, $1, new IntNode(1));
 	handleProd("postfix_expression -> postfix_expression INC_OP\n");}
 	| postfix_expression DEC_OP {
-	$$ = new ASTNode();
+	$$ = new BinaryMathNode(MINUS, $1, new IntNode(1));
 	handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 
@@ -1044,11 +1075,21 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode($1);
-	//tempBS should be yytext, or just the name of the identifier
-	    //todo okay so this should construct the node based on the symbol table pointer
-    	//we need the symbol table node and the string. passing it over will be a nightmare.
-    	//maybe yylval can be the symbol table pointer and yytext will be the string identifier.
-    	//that's my best idea...
+	/*if ($$->getTypes().empty()) {
+	    typesNotDeclaredYet.push_back($$);
+    }*/
+	idNode = $$;
+	tuple<map<string, SymbolTableNode2>::iterator, string> result = getTable()->search(*$1);
+    map<string, SymbolTableNode2>::iterator it;
+    string status;
+    tie(it, status) = result;
+    if (status != "not") {
+        $$->setSymbolNode(it->second);
+        //cout << *$1 << " found" << endl;
+    } else {
+        //cout << *$1 << " not found " << endl;
+    }
+
 	handleProd("identifier -> IDENTIFIER\n");}
 	;
 %%
