@@ -603,8 +603,8 @@ inline int compareForCast(set<int>& left, set<int>& right) {
 class BinaryMathNode : public TypeNode {
 public:
     BinaryMathNode(int type, ASTNode * left, ASTNode * right) {
-        ASTNode * newLeft;
-        ASTNode * newRight;
+        ASTNode * newLeft = left;
+        ASTNode * newRight = right;
 
         set<int> leftSet = *(set<int>*) (left->get());
         set<int> rightSet = *(set<int>*) (right->get());
