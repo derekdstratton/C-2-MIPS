@@ -1,4 +1,7 @@
 #include "ASTNodes.h"
+extern int yylineno;
+extern deque <char> columnQueue;
+extern int yyleng;
 
 string tokenToString2(int token) {
     string str;
@@ -176,6 +179,8 @@ TypeNode::TypeNode() {
 TypeNode::TypeNode(set<int> &type) {
     types = type;
 
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 set<int> TypeNode::getTypes() {
@@ -195,6 +200,9 @@ WhileNode::WhileNode(ASTNode *expr, ASTNode *stmt, bool dooo) {
     tempList.push_back(stmt);
     childrenNodes = tempList;
     doo = dooo;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void WhileNode::printNode(std::ostream &os) const {
@@ -212,6 +220,9 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt) {
     tempList.push_back(stmt);
     childrenNodes = tempList;
     flag = 0;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
@@ -221,6 +232,9 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
     tempList.push_back(stmt2);
     childrenNodes = tempList;
     flag = 1;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void IfNode::printNode(std::ostream &os) const {
@@ -236,6 +250,9 @@ UnaryNode::UnaryNode(int x, ASTNode *child) {
     list <ASTNode*> tempList;
     tempList.push_back(child);
     nodeType = x;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void UnaryNode::printNode(std::ostream &os) const {
@@ -275,6 +292,9 @@ BitwiseNode::BitwiseNode(int x, ASTNode *left, ASTNode *right) {
     }
 
     childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 LogicalNode::LogicalNode(int x, ASTNode *left, ASTNode *right) {
@@ -283,6 +303,9 @@ LogicalNode::LogicalNode(int x, ASTNode *left, ASTNode *right) {
     tempList.push_back(right);
     childrenNodes = tempList;
     nodeType = x;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void LogicalNode::printNode(std::ostream &os) const {
@@ -298,6 +321,9 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
     tmplist.push_back(lvalue);
     tmplist.push_back(rvalue);
     childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void AssignNode::printNode(std::ostream &os) const {
@@ -316,6 +342,9 @@ DeclNode::DeclNode(ASTNode *first, ASTNode *second) {
     tmpList.push_back(first);
     tmpList.push_back(second);
     childrenNodes = tmpList;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void DeclNode::printNode(std::ostream &os) const {
@@ -327,6 +356,9 @@ SeqNode::SeqNode(ASTNode *first, ASTNode *second) {
     tmpList.push_back(first);
     tmpList.push_back(second);
     childrenNodes = tmpList;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void SeqNode::printNode(std::ostream &os) const {
@@ -335,6 +367,9 @@ void SeqNode::printNode(std::ostream &os) const {
 
 IdentifierNode::IdentifierNode(string *name) {
     identifier = *name;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 string IdentifierNode::getName() {
@@ -360,11 +395,17 @@ void IntNode::printNode(std::ostream &os) const {
 IntNode::IntNode(int val) {
     nodeVal = val;
     types.insert(INT);
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 CharNode::CharNode(char val) {
     types.insert(CHAR);
     nodeVal = val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void CharNode::printNode(std::ostream &os) const {
@@ -374,6 +415,9 @@ void CharNode::printNode(std::ostream &os) const {
 FloatNode::FloatNode(float val) {
     types.insert(FLOAT);
     nodeVal = val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void FloatNode::printNode(std::ostream &os) const {
@@ -382,6 +426,9 @@ void FloatNode::printNode(std::ostream &os) const {
 
 StringNode::StringNode(string *val) {
     nodeVal = *val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void StringNode::printNode(std::ostream &os) const {
@@ -394,6 +441,9 @@ CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
     tmplist.push_back(nodeToCast);
     childrenNodes = tmplist;
     types = type->getTypes();
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void CastNode::printNode(std::ostream &os) const {
@@ -406,6 +456,9 @@ RelationalNode::RelationalNode(int type, ASTNode *left, ASTNode *right) {
     tmplist.push_back(left);
     tmplist.push_back(right);
     childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void RelationalNode::printNode(std::ostream &os) const {
@@ -445,6 +498,9 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     }
 
     childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void BinaryMathNode::printNode(std::ostream &os) const {
@@ -464,6 +520,8 @@ ReturnNode::ReturnNode(ASTNode *child) {
         childrenNodes = tmp;
     }
 
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 void ReturnNode::printNode(std::ostream &os) const {
@@ -475,6 +533,9 @@ ArrayNode::ArrayNode(ASTNode *left, ASTNode *right) {
     tmplist.push_back(left);
     tmplist.push_back(right);
     childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 
 }
 
