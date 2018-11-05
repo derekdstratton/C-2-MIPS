@@ -12,6 +12,7 @@
 #include <fstream>
 #include <stdlib.h>
 #include <deque>
+#include <cfloat>
 
 #include "SymbolTable.h"
 #include "SymbolTableNode.h"
@@ -25,6 +26,7 @@
 list <ASTNode*> empty;
 extern bool debug[5];
 extern char* fileName;
+extern int lineNum;
 deque <char> columnQueue;
 
 //Symbol Table Enum types for node construction
@@ -521,9 +523,7 @@ return {
 {real} {
     float num = atof(yytext);
     to_token_file(FLOATING_CONSTANT, "FLOATING_CONSTANT");
-    string orig = yytext;
-    string updated = to_string(num);
-    if (orig != updated) {
+    if (num > FLT_MAX) {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
         outputError("Too long", "Floating Constant too long.", true);
