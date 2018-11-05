@@ -51,9 +51,10 @@ public:
         types = fail;
         identifier = "";
     }
-    SymbolTableNode2(string name, set<int> typeArr) {
+    SymbolTableNode2(string name, set<int> typeArr, int arr_dimensions) {
         types = typeArr;
         identifier = name;
+        arr_dims = arr_dimensions;
     }
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) {
         types = other.types;
@@ -64,6 +65,7 @@ public:
 //private:
     set<int> types;
     string identifier;
+    int arr_dims; //set to 0 if it's not an array, 1 for 1D array, etc.
 };
 
 

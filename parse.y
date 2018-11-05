@@ -31,6 +31,8 @@ extern list<ASTNode*> empty;
 ASTNode * idNode;
 //list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
 
+int arr_dim = 0; //number of dimensions for the array
+
 extern deque <char> columnQueue;
 string newOutputFile;
 extern FILE * yyin;
@@ -177,7 +179,8 @@ declaration
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
-    SymbolTableNode2 s = SymbolTableNode2(name, x);
+    SymbolTableNode2 s = SymbolTableNode2(name, x, arr_dim);
+    arr_dim = 0; //reset it now
     idNode->setSymbolNode(s);
     /*for (auto &d : typesNotDeclaredYet) {
         d->setSymbolNode(s);
@@ -444,9 +447,12 @@ direct_declarator
 	handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
 	| direct_declarator OPENSQ CLOSSQ {
 	$$ = new ArrayNode($1, new NoneNode());
+	arr_dim += 1;
 	handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
 	| direct_declarator OPENSQ constant_expression CLOSSQ {
 	$$ = new ArrayNode($1, $3);
+	//todo this should probably invoke getChildren to flatten it into proper node
+	arr_dim += 1;
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
 	$$ = $1; //functions

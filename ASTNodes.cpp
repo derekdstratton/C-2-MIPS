@@ -475,6 +475,7 @@ ArrayNode::ArrayNode(ASTNode *left, ASTNode *right) {
     tmplist.push_back(left);
     tmplist.push_back(right);
     childrenNodes = tmplist;
+    types = left->getTypes();
 
 }
 
