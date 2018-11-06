@@ -24,7 +24,6 @@ SymbolTable * table_ptr;
 /* Global Variables */
 
 using namespace std;
-extern list<ASTNode*> empty;
 
 /* Global Variables */
 //SymbolTable * table_ptr;
@@ -36,12 +35,13 @@ list<int> size_decl_list;
 extern deque <char> columnQueue;
 string newOutputFile;
 extern FILE * yyin;
-bool debug[5]; // -d, -l, -s, productions flag, -o
+bool debug[6]; // -d, -l, -s, productions flag, -o, -a
 // -d enable debugging
 // -l produces a list of tokens and their values to a file
 // -s dumps symbol table at key points to a file
 // -p prints all productions to a file
 // -o name a file to output interspersed reductions to
+// -a prints AST to a file named ast.dot
 char* fileName;
 void yyerror (char const *s);
 void handleProd (string prod);
@@ -1178,7 +1178,7 @@ int main(int argc, char **argv)
 {
     SymbolTable symbolTable;
     table_ptr = &symbolTable;
-    for(int i = 0; i < 5; i++) //initialize all debug options to false
+    for(int i = 0; i < 6; i++) //initialize all debug options to false
         debug[i] = false;
     debug[3] = true;
     if(argc > 1)
@@ -1202,6 +1202,8 @@ int main(int argc, char **argv)
                         newOutputFile = argv[i+1];
                         i++;
                     }
+                    else if(strcmp(argv[i],"-a") == 0)
+                        debug[5] = true;
                     else
                         cout << argv[1] << " is not a valid command line argument." << endl;
                 }
@@ -1253,19 +1255,12 @@ int main(int argc, char **argv)
         ofs << prodStream.str();
         ofs.close();
     }
-    tree<ASTNode*> ast;
-    /* testing the tree, delete this later
-    list<ASTNode*> childrenTesting;
-    list<ASTNode*> emptyList;
-    childrenTesting.push_back(new ASTNode("b", 1, 1, emptyList));
-    childrenTesting.push_back(new ASTNode("c", 1, 1, emptyList));
-    childrenTesting.push_back(new ASTNode("d", 1, 1, emptyList));
-    childrenTesting.push_back(new ASTNode("e", 1, 1, childrenTesting));
-    root_ptr = new ASTNode("a", 1, 1, childrenTesting);
-    */
-    ASTNode::copyTree(root_ptr, ast);
-    //todo make a function that copies my tree into the tree.hh tree. Should be an easy pre-order
-    kptree::print_tree_bracketed(ast);
+    if(debug[5])
+    {
+        tree<ASTNode*> ast;
+        ASTNode::copyTree(root_ptr, ast);
+        kptree::print_tree_bracketed(ast);
+    }
 	return 0;
 }
 
