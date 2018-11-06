@@ -34,6 +34,11 @@ public:
     virtual set<int> getTypes();
     virtual string getName();
     virtual void setSymbolNode(SymbolTableNode2 symtblnd2);
+    virtual list<ASTNode*> getSizes();
+    virtual int getVal() {
+        cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
+        return -1;
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
 protected:
@@ -155,8 +160,10 @@ private:
  */
 class SeqNode : public ASTNode {
 public:
-    SeqNode(ASTNode * first, ASTNode * second);;
+    SeqNode(char seq, ASTNode * first, ASTNode * second);
+    SeqNode(char seq, list<ASTNode*> statementList);
 private:
+    char seqType;
     void printNode(std::ostream& os) const;
 };
 
@@ -168,12 +175,16 @@ public:
 private:
     SymbolTableNode2 symbolTableNode2;
     string identifier;
+    list<int> sizeList;
     void printNode(std::ostream& os) const;
 };
 
 class IntNode : public TypeNode {
 public:
-    IntNode(int val);;
+    IntNode(int val);
+    int getVal() {
+        return nodeVal;
+    }
 private:
     int nodeVal;
     void printNode(std::ostream& os) const;
@@ -257,13 +268,14 @@ private:
 
 
 /**
- * Left is the declarator, right is either none (nothing) or the size (based on an expression)
+ * Left is the declarator (variable), right is a list of sizes
  */
-class ArrayNode : public ASTNode {
+class ArrayNode : public TypeNode {
 public:
-    ArrayNode(ASTNode* left, ASTNode * right);;
-
+    ArrayNode(ASTNode* var, list<ASTNode *> sizes);
+    list<ASTNode*> getSizes();
 private:
+    list<ASTNode *> sizeList;
     void printNode(std::ostream& os) const;
 };
 

@@ -110,6 +110,11 @@ string ASTNode::getName() {
     return nullptr;
 }
 
+list<ASTNode*> ASTNode::getSizes() {
+    list<ASTNode*> empty;
+    return empty;
+}
+
 void ASTNode::setSymbolNode(SymbolTableNode2 symtblnd2) {
     cout << "IF YOURE SEEING THIS RAVIOLI" << endl;
 }
@@ -351,18 +356,63 @@ void DeclNode::printNode(std::ostream &os) const {
     os << "DECLARATION";
 }
 
-SeqNode::SeqNode(ASTNode *first, ASTNode *second) {
+SeqNode::SeqNode(char seq, ASTNode *first, ASTNode *second) {
     list<ASTNode*> tmpList;
     tmpList.push_back(first);
     tmpList.push_back(second);
     childrenNodes = tmpList;
+
+    seqType = seq;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
 }
 
 void SeqNode::printNode(std::ostream &os) const {
-    os << "STATEMENTS";
+    switch(seqType) {
+        case 's':
+            os << "STATEMENTS";
+            break;
+        case 'd':
+            os << "DECLARATIONS";
+            break;
+        case 'c':
+            os << "COMPOUND";
+            break;
+        case 'a':
+            os << "ARGUMENTS";
+            break;
+        case 'g':
+            os << "GLOBAL";
+            break;
+        case 'f':
+            os << "FUNCTION"; //todo this should be deleted once there's a proper function node
+            break;
+        case 't':
+            os << "STRUCT_LIST";
+            break;
+        case 'q':
+            os << "INIT_DECL_LIST";
+            break;
+        case 'e':
+            os << "ENUM_LIST";
+            break;
+        case 'i':
+            os << "IDENTIFIER_LIST";
+            break;
+        default:
+            os << "UNDEFINED_SEQUENCE";
+            break;
+    }
+}
+
+SeqNode::SeqNode(char seq, list<ASTNode *> statementList) {
+    childrenNodes = statementList;
+
+    seqType = seq;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 IdentifierNode::IdentifierNode(string *name) {
@@ -379,12 +429,21 @@ string IdentifierNode::getName() {
 void IdentifierNode::setSymbolNode(SymbolTableNode2 symtblnd2) {
     symbolTableNode2 = symtblnd2;
     types = symbolTableNode2.types;
+    sizeList = symbolTableNode2.sizeList;
+    //cout << sizeList.size();
 }
 
 void IdentifierNode::printNode(std::ostream &os) const {
     os << "VARIABLE_" << identifier;
     for (auto item : types) {
         os << "_" << tokenToString2(item);
+    }
+    int dimensions = sizeList.size();
+    if (dimensions > 0) {
+        os << "_ARR";
+        for (auto dim_size : symbolTableNode2.sizeList) {
+            os << dim_size << "x";
+        }
     }
 }
 
@@ -528,15 +587,20 @@ void ReturnNode::printNode(std::ostream &os) const {
     os << "RETURN";
 }
 
-ArrayNode::ArrayNode(ASTNode *left, ASTNode *right) {
+ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
     list<ASTNode*> tmplist;
-    tmplist.push_back(left);
-    tmplist.push_back(right);
+    tmplist = sizes;
+    tmplist.push_front(var);
+    sizeList = sizes;
     childrenNodes = tmplist;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
+    types = var->getTypes();
+}
 
+list<ASTNode*> ArrayNode::getSizes() {
+    return sizeList;
 }
 
 void ArrayNode::printNode(std::ostream &os) const {
