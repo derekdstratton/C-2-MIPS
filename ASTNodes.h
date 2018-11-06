@@ -160,8 +160,10 @@ private:
  */
 class SeqNode : public ASTNode {
 public:
-    SeqNode(ASTNode * first, ASTNode * second);;
+    SeqNode(char seq, ASTNode * first, ASTNode * second);
+    SeqNode(char seq, list<ASTNode*> statementList);
 private:
+    char seqType;
     void printNode(std::ostream& os) const;
 };
 
@@ -173,6 +175,7 @@ public:
 private:
     SymbolTableNode2 symbolTableNode2;
     string identifier;
+    list<int> sizeList;
     void printNode(std::ostream& os) const;
 };
 

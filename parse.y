@@ -135,11 +135,13 @@ int yylex();
 
 translation_unit
 	: external_declaration {
-	$$ = $1;
+	list<ASTNode*> tmp;
+	tmp.push_back($1);
 	root_ptr = $$;
+	$$ = new SeqNode('g', tmp);
 	handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {
-	$$ = new SeqNode($1, $2);
+	$$ = new SeqNode('g', $1, $2);
 	root_ptr = $$;
 	handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
@@ -165,7 +167,7 @@ function_definition
     tempList.push_back($1);
     tempList.push_back($2);
     tempList.push_back($3);
-    $$ = new SeqNode($2, $3); //todo temp make a function Node
+    $$ = new SeqNode('f', $2, $3); //todo temp make a function Node
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
 	| declaration_specifiers declarator declaration_list compound_statement {
 	$$ = new ASTNode();
@@ -180,25 +182,26 @@ declaration
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
     SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list);
-    size_decl_list.clear(); //reset this too
     idNode->setSymbolNode(s);
-    /*for (auto &d : typesNotDeclaredYet) {
-        d->setSymbolNode(s);
-    }*/
     //now insert it into the symbol table
     pair<string, SymbolTableNode2> entry = make_pair(name,s);
     tuple<bool, bool> result = getTable()->insert(entry);
     //now you also need to make sure the identifier node has the symbol table node stuff
 	$$ = new DeclNode($1, $2);
+	size_decl_list.clear(); //reset this too
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
 declaration_list
 	: declaration {
-	$$ = $1;
+	list<ASTNode*> seq;
+    seq.push_back($1);
+    $$ = new SeqNode('d', seq);
 	handleProd("declaration_list -> declaration\n");}
 	| declaration_list declaration {
-	$$ = new SeqNode($1, $2);
+	list<ASTNode*> seq = $1->getChildren();
+    seq.push_back($2);
+    $$ = new SeqNode('d', seq);
 	handleProd("declaration_list -> declaration_list declaration\n");}
 	;
 
@@ -327,7 +330,7 @@ struct_declaration_list
 	$$ = $1;
 	handleProd("struct_declaration_list -> struct_declaration\n");}
 	| struct_declaration_list struct_declaration {
-	$$ = new SeqNode($1, $2);
+	$$ = new SeqNode('t', $1, $2);
 	handleProd("struct_declaration_list -> struct_declaration_list struct_declaration\n");}
 	;
 
@@ -336,7 +339,7 @@ init_declarator_list
 	$$ = $1;
 	handleProd("init_declarator_list -> init_declarator\n");}
 	| init_declarator_list COMMA init_declarator {
-	$$ = new SeqNode($1, $3); //I'm pretty sure this doesn't work with the Symbol Table
+	$$ = new SeqNode('q', $1, $3); //I'm pretty sure this doesn't work with the Symbol Table
 	handleProd("init_declarator_list -> init_declarator_list COMMA init_declarator\n");}
 	;
 
@@ -416,7 +419,7 @@ enumerator_list
 	$$ = $1;
 	handleProd("enumerator_list -> enumerator\n");}
 	| enumerator_list COMMA enumerator {
-	$$ = new SeqNode($1, $3);
+	$$ = new SeqNode('e', $1, $3);
 	handleProd("enumerator_list -> enumerator_list COMMA enumerator\n");}
 	;
 
@@ -457,6 +460,7 @@ direct_declarator
 	//the following assumes that $3 is an integer constant when declaring the array. other constant
 	//expressions will break, and thus should throw an error todo
 	size_decl_list.push_back($3->getVal()); //this butter work
+	//cout << size_decl_list.size();
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
 	$$ = $1; //functions
@@ -526,7 +530,7 @@ identifier_list
 	$$ = $1;
 	handleProd("identifier_list -> identifier\n");}
 	| identifier_list COMMA identifier {
-	$$ = new SeqNode($1, $3);
+	$$ = new SeqNode('i', $1, $3);
 	handleProd("identifier_list -> identifier_list COMMA identifier\n");}
 	;
 
@@ -655,16 +659,21 @@ compound_statement
 	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
-    $$ = new SeqNode($2, $3);
+    $$ = new SeqNode('c', $2, $3);
 	handleProd("compound_statement -> OPENCUR declaration_list statement_list CLOSCUR\n");}
 	;
 
 statement_list
 	: statement {
 	$$ = $1;
+	list<ASTNode*> tmp;
+	tmp.push_back($1);
+	$$ = new SeqNode('s', tmp);
 	handleProd("statement_list -> statement\n");}
 	| statement_list statement {
-	$$ = new SeqNode($1, $2);
+	list<ASTNode*> seq = $1->getChildren();
+	seq.push_back($2);
+	$$ = new SeqNode('s', seq);
 	handleProd("statement_list -> statement_list statement\n");}
 	;
 
@@ -1062,7 +1071,7 @@ argument_expression_list
 	$$ = $1;
 	handleProd("argument_expression_list -> assignment_expression\n");}
 	| argument_expression_list COMMA assignment_expression {
-	$$ = new SeqNode($1, $3);
+	$$ = new SeqNode('a', $1, $3);
 	handleProd("argument_expression_list -> argument_expression_list COMMA assignment_expression\n");}
 	;
 

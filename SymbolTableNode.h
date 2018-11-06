@@ -6,6 +6,7 @@
 #include <string>
 #include <set>
 #include <list>
+#include <iostream>
 
 using namespace std;
 
@@ -56,10 +57,13 @@ public:
         types = typeArr;
         identifier = name;
         sizeList = size_decl_list;
+        //std::cout << sizeList.size();
     }
+    //this operator= is VERY important. you WILL explode if you disregard it
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) {
         types = other.types;
         identifier = other.identifier;
+        sizeList = other.sizeList;
         return *this;
     }
     friend ostream& operator<<(ostream& os, const SymbolTableNode2& node);
