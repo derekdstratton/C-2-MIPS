@@ -542,6 +542,7 @@ ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
+    types = var->getTypes();
 }
 
 list<ASTNode*> ArrayNode::getSizes() {
