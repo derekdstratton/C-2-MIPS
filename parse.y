@@ -37,6 +37,9 @@ list<pair<string, int>> params;
 
 list<int> size_decl_list;
 
+bool isFunction = false;
+list<set<int>> paramList;
+
 extern deque <char> columnQueue;
 string newOutputFile;
 extern FILE * yyin;
@@ -164,10 +167,14 @@ external_declaration
 
 function_definition
 	: declarator compound_statement {
+	isFunction = false;
+	paramList.clear();
 	$$ = new ASTNode();
 	handleProd("function_definition -> declarator compound_statement\n");}
 	| declarator declaration_list compound_statement {
 	$$ = new ASTNode();
+	isFunction = false;
+    paramList.clear();
 	handleProd("function_definition -> declarator declaration_list compound_statement\n");}
 	| declaration_specifiers declarator compound_statement {
 	list <ASTNode*> tempList;
@@ -175,9 +182,13 @@ function_definition
     tempList.push_back($2);
     tempList.push_back($3);
     $$ = new SeqNode('f', $2, $3); //todo temp make a function Node
+    isFunction = false;
+    paramList.clear();
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
 	| declaration_specifiers declarator declaration_list compound_statement {
 	$$ = new ASTNode();
+	isFunction = false;
+    paramList.clear();
 	handleProd("function_definition -> declaration_specifiers declarator declaration_list compound_statement\n");}
 	;
 
@@ -189,7 +200,7 @@ declaration
 	//types = $1->getTypes();
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
-    SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list);
+    SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list, isFunction, paramList);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
     pair<string, SymbolTableNode2> entry = make_pair(name,s);
@@ -197,6 +208,8 @@ declaration
     //now you also need to make sure the identifier node has the symbol table node stuff
 	$$ = new DeclNode($1, $2);
 	size_decl_list.clear(); //reset this too
+	paramList.clear();
+	isFunction = false;
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
@@ -474,12 +487,16 @@ direct_declarator
 	//cout << size_decl_list.size();
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
+	$$ = $1; //functions
+	isFunction = true;
 	list<pair<string, int>> empty;
 	$$ = new FuncNode($1 -> getName(), types, empty);
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
 	$$ = new FuncNode($1 -> getName(), types, params);
 	params.clear();
+	$$ = new ASTNode(); //functions
+	isFunction = true;
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
 	//throw an error, because it's legacy code and bad.
@@ -555,6 +572,8 @@ parameter_list
 
 parameter_declaration
 	: declaration_specifiers declarator {
+	paramList.push_back($1->getTypes()); //todo temp
+	//$$ = new ASTNode();
 	//list <pair<string,int>> tmpList;
 	//auto tempIte = $1->getTypes().begin();
 	auto tempIte = types.begin();
@@ -569,10 +588,14 @@ parameter_declaration
 	//$$ = &tmpList;
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
 	| declaration_specifiers {
+	paramList.push_back($1->getTypes()); //todo temp
+	//$$ = new ASTNode();
 	list <pair<string,int>> empty;
 	$$ = &empty;
 	handleProd("parameter_declaration -> declaration_specifiers\n");}
 	| declaration_specifiers abstract_declarator {
+	paramList.push_back($1->getTypes()); //todo temp
+	//$$ = new ASTNode();
 	list <pair<string,int>> empty;
 	$$ = &empty;
 	handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}

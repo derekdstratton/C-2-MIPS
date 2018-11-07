@@ -180,11 +180,20 @@ void SymbolTableNode::setName(string new_name) {
 ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
     os << "Identifier: " << node.identifier;
     os << ", Types: " << "needs implemented in <<";
-    os << ", Array dimensions: " << node.sizeList.size();
-    os << ", Size per dim: ";
-    for (auto i : node.sizeList) {
-        os << i << " ";
+    if (node.sizeList.size() > 0) {
+        os << ", Array dimensions: " << node.sizeList.size();
+        os << ", Size per dim: ";
+        for (auto i : node.sizeList) {
+            os << i << " ";
+        }
     }
+    if (node.isFunction) {
+        os << ", Function w/ Params: ";
+        for (auto t : node.paramTypes) {
+            os << "type t needs implemented in <<";
+        }
+    }
+
 
     return os;
 }
