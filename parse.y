@@ -573,7 +573,7 @@ parameter_list
 parameter_declaration
 	: declaration_specifiers declarator {
 	paramList.push_back($1->getTypes()); //todo temp
-	$$ = new ASTNode();
+	//$$ = new ASTNode();
 	//list <pair<string,int>> tmpList;
 	//auto tempIte = $1->getTypes().begin();
 	auto tempIte = types.begin();
@@ -589,13 +589,13 @@ parameter_declaration
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
 	| declaration_specifiers {
 	paramList.push_back($1->getTypes()); //todo temp
-	$$ = new ASTNode();
+	//$$ = new ASTNode();
 	list <pair<string,int>> empty;
 	$$ = &empty;
 	handleProd("parameter_declaration -> declaration_specifiers\n");}
 	| declaration_specifiers abstract_declarator {
 	paramList.push_back($1->getTypes()); //todo temp
-	$$ = new ASTNode();
+	//$$ = new ASTNode();
 	list <pair<string,int>> empty;
 	$$ = &empty;
 	handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}
