@@ -53,10 +53,12 @@ public:
         types = fail;
         identifier = "";
     }
-    SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list) {
+    SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc, list<set<int>> params) {
         types = typeArr;
         identifier = name;
         sizeList = size_decl_list;
+        isFunction = isFunc;
+        paramTypes = params;
         //std::cout << sizeList.size();
     }
     //this operator= is VERY important. you WILL explode if you disregard it
@@ -71,6 +73,8 @@ public:
     set<int> types;
     string identifier;
     list<int> sizeList; //list of sizes for each dimension
+    bool isFunction;
+    list<set<int>> paramTypes;
 };
 
 
