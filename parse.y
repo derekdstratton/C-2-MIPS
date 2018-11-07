@@ -68,7 +68,6 @@ int yylex();
     ASTNode * node;
     string * sval;
     int ival;
-    list<pair<string, int>> * listPtr;
 }
 
 %type <node> translation_unit external_declaration function_definition declaration
@@ -78,6 +77,7 @@ int yylex();
 %type <node> struct_declarator_list struct_declarator enum_specifier enumerator_list
 %type <node> enumerator declarator direct_declarator pointer
 %type <node> identifier_list initializer initializer_list type_name
+%type <node> parameter_type_list parameter_list parameter_declaration
 %type <node> abstract_declarator direct_abstract_declarator statement labeled_statement
 %type <node> expression_statement compound_statement statement_list selection_statement
 %type <node> iteration_statement jump_statement expression assignment_expression
@@ -90,8 +90,6 @@ int yylex();
 
 %type <ival> assignment_operator unary_operator struct_or_union type_qualifier_list
 %type <ival> type_specifier type_qualifier storage_class_specifier
-
-%type <listPtr> parameter_type_list parameter_list parameter_declaration
 
 %code provides {
     // A function that returns a pointer to the table, for communicating with the Scanner
@@ -517,10 +515,11 @@ parameter_type_list
         	    cout << printItr.first << printItr.second << endl;
         	}*/
 	//$$ = $1;
+	$$ = new ASTNode();
 	handleProd("parameter_type_list -> parameter_list\n");}
 	| parameter_list COMMA ELIPSIS {
 	list <pair<string,int>> empty;
-	$$ = &empty; //todo deal with this?
+	$$ = new ASTNode(); //todo deal with this?
 	handleProd("parameter_type_list -> parameter_list COMMA ELIPSIS\n");}
 	;
 
@@ -533,7 +532,7 @@ parameter_list
     //list<pair<string, int>> tmpList;
     //tmpList = *$1;
 	//$$ = &tmpList;
-
+    $$ = new ASTNode();
 	handleProd("parameter_list -> parameter_declaration\n");}
 	| parameter_list COMMA parameter_declaration {
 	//cout << "$1 " << $1->empty() << endl;
@@ -550,6 +549,7 @@ parameter_list
 	//auto tempIte = $3->begin();
 	//tmpList.push_back(*tempIte);
 	//$$ = &tmpList;
+	$$ = new ASTNode();
 	handleProd("parameter_list -> parameter_list COMMA parameter_declaration\n");}
 	;
 
@@ -567,14 +567,15 @@ parameter_declaration
 	}*/
 
 	//$$ = &tmpList;
+	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
 	| declaration_specifiers {
-	list <pair<string,int>> empty;
-	$$ = &empty;
+	//list <pair<string,int>> empty;
+	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers\n");}
 	| declaration_specifiers abstract_declarator {
-	list <pair<string,int>> empty;
-	$$ = &empty;
+	//list <pair<string,int>> empty;
+	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}
 	;
 
