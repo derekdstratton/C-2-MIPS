@@ -279,4 +279,26 @@ private:
     void printNode(std::ostream& os) const;
 };
 
+
+/**
+ * Needs return type, parameters names and types
+ */
+class FuncNode : public TypeNode {
+public:
+    FuncNode(string name, set<int> type, list<pair <string, int>> params);
+private:
+    list<pair <string, int>> parameters;
+    int retType;
+    string funcName;
+    void printNode(std::ostream& os) const;
+};
+
+class ForNode : public ASTNode {
+public:
+    ForNode(list<ASTNode*> ptrList, bool arr[3]);
+private:
+    list<ASTNode*> stmtList;
+    bool stmtWritten[3];
+};
+
 #endif //PROJECT_ASTNODES_H
