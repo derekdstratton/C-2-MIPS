@@ -65,7 +65,7 @@ public:
         types = other.types;
         identifier = other.identifier;
         sizeList = other.sizeList;
-        cout << "lol";
+        //cout << "lol";
     }
     //this operator= is VERY important. you WILL explode if you disregard it
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) = default;
