@@ -31,12 +31,10 @@ using namespace std;
 //SymbolTable * table_ptr;
 ASTNode * idNode;
 set<int> types;
-bool changeType = true;
-list<pair<string, int>> params;
 //list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
 
 list<int> size_decl_list;
-
+list<ASTNode*> idList;
 bool isFunction = false;
 list<set<int>> paramList;
 
@@ -165,9 +163,9 @@ external_declaration
 
 function_definition
 	: declarator compound_statement {
+	$$ = new ASTNode();
 	isFunction = false;
 	paramList.clear();
-	$$ = new ASTNode();
 	handleProd("function_definition -> declarator compound_statement\n");}
 	| declarator declaration_list compound_statement {
 	$$ = new ASTNode();
@@ -175,11 +173,11 @@ function_definition
     paramList.clear();
 	handleProd("function_definition -> declarator declaration_list compound_statement\n");}
 	| declaration_specifiers declarator compound_statement {
-	list <ASTNode*> tempList;
-    tempList.push_back($1);
-    tempList.push_back($2);
-    tempList.push_back($3);
-    $$ = new SeqNode('f', $2, $3); //todo temp make a function Node
+	list<set<int>> types;
+	types.push_back($1->getTypes());
+	list<ASTNode*> tmpList;
+	tmpList.push_back($3);
+	$$ = new FuncNode($2->getName(), types, tmpList);
     isFunction = false;
     paramList.clear();
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
@@ -198,6 +196,11 @@ declaration
 	//types = $1->getTypes();
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
+    cout << "isfunction: " << isFunction << endl;
+    for(auto it = paramList.begin(); it != paramList.end(); ++it)
+            for(auto ite = it->begin(); ite != it->end(); ++ite)
+                cout << *ite << " ";
+        cout << endl << endl;
     SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list, isFunction, paramList);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
@@ -239,8 +242,6 @@ declaration_specifiers
 	set<int> tmp;
     tmp.insert($1);
     $$ = new TypeNode(tmp);
-    if(changeType)
-        types = tmp;
 	handleProd("declaration_specifiers -> type_specifier\n");}
 	| type_specifier declaration_specifiers {
 	set<int> x = $2->getTypes();
@@ -485,15 +486,13 @@ direct_declarator
 	//cout << size_decl_list.size();
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
-	$$ = $1; //functions
+	list<ASTNode*> empty;
+	$$ = new FuncNode($1->getName(), paramList, empty);
 	isFunction = true;
-	list<pair<string, int>> empty;
-	$$ = new FuncNode($1 -> getName(), types, empty);
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
-	$$ = new FuncNode($1 -> getName(), types, params);
-	params.clear();
-	$$ = new ASTNode(); //functions
+	list<ASTNode*> empty;
+	$$ = new FuncNode($1->getName(), paramList, empty);
 	isFunction = true;
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
@@ -542,30 +541,9 @@ parameter_type_list
 
 parameter_list
 	: parameter_declaration {
-	/*for(auto printItr : *$1)
-            	{
-            	    cout << printItr.first << printItr.second << endl;
-            	}*/
-    //list<pair<string, int>> tmpList;
-    //tmpList = *$1;
-	//$$ = &tmpList;
     $$ = new ASTNode();
 	handleProd("parameter_list -> parameter_declaration\n");}
 	| parameter_list COMMA parameter_declaration {
-	//cout << "$1 " << $1->empty() << endl;
-	//auto printItr = $1->begin();
-
-	/*for(auto printIte : *$1)
-    	{
-    	    cout << printItr->first << printItr ->second << endl;
-    	}*/
-
-	//list<pair<string, int>> tmpList;
-	//tmpList = *$1;
-	//cout << "apple" << endl;
-	//auto tempIte = $3->begin();
-	//tmpList.push_back(*tempIte);
-	//$$ = &tmpList;
 	$$ = new ASTNode();
 	handleProd("parameter_list -> parameter_list COMMA parameter_declaration\n");}
 	;
@@ -573,32 +551,16 @@ parameter_list
 parameter_declaration
 	: declaration_specifiers declarator {
 	paramList.push_back($1->getTypes()); //todo temp
-	//$$ = new ASTNode();
-	//list <pair<string,int>> tmpList;
-	//auto tempIte = $1->getTypes().begin();
 	auto tempIte = types.begin();
-	pair<string, int> tmpPair (idNode->getName(), *tempIte);
-	params.push_back(tmpPair);
-
-	/*for(auto printIte = tmpList.begin(); printIte != tmpList.end(); printIte++)
-	{
-	    cout << printIte->first << printIte ->second << endl;
-	}*/
-
-	//$$ = &tmpList;
 	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
 	| declaration_specifiers {
-	//list <pair<string,int>> empty;
 	$$ = new ASTNode();
 	paramList.push_back($1->getTypes()); //todo temp
-	//$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers\n");}
 	| declaration_specifiers abstract_declarator {
-	//list <pair<string,int>> empty;
 	$$ = new ASTNode();
 	paramList.push_back($1->getTypes()); //todo temp
-	//$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}
 	;
 
@@ -742,7 +704,6 @@ compound_statement
 
 statement_list
 	: statement {
-	$$ = $1;
 	list<ASTNode*> tmp;
 	tmp.push_back($1);
 	$$ = new SeqNode('s', tmp);
@@ -776,46 +737,46 @@ iteration_statement
 	| FOR OPENPAR SEMI SEMI CLOSEPAR statement {
 	list<ASTNode*> tmpList;
 	bool arr[3] = {0, 0, 0};
-	$$ = new ForNode(tmpList, arr);
+	$$ = new ForNode(tmpList, arr, $6);
 	handleProd("iteration_statement -> FOR OPENPAR SEMI SEMI CLOSEPAR statement\n");}
 	| FOR OPENPAR SEMI SEMI expression CLOSEPAR statement {
 	list<ASTNode*> tmpList;
 	tmpList.push_back($5);
 	bool arr[3] = {0, 0, 1};
-	$$ = new ForNode(tmpList, arr);
+	$$ = new ForNode(tmpList, arr, $7);
 	handleProd("iteration_statement -> FOR OPENPAR SEMI SEMI expression CLOSEPAR statement\n");}
 	| FOR OPENPAR SEMI expression SEMI CLOSEPAR statement {
 	list<ASTNode*> tmpList;
     tmpList.push_back($4);
     bool arr[3] = {0, 1, 0};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $7);
 	handleProd("iteration_statement -> FOR OPENPAR SEMI expression SEMI CLOSEPAR statement\n");}
 	| FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement {
 	list<ASTNode*> tmpList;
     tmpList.push_back($4);
     tmpList.push_back($6);
     bool arr[3] = {0, 1, 1};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $8);
 	handleProd("iteration_statement -> FOR OPENPAR SEMI expression SEMI expression CLOSEPAR statement\n");}
 	| FOR OPENPAR expression SEMI SEMI CLOSEPAR statement {
 	list<ASTNode*> tmpList;
     tmpList.push_back($3);
     bool arr[3] = {1, 0, 0};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $7);
 	handleProd("iteration_statement -> FOR OPENPAR expression SEMI SEMI CLOSEPAR statement\n");}
 	| FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement {
 	list<ASTNode*> tmpList;
     tmpList.push_back($3);
     tmpList.push_back($6);
     bool arr[3] = {1, 0, 1};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $8);
 	handleProd("iteration_statement -> FOR OPENPAR expression SEMI SEMI expression CLOSEPAR statement\n");}
 	| FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement {
 	list<ASTNode*> tmpList;
     tmpList.push_back($3);
     tmpList.push_back($5);
     bool arr[3] = {1, 1, 0};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $8);
 	handleProd("iteration_statement -> FOR OPENPAR expression SEMI expression SEMI CLOSEPAR statement\n");}
 	| FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement {
 	list<ASTNode*> tmpList;
@@ -823,7 +784,7 @@ iteration_statement
     tmpList.push_back($5);
     tmpList.push_back($7);
     bool arr[3] = {1, 1, 1};
-    $$ = new ForNode(tmpList, arr);
+    $$ = new ForNode(tmpList, arr, $9);
 	handleProd("iteration_statement -> FOR OPENPAR expression SEMI expression SEMI expression CLOSEPAR statement\n");}
 	;
 
@@ -1137,10 +1098,14 @@ postfix_expression
     //$$ = new ASTNode(); //function calls
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 	| postfix_expression OPENPAR CLOSEPAR {
-	$$ = new ASTNode(); //function calls
+	list<set<int>> types;
+	list<ASTNode*> empty;
+	$$ = new FuncNode($1->getName(), types, empty);
 	handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
 	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {
-	$$ = new ASTNode(); //function calls with args
+	list<set<int>> types;
+	$$ = new FuncNode($1->getName(), types, idList);
+	idList.clear();
 	handleProd("postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n");}
 	| postfix_expression PERIOD identifier {
 	$$ = new ASTNode(); //structs
@@ -1173,10 +1138,12 @@ primary_expression
 
 argument_expression_list
 	: assignment_expression {
+	idList.push_back($1);
 	$$ = $1;
 	handleProd("argument_expression_list -> assignment_expression\n");}
 	| argument_expression_list COMMA assignment_expression {
-	$$ = new SeqNode('a', $1, $3);
+	idList.push_back($3);
+	//$$ = new SeqNode('a', $1, $3);
 	handleProd("argument_expression_list -> argument_expression_list COMMA assignment_expression\n");}
 	;
 

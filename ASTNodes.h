@@ -281,23 +281,25 @@ private:
 
 
 /**
- * Needs return type, parameters names and types
+ * @brief node for functions. Stores function name, parameter types if it is a prototype/definition
  */
 class FuncNode : public TypeNode {
 public:
-    FuncNode(string name, set<int> type, list<pair <string, int>> params);
+    FuncNode(string name, list<set<int>> types, list<ASTNode*> children);
+    string getName();
 private:
-    list<pair <string, int>> parameters;
-    int retType;
     string funcName;
+    list<set<int>> paramTypes;
+    list<ASTNode*> body;
     void printNode(std::ostream& os) const;
 };
 
 class ForNode : public ASTNode {
 public:
-    ForNode(list<ASTNode*> ptrList, bool arr[3]);
+    ForNode(list<ASTNode*> ptrList, bool arr[3], ASTNode * stmt);
 private:
-    list<ASTNode*> stmtList;
+    ASTNode* body;
+    list<ASTNode*> exprList;
     bool stmtWritten[3];
 };
 
