@@ -61,13 +61,14 @@ public:
         paramTypes = params;
         //std::cout << sizeList.size();
     }
-    //this operator= is VERY important. you WILL explode if you disregard it
-    SymbolTableNode2& operator=(SymbolTableNode2 const & other) {
+    SymbolTableNode2(SymbolTableNode2 const & other){
         types = other.types;
         identifier = other.identifier;
         sizeList = other.sizeList;
-        return *this;
+        //cout << "lol";
     }
+    //this operator= is VERY important. you WILL explode if you disregard it
+    SymbolTableNode2& operator=(SymbolTableNode2 const & other) = default;
     friend ostream& operator<<(ostream& os, const SymbolTableNode2& node);
 //private:
     set<int> types;

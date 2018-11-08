@@ -23,7 +23,7 @@ SymbolTable::SymbolTable() {
  */
 tuple<bool, bool> SymbolTable::insert(const pair<string, SymbolTableNode2>& item) {
 
-    tuple<map<string, SymbolTableNode2>::iterator, string> tup = this->search(item.first);
+    tuple<SymbolTableNode2*, string> tup = this->search(item.first);
     string retval = get<1>(tup);
     if (retval == "top") {
         return make_tuple(false, false);
@@ -49,7 +49,7 @@ tuple<bool, bool> SymbolTable::insert(const pair<string, SymbolTableNode2>& item
  *          "other"- found at a level other than the top
  *          "not"- not found at all
  */
-tuple<map<string, SymbolTableNode2>::iterator, string> SymbolTable::search(const string &key, bool topLevelOnly) {
+tuple<SymbolTableNode2*, string> SymbolTable::search(const string &key, bool topLevelOnly) {
     map<string, SymbolTableNode2>::iterator node_iterator;
     string status;
     bool found = false;
@@ -85,7 +85,15 @@ tuple<map<string, SymbolTableNode2>::iterator, string> SymbolTable::search(const
             status="not";
         }
     }
-    return make_tuple(node_iterator, status);
+    SymbolTableNode2*s;
+    if (status != "not") {
+        s = new SymbolTableNode2(node_iterator->second);
+        //todo this is a memory leak but what else is new
+    } else {
+        s = NULL;
+    }
+
+    return make_tuple(s, status);
 }
 
 /**
