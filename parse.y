@@ -196,15 +196,10 @@ declaration
 	//types = $1->getTypes();
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
-    cout << "isfunction: " << isFunction << endl;
-    for(auto it = paramList.begin(); it != paramList.end(); ++it)
-            for(auto ite = it->begin(); ite != it->end(); ++ite)
-                cout << *ite << " ";
-        cout << endl << endl;
-    SymbolTableNode2 s = SymbolTableNode2(name, x, size_decl_list, isFunction, paramList);
+    SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
-    pair<string, SymbolTableNode2> entry = make_pair(name,s);
+    pair<string, SymbolTableNode2> entry = make_pair(name,*s);
     tuple<bool, bool> result = getTable()->insert(entry);
     //now you also need to make sure the identifier node has the symbol table node stuff
 	$$ = new DeclNode($1, $2);
@@ -1175,12 +1170,13 @@ identifier
 	    typesNotDeclaredYet.push_back($$);
     }*/
 	idNode = $$;
-	tuple<map<string, SymbolTableNode2>::iterator, string> result = getTable()->search(*$1);
-    map<string, SymbolTableNode2>::iterator it;
+	tuple<SymbolTableNode2*, string> result = getTable()->search(*$1);
+    SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
     if (status != "not") {
-        $$->setSymbolNode(it->second);
+        //it++;
+        $$->setSymbolNode(it);
         //cout << *$1 << " found" << endl;
     } else {
         //cout << *$1 << " not found " << endl;

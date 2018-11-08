@@ -13,7 +13,7 @@ class SymbolTable {
   public:
     SymbolTable();
     tuple<bool, bool> insert(const pair<string, SymbolTableNode2>& item);
-    tuple<map<string, SymbolTableNode2>::iterator, string> search(const string& key, bool topLevelOnly=false);
+    tuple<SymbolTableNode2*, string> search(const string& key, bool topLevelOnly=false);
     void pushLevel();
     bool popLevel();
     bool getMode() const;
