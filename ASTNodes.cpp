@@ -145,7 +145,7 @@ list<ASTNode*> ASTNode::getSizes() {
  * @brief function to set SymbolTableNode in an ASTNode. Should not be used for base class
  * @param symtblnd2 is the symbol table node to be inserted
  */
-void ASTNode::setSymbolNode(SymbolTableNode2 symtblnd2) {
+void ASTNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
     cout << "IF YOURE SEEING THIS RAVIOLI" << endl;
 }
 
@@ -607,10 +607,10 @@ string IdentifierNode::getName() {
  * @brief sets symbol table node from an identifier node. copies types and size set
  * @param symtblnd2 is the symboltablenode to be set
  */
-void IdentifierNode::setSymbolNode(SymbolTableNode2 symtblnd2) {
+void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
     symbolTableNode2 = symtblnd2;
-    types = symbolTableNode2.types;
-    sizeList = symbolTableNode2.sizeList;
+    types = symbolTableNode2->types;
+    sizeList = symbolTableNode2->sizeList;
     //cout << sizeList.size();
 }
 
@@ -626,10 +626,14 @@ void IdentifierNode::printNode(std::ostream &os) const {
     int dimensions = sizeList.size();
     if (dimensions > 0) {
         os << "_ARR";
-        for (auto dim_size : symbolTableNode2.sizeList) {
+        for (auto dim_size : symbolTableNode2->sizeList) {
             os << dim_size << "x";
         }
     }
+}
+
+IdentifierNode::~IdentifierNode() {
+    delete symbolTableNode2;
 }
 
 /**

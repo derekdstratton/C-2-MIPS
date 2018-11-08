@@ -33,7 +33,7 @@ public:
 
     virtual set<int> getTypes();
     virtual string getName();
-    virtual void setSymbolNode(SymbolTableNode2 symtblnd2);
+    virtual void setSymbolNode(SymbolTableNode2* symtblnd2);
     virtual list<ASTNode*> getSizes();
     virtual int getVal() {
         cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
@@ -170,10 +170,11 @@ private:
 class IdentifierNode : public TypeNode {
 public:
     IdentifierNode(string * name);
+    ~IdentifierNode();
     string getName();
-    void setSymbolNode(SymbolTableNode2 symtblnd2);
+    void setSymbolNode(SymbolTableNode2* symtblnd2);
 private:
-    SymbolTableNode2 symbolTableNode2;
+    SymbolTableNode2 * symbolTableNode2;
     string identifier;
     list<int> sizeList;
     void printNode(std::ostream& os) const;
