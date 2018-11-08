@@ -880,37 +880,81 @@ void ArrayNode::printNode(std::ostream &os) const {
 }
 
 /**
- * @brief FuncNode constructor. Stores parameter types if it is a function prototype or definition.
- *        If function call, types is empty.
- *        If prototype, children is empty. If definition, children is what is inside curly braces.
- *        If function call, children is a list of identifier nodes passed as args.
+ * @brief FuncNode constructor. Uses a switch statement to construct appropriate member fields.
+ *        If function prototype, sets name and param types.
+ *        If function definition, sets name, return type, name and type of parameters, and children nodes (what is inside curly braces)
+ *        Additionally makes a TypeNode as a child denoting return type.
+ *        If function call, sets given arguments as children nodes.
  * @param name is the function name
  * @param type
  * @param params
  */
-FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children)
+ //todo finish function calls
+FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type)
 {
     funcName = name;
-    paramTypes = types;
-    body = children;
-    //debugging output for constructing
-    /*cout << "constructing FuncNode: " << endl
-    << "Name: " << funcName << endl
-    << "paramTypes: ";
-    for(auto it = types.begin(); it != types.end(); ++it)
-        for(auto ite = it->begin(); ite != it->end(); ++ite)
-            cout << *ite << " ";
-    cout << endl << endl;*/
-
+    funcType = type;
+    switch(type)
+    {
+        case 0: {
+            paramTypes = types;
+            break;
+        }
+        case 1: {
+            paramTypes = types;
+            args = arguments;
+            childrenNodes = children;
+            auto tempIt = types.begin();
+            childrenNodes.push_front(new TypeNode(*tempIt));
+            break;
+        }
+        case 2: {
+            childrenNodes = children;
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 /**
- * @brief function to print funcnodes.
+ * @brief function to print funcnodes. Uses a switch statement to print different types of funcnodes.
+ *        If function prototype, prints name and param types.
+ *        If function definition, prints name and param names and types.
+ *        If function call, prints name and args if they are given.
  * @param os is the stream to be printed to
  */
- //todo maybe add other stuff to printout?
 void FuncNode:: printNode(std::ostream &os) const{
-    os << "FUNCTION" << funcName;
+     switch(funcType)
+     {
+         case 0: {
+             os << "FUNCTION_PROTOTYPE_" << funcName;
+             for(auto it = paramTypes.begin(); it != paramTypes.end(); ++it)
+             {
+                 os << "_";
+                 for(auto ite = it->begin(); ite != it->end(); ++ite)
+                     os << *ite;
+             }
+             break;
+         }
+         case 1: {
+             os << "FUNCTION_DEFINITION_" << funcName;
+             for(auto it = args.begin(); it != args.end(); ++it)
+             {
+                 os << "_";
+                 os << it->first << "_";
+                 for(auto ite = it->second.begin(); ite != it->second.end(); ++ite)
+                    os << *ite;
+             }
+             break;
+         }
+         case 2: {
+             os << "FUNCTION_CALL_" << funcName;
+             break;
+         }
+         default:
+             break;
+     }
 }
 
 /**
@@ -928,9 +972,14 @@ string FuncNode:: getName(){
  * @param arr is the bool array denoting which expressions are written
  * @param stmt is the statement or the body of the loop
  */
+ //todo put ptrlist to childrenNodes
 ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
     exprList = ptrList;
     for(int i = 0; i < 3; ++i)
         stmtWritten[i] = arr[i];
     body = stmt;
+}
+
+void ForNode::printNode(std::ostream &os) const{
+    os << "FOR_";
 }

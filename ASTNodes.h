@@ -271,7 +271,7 @@ private:
 /**
  * Left is the declarator (variable), right is a list of sizes
  */
-class ArrayNode : public TypeNode {
+class ArrayNode : public ASTNode {
 public:
     ArrayNode(ASTNode* var, list<ASTNode *> sizes);
     list<ASTNode*> getSizes();
@@ -286,13 +286,14 @@ private:
  */
 class FuncNode : public TypeNode {
 public:
-    FuncNode(string name, list<set<int>> types, list<ASTNode*> children);
+    FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
     string getName();
 private:
     string funcName;
-    list<set<int>> paramTypes;
-    list<ASTNode*> body;
+    list<set<int>> paramTypes; //for prototypes
+    list<pair<string, set<int>>> args; //for definitions
     void printNode(std::ostream& os) const;
+    int funcType; //0 for prototype, 1 for definition, 2 for call
 };
 
 class ForNode : public ASTNode {
@@ -302,6 +303,7 @@ private:
     ASTNode* body;
     list<ASTNode*> exprList;
     bool stmtWritten[3];
+    void printNode(std::ostream& os) const;
 };
 
 #endif //PROJECT_ASTNODES_H
