@@ -314,7 +314,7 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt) {
     tempList.push_back(expr);
     tempList.push_back(stmt);
     childrenNodes = tempList;
-    flag = 0;
+    flag = 1;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -333,7 +333,7 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
     tempList.push_back(stmt);
     tempList.push_back(stmt2);
     childrenNodes = tempList;
-    flag = 1;
+    flag = 0;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -974,12 +974,12 @@ string FuncNode:: getName(){
  */
  //todo put ptrlist to childrenNodes
 ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
-    exprList = ptrList;
+    childrenNodes = ptrList;
+    childrenNodes.push_back(stmt);
     for(int i = 0; i < 3; ++i)
         stmtWritten[i] = arr[i];
-    body = stmt;
 }
 
 void ForNode::printNode(std::ostream &os) const{
-    os << "FOR_";
+    os << "FOR";
 }

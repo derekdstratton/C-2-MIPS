@@ -300,8 +300,6 @@ class ForNode : public ASTNode {
 public:
     ForNode(list<ASTNode*> ptrList, bool arr[3], ASTNode * stmt);
 private:
-    ASTNode* body;
-    list<ASTNode*> exprList;
     bool stmtWritten[3];
     void printNode(std::ostream& os) const;
 };
