@@ -880,33 +880,57 @@ void ArrayNode::printNode(std::ostream &os) const {
 }
 
 /**
- * @brief FuncNode constructor. Still needs to be worked on
- * @param name
+ * @brief FuncNode constructor. Stores parameter types if it is a function prototype or definition.
+ *        If function call, types is empty.
+ *        If prototype, children is empty. If definition, children is what is inside curly braces.
+ *        If function call, children is a list of identifier nodes passed as args.
+ * @param name is the function name
  * @param type
  * @param params
  */
-FuncNode::FuncNode(string name, set<int> type, list<pair<string, int>> params)
+FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children)
 {
-    auto ite = type.begin();
-    parameters = params;
     funcName = name;
-    retType = *ite;
-    /*cout << "function name is " << name
-    << ", return type is " << retType
-    << ", parameter types are: ";
+    paramTypes = types;
+    body = children;
+    //debugging output for constructing
+    /*cout << "constructing FuncNode: " << endl
+    << "Name: " << funcName << endl
+    << "paramTypes: ";
+    for(auto it = types.begin(); it != types.end(); ++it)
+        for(auto ite = it->begin(); ite != it->end(); ++ite)
+            cout << *ite << " ";
+    cout << endl << endl;*/
 
-    for(auto iter = params.begin(); iter != params.end(); iter++)
-    {
-        cout << iter->first << iter->second << endl;
-    }*/
 }
 
+/**
+ * @brief function to print funcnodes.
+ * @param os is the stream to be printed to
+ */
+ //todo maybe add other stuff to printout?
 void FuncNode:: printNode(std::ostream &os) const{
-    os << "FUNCTION" << funcName << retType;
+    os << "FUNCTION" << funcName;
 }
 
-ForNode::ForNode(list<ASTNode *> ptrList, bool *arr) {
-    stmtList = ptrList;
+/**
+ * @brief function that returns the name of a funcnode
+ *
+ */
+string FuncNode:: getName(){
+    return funcName;
+}
+
+/**
+ * @brief ForNode constructor. Stores a ASTNode* list of the expressions and an bool array
+ *        with values corresponding to which expressions are written
+ * @param ptrList is the list of expressions
+ * @param arr is the bool array denoting which expressions are written
+ * @param stmt is the statement or the body of the loop
+ */
+ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
+    exprList = ptrList;
     for(int i = 0; i < 3; ++i)
         stmtWritten[i] = arr[i];
+    body = stmt;
 }
