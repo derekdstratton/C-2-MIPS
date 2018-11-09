@@ -3,6 +3,8 @@ extern int yylineno;
 extern deque <char> columnQueue;
 extern int yyleng;
 
+extern void outputError(string errmsg1, string errmsg2, bool errtype);
+
 /**
  * @brief converts a defined token into a string
  * @param token is the token to be converted
@@ -121,6 +123,12 @@ set<int> ASTNode::getTypes() {
     cout << "IF YOU'RE SEEING THIS DIE" << endl;
     set<int> fail;
     return fail;
+}
+
+int ASTNode::getDimensions() {
+    //cout << "IF YOU'RE SEEING THIS MEEEWOA" << endl;
+    //things like int const, float const, should all be 0
+    return 0;
 }
 
 /**
@@ -454,6 +462,14 @@ void LogicalNode::printNode(std::ostream &os) const {
 AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
     list <ASTNode*> tmplist;
 
+    int leftArrDims = lvalue->getDimensions();
+    int rightArrDims = rvalue->getDimensions();
+
+    //Check for type mismatch (arrays)
+    if (leftArrDims != rightArrDims) {
+        outputError("Semantic Error", "Mismatch of types in Array assignment", false);
+    }
+
     set<int> leftSet = lvalue->getTypes();
     types = leftSet;
 
@@ -593,6 +609,10 @@ IdentifierNode::IdentifierNode(string *name) {
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
+}
+
+int IdentifierNode::getDimensions() {
+    return sizeList.size();
 }
 
 /**
@@ -781,7 +801,16 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     ASTNode * newRight;
 
     set<int> leftSet = left->getTypes();
+    int leftArrDims = left->getDimensions();
     set<int> rightSet = right->getTypes();
+    int rightArrDims = right->getDimensions();
+
+    //Check for type mismatch (arrays)
+    if (leftArrDims != rightArrDims) {
+        outputError("Semantic Error", "Mismatch of types in Array operation", false);
+    }
+
+    //Implicit casting
     int ret = compareForCast(leftSet, rightSet);
     if (ret < 0) {
         //Cast the node on the left to the type of the right node
@@ -863,6 +892,12 @@ ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
     types = var->getTypes();
+}
+
+int ArrayNode::getDimensions() {
+    int arrSize = getChildren().front()->getDimensions();
+    int derefs = sizeList.size();
+    return arrSize - derefs;
 }
 
 /**
