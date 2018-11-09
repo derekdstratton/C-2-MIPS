@@ -1,7 +1,7 @@
 int main() {
     char x;
     int y;
-    x = 'b';
-    y = (int) x;
+    x = 4;
+    y = x;
     return 0;
 }

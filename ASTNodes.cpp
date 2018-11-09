@@ -470,11 +470,32 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
         outputError("Semantic Error", "Mismatch of types in Array assignment", false);
     }
 
+    ASTNode * newLeft;
+    ASTNode * newRight;
+
     set<int> leftSet = lvalue->getTypes();
+    set<int> rightSet = rvalue->getTypes();
+
+    //Implicit casting
+    int ret = compareForCast(leftSet, rightSet);
+    if (ret != 0) {
+        ASTNode *newtype = new TypeNode(leftSet);
+        newLeft = lvalue;
+        newRight = new CastNode(newtype, rvalue);
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        //types = leftSet;
+        outputError("Cast", "Implicit Casting of types for assignment", true);
+    } else {
+        tmplist.push_back(lvalue);
+        tmplist.push_back(rvalue);
+        //types = leftSet;
+    }
+
     types = leftSet;
 
-    tmplist.push_back(lvalue);
-    tmplist.push_back(rvalue);
+    //tmplist.push_back(lvalue);
+    //tmplist.push_back(rvalue);
     childrenNodes = tmplist;
 
     lineNum = yylineno;
@@ -820,6 +841,7 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
         tmplist.push_back(newLeft);
         tmplist.push_back(newRight);
         types = rightSet;
+        outputError("Cast", "Implicit Casting of types for operation", true);
     } else if (ret > 0) {
         //Cast the node on the right to the type of the left node
         ASTNode * newtype = new TypeNode(leftSet);
@@ -828,6 +850,7 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
         tmplist.push_back(newLeft);
         tmplist.push_back(newRight);
         types = leftSet;
+        outputError("Cast", "Implicit Casting of types for operation", true);
     } else {
         tmplist.push_back(left);
         tmplist.push_back(right);
