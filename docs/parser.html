@@ -69,9 +69,9 @@ Testing the Parser</h1>
 <ul>
 <li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests</a></li>
 </ul>
-<p>These tests can be compared with their outputs, found in the tests/output directory.</p>
+<p>These tests can be compared with their outputs, found in the output directory.</p>
 <ul>
-<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output</a></li>
+<li><a href="https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output_productions">https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output_productions</a></li>
 </ul>
 <h1><a class="anchor" id="tech_details"></a>
 Technical Details</h1>
@@ -83,6 +83,7 @@ Command Line Debug Options</h2>
 <li><code>-s</code>: dumps the symbol table at the beginning and end of each block to a file called SymDump.out</li>
 <li><code>-p</code>: outputs recorded productions to a file called productions.out. The token '!!P' in the source file toggles on and off recording the productions. By default, production recording is turned on.</li>
 <li><code>-o</code>: outputs the final output of the parser (source code interspersed with reductions) to be written to a specific file. The -o flag must be followed by a space and then the file name. If the -o flag is not used, this final output is written to list_file.</li>
+<li><code>-a</code>: outputs the abstract syntax tree to a DOT file, which can be converted to a tree with GraphViz.</li>
 </ul>
 <h1><a class="anchor" id="links_parser"></a>
 Links</h1>

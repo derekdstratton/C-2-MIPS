@@ -7,13 +7,7 @@
 // Special permission to use tree.hh under the conditions of a
 // different license can be requested from the author.
 
-/** \mainpage tree.hh
-    \author   Kasper Peeters
-    \version  3.7
-    \date     30-Jan-2018
-    \see      http://tree.phi-sci.com/
-    \see      http://tree.phi-sci.com/ChangeLog
-
+/**
    The tree.hh library for C++ provides an STL-like container class
    for n-ary trees, templated over the data stored at the
    nodes. Various types of iterators are provided (post-order,

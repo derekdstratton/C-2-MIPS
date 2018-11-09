@@ -14,17 +14,17 @@
  * file that processes an input character stream and returns tokens. The parser is
  * implemented as a Yacc (.l) file that processes tokens from the scanner and returns
  * productions. The scanner uses Flex and the parser uses Bison for compilation. The
- * Abstract Syntax Tree is built as a tree from the n-ary tree library tree.hh. The
- * Compiler's build is automated with CMake, and it is being written and tested with the
+ * Abstract Syntax Tree is built as a tree from the n-ary tree library tree.hh. The Parser
+ * constructs the ASTNodes and performs type checking before inserting them in the tree.hh
+ * tree. The Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
  * Some assumptions for this phase include that the Symbol Table does not have to process structs,
  * unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode
  * escape characters are not input. The compiler is restricted to receiving a character stream
  * from a file, and not from stdin. Functions are also restricted from having the same name as
- * variables in the Symbol Table.
- *
- * Limitation: can't do type checking on int a = 4; (all in one line, based on how the symbol table works)
+ * variables in the Symbol Table. Limitation: can't do type checking on int a = 4;
+ * (all in one line, based on how the symbol table works)
  *
  * \section module Modules
  *
@@ -52,9 +52,9 @@
 
     options:
 
-    - `-d`, `-l`, `-s`, `-p`, `-o`
+    - `-d`, `-l`, `-s`, `-p`, `-o`, `-a`
 
-    - more details on the Parser page
+    - more details on the \ref parser page
 
     file_path:
 
@@ -110,11 +110,11 @@
     - https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.cpp
     - https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTable.h
 
-  %Node Class Documentation: Node
+  %Node Class Documentation: SymbolTableNode
 
   %Node Source Code:
-    - https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.cpp
-    - https://github.com/derekdstratton/C-2-MIPS/blob/master/Node.h
+    - https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableNode.cpp
+    - https://github.com/derekdstratton/C-2-MIPS/blob/master/SymbolTableNode.h
 
 */
 
@@ -134,9 +134,10 @@
 
   - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests
 
-  These tests can be compared with their outputs, found in the tests/output directory.
+  These tests can be compared with their outputs to the terminal, when catching scanner errors.
+  Terminal outputs of errors and warnings can be found in the terminal outputs.
 
-  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output
+  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output_terminal
 
   \section tech_details Technical Details
 
@@ -185,9 +186,9 @@
 
   - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests
 
-  These tests can be compared with their outputs, found in the tests/output directory.
+  These tests can be compared with their outputs, found in the output directory.
 
-  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output
+  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output_productions
 
   \section tech_details Technical Details
 
@@ -206,6 +207,8 @@
     be written to a specific file. The -o flag must be followed by a space and then the file name.
     If the -o flag is not used, this final output is written to list_file.
 
+    - `-a`: outputs the abstract syntax tree to a DOT file, which can be converted to a tree with GraphViz.
+
   \section links_parser Links
 
   Parser Yacc File:
@@ -216,19 +219,36 @@
 //AST:
 /*! \page ast Abstract Syntax Tree
  *
-  todo
+  The Abstract Syntax Tree provides an intermediate representation between the Parser's productions
+  and the Three Address Code. Multiple nodes of various types are built by the Parser, and will later
+  be traversed to generate the code. Currently there are 12 subclasses of ASTNode, which is the main
+  base node that every node in the Abstract Syntax Tree is derived from. TypeNode is an important
+  subclass of ASTNode, as it has 10 subclasses that represent nodes with some sort of type. More
+  information can be found on the ASTNode class page. The tree is stored in the non-binary tree class
+  tree.hh, which has been modified in tree_util2.hh to print to a file for output that can be viewed
+  in GraphViz.
 
   \section test_ast Testing the Abstract Syntax Tree
 
-  todo
+  The AST can be tested by running the Test Files with `ScannerParser`. The
+  program argument should contain a file from the tests folder.
 
-  \section tech_details Technical Details
+  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests
 
-  todo
+  When running, add the program argument `-a` to output the AST to a file.
+  These tests can be compared with their outputs, found in the output directory.
+
+  - https://github.com/derekdstratton/C-2-MIPS/tree/master/tests/output_ast
 
   \section links_ast Links
 
-  todo
+  Abstract Syntax Tree Documentation: ASTNode
+
+  Abstract Syntax Tree Source Code:
+
+  - https://github.com/derekdstratton/C-2-MIPS/blob/master/ASTNodes.cpp
+
+  - https://github.com/derekdstratton/C-2-MIPS/blob/master/ASTNodes.h
 
 */
 
