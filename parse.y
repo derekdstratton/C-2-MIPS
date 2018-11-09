@@ -39,8 +39,14 @@ bool isFunction = false;
 list<set<int>> paramList;
 list<pair<string, set<int>>> definitionList;
 
+extern int yylineno;
 extern deque <char> columnQueue;
+extern string currentLine;
 string newOutputFile;
+string TOKENPATH;
+string PRODPATH;
+string SYMBOLPATH;
+string ASTPATH;
 extern FILE * yyin;
 bool debug[6]; // -d, -l, -s, productions flag, -o, -a
 // -d enable debugging
@@ -50,6 +56,8 @@ bool debug[6]; // -d, -l, -s, productions flag, -o, -a
 // -o name a file to output interspersed reductions to
 // -a prints AST to a file named ast.dot
 char* fileName;
+
+extern void outputError(string errmsg1, string errmsg2, bool errtype);
 void yyerror (char const *s);
 void handleProd (string prod);
 bool printProd = false;
@@ -181,6 +189,37 @@ function_definition
 	list<ASTNode*> tmpList;
 	tmpList.push_back($3);
 	$$ = new FuncNode($2->getName(), types, tmpList, definitionList, 1);
+	isFunction = true;
+
+    tuple<SymbolTableNode2*, string> result = getTable()->search($2->getName());
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
+    if(status != "not") //was found, means prototype is in here
+    {
+        if(it->defined == 1)
+        {
+            cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
+            exit(0);
+            //outputError("Bad function", "Trying to redeclare a function", false);
+            //cout << "BAD BAD BAD AVOCADO" << endl; //todo throw error
+        }
+        else
+            it->defined = 1;
+    }
+    else
+    {
+        cout << "INSERTING NEW DEFINITION" << endl;
+        set<int> x;
+        SymbolTableNode2* s = new SymbolTableNode2($2->getName(), x, size_decl_list, isFunction, paramList, 1);
+        idNode->setSymbolNode(s);
+        //now insert it into the symbol table
+        pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
+        tuple<bool, bool> result = getTable()->insert(entry);
+        //now you also need to make sure the identifier node has the symbol table node stuff
+        size_decl_list.clear(); //reset this too
+    }
+
     isFunction = false;
     paramList.clear();
     definitionList.clear();
@@ -201,7 +240,7 @@ declaration
 	//types = $1->getTypes();
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
-    SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList);
+    SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
     pair<string, SymbolTableNode2> entry = make_pair(name,*s);
@@ -210,7 +249,6 @@ declaration
 	$$ = new DeclNode($1, $2);
 	size_decl_list.clear(); //reset this too
 	paramList.clear();
-	//definitionList.clear();
 	isFunction = false;
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
@@ -491,12 +529,64 @@ direct_declarator
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
 	isFunction = true;
+
+    tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
+    if(status != "not") //another function was found
+    {
+        cerr << "Error on line " << yylineno << ": Function already exists." << endl;
+        exit(0);
+        outputError("Bad function", "Function already exists", false);
+        //cout << "WOAH NELLY" << endl; //todo throw error
+    }
+    else
+    {
+        set<int> x;
+        SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, isFunction, paramList, 0);
+        idNode->setSymbolNode(s);
+        //now insert it into the symbol table
+        pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
+        tuple<bool, bool> result = getTable()->insert(entry);
+        //now you also need to make sure the identifier node has the symbol table node stuff
+        size_decl_list.clear(); //reset this too
+    }
+    paramList.clear();
+    isFunction = false;
+
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
 	isFunction = true;
+
+	tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
+        SymbolTableNode2* it;
+        string status;
+        tie(it, status) = result;
+        if(status != "not") //another function was found
+        {
+            cerr << "Error on line " << yylineno << ": Function already exists." << endl;
+            exit(0);
+            outputError("Bad function", "Function already exists", false);
+            //cout << "WOAH NELLY" << endl; //todo throw error
+        }
+        else
+        {
+            set<int> x;
+            SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, isFunction, paramList, 0);
+            idNode->setSymbolNode(s);
+            //now insert it into the symbol table
+            pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
+            tuple<bool, bool> result = getTable()->insert(entry);
+            //now you also need to make sure the identifier node has the symbol table node stuff
+            size_decl_list.clear(); //reset this too
+        }
+        paramList.clear();
+        isFunction = false;
+
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
 	//throw an error, because it's legacy code and bad.
@@ -548,7 +638,6 @@ parameter_declaration
 	: declaration_specifiers declarator {
 	paramList.push_back($1->getTypes()); //todo temp
 	auto it = $1->getTypes().begin();
-	cout << "pushing back " << $2->getName() << " " << *it << endl;
 	pair<string, set<int>> tmpPair ($2->getName(), $1->getTypes());
     definitionList.push_back(tmpPair);
 	$$ = new ASTNode();
@@ -1097,6 +1186,21 @@ postfix_expression
     //$$ = new ASTNode(); //function calls
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 	| postfix_expression OPENPAR CLOSEPAR {
+
+    tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
+	if(status == "not")
+	{
+	    cout << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
+	}
+	else if(status != "not")
+	{
+	    if(it->defined != 1)
+	        cout << "FUNCTION NOT DEFINED BUDDY" << endl; //todo throw error
+	}
+
 	list<set<int>> types;
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
@@ -1304,7 +1408,7 @@ int main(int argc, char **argv)
                              return(-1);
                          }
                          else
-                                     fileName = argv[argc - 1];
+                             fileName = argv[argc - 1];
                 }
             }
 
@@ -1325,26 +1429,50 @@ int main(int argc, char **argv)
 
     if(debug[1] && debug[0])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_tokens/tokens_" + outputF;
+        outputF += ".txt";
+        TOKENPATH = outputF;
         ofstream ofs;
-        ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(TOKENPATH, std::ofstream::out | std::ofstream::trunc);
         ofs.close();
     }
     if(debug[2] && debug[0])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_symbol/symbol_" + outputF;
+        outputF += ".txt";
+        SYMBOLPATH = outputF;
         ofstream ofs;
-        ofs.open("SymDump.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(SYMBOLPATH, std::ofstream::out | std::ofstream::trunc);
         ofs.close();
     }
 	yyparse();
     if(printProd)
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_prods/prods_" + outputF;
+        outputF += ".txt";
+        PRODPATH = outputF;
         ofstream ofs;
-        ofs.open("productions.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(PRODPATH, std::ofstream::out | std::ofstream::trunc);
         ofs << prodStream.str();
         ofs.close();
     }
     if(debug[5])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_ast/ast_" + outputF;
+        outputF += ".dot";
+        ASTPATH = outputF;
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
