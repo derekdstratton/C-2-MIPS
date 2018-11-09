@@ -972,7 +972,6 @@ string FuncNode:: getName(){
  * @param arr is the bool array denoting which expressions are written
  * @param stmt is the statement or the body of the loop
  */
- //todo put ptrlist to childrenNodes
 ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
     childrenNodes = ptrList;
     childrenNodes.push_back(stmt);

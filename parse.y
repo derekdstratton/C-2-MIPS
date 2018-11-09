@@ -41,6 +41,10 @@ list<pair<string, set<int>>> definitionList;
 
 extern deque <char> columnQueue;
 string newOutputFile;
+string TOKENPATH;
+string PRODPATH;
+string SYMBOLPATH;
+string ASTPATH;
 extern FILE * yyin;
 bool debug[6]; // -d, -l, -s, productions flag, -o, -a
 // -d enable debugging
@@ -548,7 +552,6 @@ parameter_declaration
 	: declaration_specifiers declarator {
 	paramList.push_back($1->getTypes()); //todo temp
 	auto it = $1->getTypes().begin();
-	cout << "pushing back " << $2->getName() << " " << *it << endl;
 	pair<string, set<int>> tmpPair ($2->getName(), $1->getTypes());
     definitionList.push_back(tmpPair);
 	$$ = new ASTNode();
@@ -1304,7 +1307,7 @@ int main(int argc, char **argv)
                              return(-1);
                          }
                          else
-                                     fileName = argv[argc - 1];
+                             fileName = argv[argc - 1];
                 }
             }
 
@@ -1325,26 +1328,50 @@ int main(int argc, char **argv)
 
     if(debug[1] && debug[0])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_tokens/tokens_" + outputF;
+        outputF += ".txt";
+        TOKENPATH = outputF;
         ofstream ofs;
-        ofs.open("tokens.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(TOKENPATH, std::ofstream::out | std::ofstream::trunc);
         ofs.close();
     }
     if(debug[2] && debug[0])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_symbol/symbol_" + outputF;
+        outputF += ".txt";
+        SYMBOLPATH = outputF;
         ofstream ofs;
-        ofs.open("SymDump.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(SYMBOLPATH, std::ofstream::out | std::ofstream::trunc);
         ofs.close();
     }
 	yyparse();
     if(printProd)
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_prods/prods_" + outputF;
+        outputF += ".txt";
+        PRODPATH = outputF;
         ofstream ofs;
-        ofs.open("productions.out", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(PRODPATH, std::ofstream::out | std::ofstream::trunc);
         ofs << prodStream.str();
         ofs.close();
     }
     if(debug[5])
     {
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_ast/ast_" + outputF;
+        outputF += ".dot";
+        ASTPATH = outputF;
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);

@@ -30,7 +30,9 @@
 #include <iostream>
 #include <fstream>
 #include "tree.hh"
+#include <string>
 
+extern std::string ASTPATH;
 int counter = 0;
 //int parent;
 
@@ -53,7 +55,7 @@ namespace kptree {
     {
         counter = 0; //reset this here in case someone calls print_tree multiple times
         std::ofstream ofs;
-        ofs.open("ast.dot", std::ofstream::out | std::ofstream::trunc);
+        ofs.open(ASTPATH, std::ofstream::out | std::ofstream::trunc);
         ofs << "graph G {" << std::endl;
         ofs.close();
         int headCount = t.number_of_siblings(t.begin());
@@ -64,7 +66,7 @@ namespace kptree {
                 str << std::endl;
             }
         }
-        ofs.open("ast.dot", std::ios::app);
+        ofs.open(ASTPATH, std::ios::app);
         ofs << "}" << std::endl;
         ofs.close();
     }
@@ -76,7 +78,7 @@ namespace kptree {
     void print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator iRoot, std::ostream& str, int parent)
     {
         std::ofstream ofile;
-        ofile.open("ast.dot", std::ios::app);
+        ofile.open(ASTPATH, std::ios::app);
         if(t.empty()) return;
         if (t.number_of_children(iRoot) == 0) {
             //ofile << counter << ";" << std::endl;
