@@ -252,6 +252,39 @@ ASTNode::ASTNode() {
  */
 TypeNode::TypeNode() {
     //default- MUST set type in derived constructor
+    //also must CHECK type in derived constructor after setting it.
+}
+
+void TypeNode::checkType() {
+    bool goodType = true;
+    int typeCount = 0;
+
+    if (types.count(CHAR) == 1) {
+        typeCount++;
+    }
+    if (types.count(SHORT) == 1) {
+        typeCount++;
+    }
+    if (types.count(INT) == 1) {
+        typeCount++;
+    }
+    if (types.count(LONG) == 1) {
+        typeCount++;
+    }
+    if (types.count(FLOAT) == 1) {
+        typeCount++;
+    }
+    if (types.count(DOUBLE) == 1) {
+        typeCount++;
+    }
+
+    if (typeCount >= 2) {
+        goodType = false;
+    }
+
+    if (!goodType) {
+        outputError("Bad type", "Defined type is not a logical type", false);
+    }
 }
 
 /**
@@ -651,6 +684,7 @@ string IdentifierNode::getName() {
 void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
     symbolTableNode2 = symtblnd2;
     types = symbolTableNode2->types;
+    checkType();
     sizeList = symbolTableNode2->sizeList;
     //cout << sizeList.size();
 }
@@ -769,6 +803,7 @@ CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
     tmplist.push_back(nodeToCast);
     childrenNodes = tmplist;
     types = type->getTypes();
+    checkType();
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -856,6 +891,7 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
         tmplist.push_back(right);
         types = leftSet;
     }
+    checkType();
 
     childrenNodes = tmplist;
 
@@ -915,6 +951,7 @@ ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
     types = var->getTypes();
+    checkType();
 }
 
 int ArrayNode::getDimensions() {

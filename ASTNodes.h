@@ -70,6 +70,7 @@ public:
     TypeNode(set<int>& type);;
 
     set<int> getTypes();
+    void checkType();
 protected:
     set<int> types; //todo figure out how this should know types like array and pointer in the int set. encode it.
     void printNode(std::ostream& os) const;
