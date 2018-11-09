@@ -19,12 +19,10 @@
  * tree. The Compiler's build is automated with CMake, and it is being written and tested with the
  * IDE CLion.
  *
- * Some assumptions for this phase include that the Symbol Table does not have to process structs,
- * unions, typedefs, or enums. It is also assumed that octal, hexadecimal, and unicode
- * escape characters are not input. The compiler is restricted to receiving a character stream
- * from a file, and not from stdin. Functions are also restricted from having the same name as
- * variables in the Symbol Table. Limitation: can't do type checking on int a = 4;
- * (all in one line, based on how the symbol table works)
+ * Some assumptions for the compiler include that the compiler does not process structs, unions,
+ * typedefs, enums, array initializer lists, and multiple variable declarations in one line. It is
+ * also restricted from processing octal, hexadecimal, and unicode escape characters. The Symbol Table
+ * cannot handle declaration and assignment on one line.
  *
  * \section module Modules
  *
