@@ -1096,7 +1096,7 @@ postfix_expression
 	//postfix_expression can be a variable or array as far as i care
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
-    $$ = new ArrayNode($1, sizes); //1D case
+    $$ = new ArrayNode(idNode, sizes); //1D case
     //$$ = new ASTNode(); //function calls
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 	| postfix_expression OPENPAR CLOSEPAR {
