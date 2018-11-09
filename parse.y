@@ -218,6 +218,14 @@ function_definition
         tuple<bool, bool> result = getTable()->insert(entry);
         //now you also need to make sure the identifier node has the symbol table node stuff
         size_decl_list.clear(); //reset this too
+
+        bool insertSuccess, notShadowing;
+        tie(insertSuccess, notShadowing) = result;
+        if (!insertSuccess) {
+            outputError("Already exists", "Variable already exists on this scope.", false);
+        } else if (!notShadowing) {
+            outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+        }
     }
 
     isFunction = false;
@@ -250,6 +258,15 @@ declaration
 	size_decl_list.clear(); //reset this too
 	paramList.clear();
 	isFunction = false;
+
+    bool insertSuccess, notShadowing;
+    tie(insertSuccess, notShadowing) = result;
+    if (!insertSuccess) {
+        outputError("Already exists", "Variable already exists on this scope.", false);
+    } else if (!notShadowing) {
+        outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+    }
+
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
