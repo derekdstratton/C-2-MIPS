@@ -271,7 +271,7 @@ private:
 /**
  * Left is the declarator (variable), right is a list of sizes
  */
-class ArrayNode : public ASTNode {
+class ArrayNode : public TypeNode {
 public:
     ArrayNode(ASTNode* var, list<ASTNode *> sizes);
     list<ASTNode*> getSizes();

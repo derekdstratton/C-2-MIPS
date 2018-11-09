@@ -625,9 +625,11 @@ void IdentifierNode::printNode(std::ostream &os) const {
     }
     int dimensions = sizeList.size();
     if (dimensions > 0) {
-        os << "_ARR";
+        os << "_ARR_";
+        int i = 1;
         for (auto dim_size : symbolTableNode2->sizeList) {
-            os << dim_size << "x";
+            os << "DIM" << i << "_" << dim_size;
+            i++;
         }
     }
 }
