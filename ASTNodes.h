@@ -34,6 +34,7 @@ public:
     virtual set<int> getTypes();
     virtual string getName();
     virtual void setSymbolNode(SymbolTableNode2* symtblnd2);
+    virtual int getDimensions();
     virtual list<ASTNode*> getSizes();
     virtual int getVal() {
         cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
@@ -69,6 +70,7 @@ public:
     TypeNode(set<int>& type);;
 
     set<int> getTypes();
+    void checkType();
 protected:
     set<int> types; //todo figure out how this should know types like array and pointer in the int set. encode it.
     void printNode(std::ostream& os) const;
@@ -173,6 +175,7 @@ public:
     ~IdentifierNode();
     string getName();
     void setSymbolNode(SymbolTableNode2* symtblnd2);
+    int getDimensions();
 private:
     SymbolTableNode2 * symbolTableNode2;
     string identifier;
@@ -271,10 +274,11 @@ private:
 /**
  * Left is the declarator (variable), right is a list of sizes
  */
-class ArrayNode : public ASTNode {
+class ArrayNode : public TypeNode {
 public:
     ArrayNode(ASTNode* var, list<ASTNode *> sizes);
     list<ASTNode*> getSizes();
+    int getDimensions();
 private:
     list<ASTNode *> sizeList;
     void printNode(std::ostream& os) const;

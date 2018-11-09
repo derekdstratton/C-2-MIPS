@@ -3,6 +3,8 @@ extern int yylineno;
 extern deque <char> columnQueue;
 extern int yyleng;
 
+extern void outputError(string errmsg1, string errmsg2, bool errtype);
+
 /**
  * @brief converts a defined token into a string
  * @param token is the token to be converted
@@ -121,6 +123,12 @@ set<int> ASTNode::getTypes() {
     cout << "IF YOU'RE SEEING THIS DIE" << endl;
     set<int> fail;
     return fail;
+}
+
+int ASTNode::getDimensions() {
+    //cout << "IF YOU'RE SEEING THIS MEEEWOA" << endl;
+    //things like int const, float const, should all be 0
+    return 0;
 }
 
 /**
@@ -244,6 +252,39 @@ ASTNode::ASTNode() {
  */
 TypeNode::TypeNode() {
     //default- MUST set type in derived constructor
+    //also must CHECK type in derived constructor after setting it.
+}
+
+void TypeNode::checkType() {
+    bool goodType = true;
+    int typeCount = 0;
+
+    if (types.count(CHAR) == 1) {
+        typeCount++;
+    }
+    if (types.count(SHORT) == 1) {
+        typeCount++;
+    }
+    if (types.count(INT) == 1) {
+        typeCount++;
+    }
+    if (types.count(LONG) == 1) {
+        typeCount++;
+    }
+    if (types.count(FLOAT) == 1) {
+        typeCount++;
+    }
+    if (types.count(DOUBLE) == 1) {
+        typeCount++;
+    }
+
+    if (typeCount >= 2) {
+        goodType = false;
+    }
+
+    if (!goodType) {
+        outputError("Bad type", "Defined type is not a logical type", false);
+    }
 }
 
 /**
@@ -454,11 +495,40 @@ void LogicalNode::printNode(std::ostream &os) const {
 AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
     list <ASTNode*> tmplist;
 
+    int leftArrDims = lvalue->getDimensions();
+    int rightArrDims = rvalue->getDimensions();
+
+    //Check for type mismatch (arrays)
+    if (leftArrDims != rightArrDims) {
+        outputError("Semantic Error", "Mismatch of types in Array assignment", false);
+    }
+
+    ASTNode * newLeft;
+    ASTNode * newRight;
+
     set<int> leftSet = lvalue->getTypes();
+    set<int> rightSet = rvalue->getTypes();
+
+    //Implicit casting
+    int ret = compareForCast(leftSet, rightSet);
+    if (ret != 0) {
+        ASTNode *newtype = new TypeNode(leftSet);
+        newLeft = lvalue;
+        newRight = new CastNode(newtype, rvalue);
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        //types = leftSet;
+        outputError("Cast", "Implicit Casting of types for assignment", true);
+    } else {
+        tmplist.push_back(lvalue);
+        tmplist.push_back(rvalue);
+        //types = leftSet;
+    }
+
     types = leftSet;
 
-    tmplist.push_back(lvalue);
-    tmplist.push_back(rvalue);
+    //tmplist.push_back(lvalue);
+    //tmplist.push_back(rvalue);
     childrenNodes = tmplist;
 
     lineNum = yylineno;
@@ -595,6 +665,10 @@ IdentifierNode::IdentifierNode(string *name) {
     colNum = columnQueue.size() - yyleng + 1;
 }
 
+int IdentifierNode::getDimensions() {
+    return sizeList.size();
+}
+
 /**
  * @brief IDNode function to get the identifier name
  * @return returns a string that is the identifier name
@@ -610,6 +684,7 @@ string IdentifierNode::getName() {
 void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
     symbolTableNode2 = symtblnd2;
     types = symbolTableNode2->types;
+    checkType();
     sizeList = symbolTableNode2->sizeList;
     //cout << sizeList.size();
 }
@@ -625,9 +700,11 @@ void IdentifierNode::printNode(std::ostream &os) const {
     }
     int dimensions = sizeList.size();
     if (dimensions > 0) {
-        os << "_ARR";
+        os << "_ARR_";
+        int i = 1;
         for (auto dim_size : symbolTableNode2->sizeList) {
-            os << dim_size << "x";
+            os << "DIM" << i << "_" << dim_size;
+            i++;
         }
     }
 }
@@ -726,6 +803,7 @@ CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
     tmplist.push_back(nodeToCast);
     childrenNodes = tmplist;
     types = type->getTypes();
+    checkType();
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -779,7 +857,16 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     ASTNode * newRight;
 
     set<int> leftSet = left->getTypes();
+    int leftArrDims = left->getDimensions();
     set<int> rightSet = right->getTypes();
+    int rightArrDims = right->getDimensions();
+
+    //Check for type mismatch (arrays)
+    if (leftArrDims != rightArrDims) {
+        outputError("Semantic Error", "Mismatch of types in Array operation", false);
+    }
+
+    //Implicit casting
     int ret = compareForCast(leftSet, rightSet);
     if (ret < 0) {
         //Cast the node on the left to the type of the right node
@@ -789,6 +876,7 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
         tmplist.push_back(newLeft);
         tmplist.push_back(newRight);
         types = rightSet;
+        outputError("Cast", "Implicit Casting of types for operation", true);
     } else if (ret > 0) {
         //Cast the node on the right to the type of the left node
         ASTNode * newtype = new TypeNode(leftSet);
@@ -797,11 +885,13 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
         tmplist.push_back(newLeft);
         tmplist.push_back(newRight);
         types = leftSet;
+        outputError("Cast", "Implicit Casting of types for operation", true);
     } else {
         tmplist.push_back(left);
         tmplist.push_back(right);
         types = leftSet;
     }
+    checkType();
 
     childrenNodes = tmplist;
 
@@ -861,6 +951,13 @@ ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
     types = var->getTypes();
+    checkType();
+}
+
+int ArrayNode::getDimensions() {
+    int arrSize = getChildren().front()->getDimensions();
+    int derefs = sizeList.size();
+    return arrSize - derefs;
 }
 
 /**

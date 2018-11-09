@@ -24,6 +24,8 @@
  * from a file, and not from stdin. Functions are also restricted from having the same name as
  * variables in the Symbol Table.
  *
+ * Limitation: can't do type checking on int a = 4; (all in one line, based on how the symbol table works)
+ *
  * \section module Modules
  *
  * \ref symtable : The Symbol Table for the compiler.
