@@ -1,0 +1,11 @@
+graph G {
+0[label=FUNCTION_DEFINITION_main];
+1[label=TYPE_INT];
+0--1;
+2[label=STATEMENTS];
+0--2;
+3[label=RETURN];
+2--3;
+4[label=INT_0];
+3--4;
+}

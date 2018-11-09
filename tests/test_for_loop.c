@@ -1,10 +1,7 @@
-int main() {
+int main(){
     int i;
-    int k;
-    i = 0;
-    k = 0;
-    for (i = 0; i < 5; i++) {
-        k += 2;
+    for(i = 0; i < 3; i++)
+    {
+        i = i + 1;
     }
-    return 0;
 }

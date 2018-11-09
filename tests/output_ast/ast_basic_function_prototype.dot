@@ -1,0 +1,17 @@
+graph G {
+0[label=GLOBAL];
+1[label=GLOBAL];
+0--1;
+2[label=DECLARATION];
+1--2;
+3[label=TYPE_INT];
+2--3;
+4[label=FUNCTION_PROTOTYPE_testFuncc_294297_292];
+2--4;
+5[label=DECLARATION];
+0--5;
+6[label=TYPE_INT];
+5--6;
+7[label=FUNCTION_PROTOTYPE_testFunc_294_294];
+5--7;
+}

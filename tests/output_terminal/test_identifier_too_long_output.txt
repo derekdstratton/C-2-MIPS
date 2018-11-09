@@ -1,5 +1,0 @@
-    int aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
-        ^ too long buddy
-Warning on line 2 (column 9): Identifier name too long.
-
-Process finished with exit code 0

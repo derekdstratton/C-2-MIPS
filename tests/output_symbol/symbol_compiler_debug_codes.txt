@@ -1,0 +1,19 @@
+DUMPING SYMBOL TABLE AT LINE 1
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+	Map at level 0 (size: 0)
+	Map at level 1 (size: 1)
+		Key: main, Value: Identifier: main, Types: , Function w/ Params: 
+
+
+DUMPING SYMBOL TABLE AT LINE 12
+Symbol Table: (Stack size: 2)
+Current Mode: Lookup
+Maps (From top to bottom):
+	Map at level 0 (size: 1)
+		Key: x, Value: Identifier: x, Types: 294_
+	Map at level 1 (size: 1)
+		Key: main, Value: Identifier: main, Types: , Function w/ Params: 
+
+

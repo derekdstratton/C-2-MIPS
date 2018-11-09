@@ -1,0 +1,54 @@
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+type_specifier -> UNSIGNED
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+declaration_specifiers -> type_specifier declaration_specifiers
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+declarator -> direct_declarator
+parameter_declaration -> declaration_specifiers declarator
+parameter_list -> parameter_declaration
+type_specifier -> CHAR
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+declarator -> direct_declarator
+parameter_declaration -> declaration_specifiers declarator
+parameter_list -> parameter_list COMMA parameter_declaration
+parameter_type_list -> parameter_list
+direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR
+declarator -> direct_declarator
+init_declarator -> declarator
+init_declarator_list -> init_declarator
+declaration -> declaration_specifiers init_declarator_list SEMI
+external_declaration -> declaration
+translation_unit -> external_declaration
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+declarator -> direct_declarator
+parameter_declaration -> declaration_specifiers declarator
+parameter_list -> parameter_declaration
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+declarator -> direct_declarator
+parameter_declaration -> declaration_specifiers declarator
+parameter_list -> parameter_list COMMA parameter_declaration
+parameter_type_list -> parameter_list
+direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR
+declarator -> direct_declarator
+init_declarator -> declarator
+init_declarator_list -> init_declarator
+declaration -> declaration_specifiers init_declarator_list SEMI
+external_declaration -> declaration
+translation_unit -> translation_unit external_declaration

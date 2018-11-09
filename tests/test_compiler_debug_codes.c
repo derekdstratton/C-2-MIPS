@@ -1,6 +1,7 @@
 int main() {
     !!P
-    int x = 3;
+    int x;
+    x = 3;
     !!M
     x = 4;
     !!P

@@ -1,5 +1,0 @@
-    int y;
-    ^
-syntax error, unexpected INT on line 4 (column 5)
-
-Process finished with exit code 0
