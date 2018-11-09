@@ -213,7 +213,7 @@
   - https://github.com/derekdstratton/C-2-MIPS/blob/master/parse.y
 */
 
-//Parser:
+//AST:
 /*! \page ast Abstract Syntax Tree
  *
   todo
