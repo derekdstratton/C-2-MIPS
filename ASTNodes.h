@@ -34,6 +34,7 @@ public:
     virtual set<int> getTypes();
     virtual string getName();
     virtual void setSymbolNode(SymbolTableNode2* symtblnd2);
+    virtual int getDimensions();
     virtual list<ASTNode*> getSizes();
     virtual int getVal() {
         cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
@@ -173,6 +174,7 @@ public:
     ~IdentifierNode();
     string getName();
     void setSymbolNode(SymbolTableNode2* symtblnd2);
+    int getDimensions();
 private:
     SymbolTableNode2 * symbolTableNode2;
     string identifier;
@@ -275,6 +277,7 @@ class ArrayNode : public TypeNode {
 public:
     ArrayNode(ASTNode* var, list<ASTNode *> sizes);
     list<ASTNode*> getSizes();
+    int getDimensions();
 private:
     list<ASTNode *> sizeList;
     void printNode(std::ostream& os) const;
