@@ -548,7 +548,7 @@ return {
         outputError("Too long", "Integer Constant too long.", true);
     }
     //todo check size for a long, c string compare
-    yylval.ival = atol(yytext);
+    yylval.ival = atoi(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {
     to_token_file(IDENTIFIER, "IDENTIFIER");
