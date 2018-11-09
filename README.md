@@ -20,7 +20,7 @@ be found in the [wiki](https://derekdstratton.github.io/C-2-MIPS).
 - Derek Stratton
 - Chris Koh
 
-### Installation: 
+### Installation on an ECC Machine: 
 
 ```
 git clone https://github.com/derekdstratton/C-2-MIPS
