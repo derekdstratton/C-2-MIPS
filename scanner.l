@@ -24,6 +24,10 @@
 /* Global Variables */
 
 list <ASTNode*> empty;
+extern string TOKENPATH;
+extern string PRODPATH;
+extern string SYMBOLPATH;
+extern string ASTPATH;
 extern bool debug[5];
 extern char* fileName;
 extern int lineNum;
@@ -276,7 +280,7 @@ return {
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
-        SymDump.open("SymDump.out", ios::app);
+        SymDump.open(SYMBOLPATH, ios::app);
         SymDump << "DUMPING SYMBOL TABLE AT LINE " << yylineno << endl;
         SymDump << *getTable() << "\n\n";
         SymDump.close();
@@ -290,7 +294,7 @@ return {
     if(debug[0] && debug[2])
     {
         ofstream SymDump;
-        SymDump.open("SymDump.out", ios::app);
+        SymDump.open(SYMBOLPATH, ios::app);
         SymDump << "DUMPING SYMBOL TABLE AT LINE " << yylineno << endl;
         SymDump << *getTable() << "\n\n";
         SymDump.close();
@@ -686,14 +690,14 @@ void to_token_file(int token, string tokName) {
     if(tokName == "ERROR")
     {
         ofstream errStream;
-        errStream.open("tokens.out", ios::app);
+        errStream.open(TOKENPATH, ios::app);
         errStream << "  ERROR" << endl;
         errStream.close();
     }
     else if(tokName == "ERROR1")
     {
         ofstream errStream;
-        errStream.open("tokens.out", ios::app);
+        errStream.open(TOKENPATH, ios::app);
         errStream << "  ERROR" << endl;
         errStream.close();
         for (int i = 0; i < yyleng; i++)
@@ -712,7 +716,7 @@ void to_token_file(int token, string tokName) {
             columnQueue.push_back(' ');
         if (debug[1] && debug[0]) {
             ofstream tokenfile;
-            tokenfile.open("tokens.out", ios::app);
+            tokenfile.open(TOKENPATH, ios::app);
             tokenfile << yytext << " " << tokName << " " << token << "\n";
             tokenfile.close();
         }
