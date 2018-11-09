@@ -60,13 +60,14 @@ public:
         isFunction = isFunc;
         paramTypes = params;
         defined = Defined;
-        //std::cout << sizeList.size();
     }
     SymbolTableNode2(SymbolTableNode2 const & other){
         types = other.types;
         identifier = other.identifier;
         sizeList = other.sizeList;
-        //cout << "lol";
+        isFunction = other.isFunction;
+        paramTypes = other.paramTypes;
+        defined = other.defined;
     }
     //this operator= is VERY important. you WILL explode if you disregard it
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) = default;
