@@ -1,0 +1,31 @@
+type_specifier -> INT
+declaration_specifiers -> type_specifier
+identifier -> IDENTIFIER
+direct_declarator -> identifier
+direct_declarator -> direct_declarator OPENPAR CLOSEPAR
+declarator -> direct_declarator
+constant -> INTEGER_CONSTANT
+primary_expression -> constant
+postfix_expression -> primary_expression
+unary_expression -> postfix_expression
+cast_expression -> unary_expression
+multiplicative_expression -> cast_expression
+additive_expression -> multiplicative_expression
+shift_expression -> additive_expression
+relational_expression -> shift_expression
+equality_expression -> relational_expression
+and_expression -> equality_expression
+exclusive_or_expression -> and_expression
+inclusive_or_expression -> exclusive_or_expression
+logical_and_expression -> inclusive_or_expression
+logical_or_expression -> logical_and_expression
+conditional_expression -> logical_or_expression
+assignment_expression -> conditional_expression
+expression -> assignment_expression
+jump_statement -> RETURN expression SEMI
+statement -> jump_statement
+statement_list -> statement
+compound_statement -> OPENCUR statement_list CLOSCUR
+function_definition -> declaration_specifiers declarator compound_statement
+external_declaration -> function_definition
+translation_unit -> external_declaration

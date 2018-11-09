@@ -1,0 +1,39 @@
+DUMPING SYMBOL TABLE AT LINE 1
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+	Map at level 0 (size: 0)
+	Map at level 1 (size: 1)
+		Key: testFunc, Value: Identifier: testFunc, Types: , Function w/ Params: type t needs implemented in <<type t needs implemented in <<
+
+
+DUMPING SYMBOL TABLE AT LINE 5
+Symbol Table: (Stack size: 2)
+Current Mode: Lookup
+Maps (From top to bottom):
+	Map at level 0 (size: 1)
+		Key: x, Value: Identifier: x, Types: 294_
+	Map at level 1 (size: 1)
+		Key: testFunc, Value: Identifier: testFunc, Types: , Function w/ Params: type t needs implemented in <<type t needs implemented in <<
+
+
+DUMPING SYMBOL TABLE AT LINE 7
+Symbol Table: (Stack size: 2)
+Current Mode: Lookup
+Maps (From top to bottom):
+	Map at level 0 (size: 0)
+	Map at level 1 (size: 2)
+		Key: testFunc, Value: Identifier: testFunc, Types: , Function w/ Params: type t needs implemented in <<type t needs implemented in <<
+		Key: testFuncc, Value: Identifier: testFuncc, Types: , Function w/ Params: 
+
+
+DUMPING SYMBOL TABLE AT LINE 9
+Symbol Table: (Stack size: 2)
+Current Mode: Insert
+Maps (From top to bottom):
+	Map at level 0 (size: 0)
+	Map at level 1 (size: 2)
+		Key: testFunc, Value: Identifier: testFunc, Types: , Function w/ Params: type t needs implemented in <<type t needs implemented in <<
+		Key: testFuncc, Value: Identifier: testFuncc, Types: , Function w/ Params: 
+
+

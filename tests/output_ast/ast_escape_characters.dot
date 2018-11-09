@@ -1,0 +1,27 @@
+graph G {
+0[label=FUNCTION_DEFINITION_main];
+1[label=TYPE_INT];
+0--1;
+2[label=COMPOUND];
+0--2;
+3[label=DECLARATIONS];
+2--3;
+4[label=DECLARATION];
+3--4;
+5[label=TYPE_CHAR];
+4--5;
+6[label=VARIABLE_c_CHAR];
+4--6;
+7[label=STATEMENTS];
+2--7;
+8[label=ASSIGN];
+7--8;
+9[label=VARIABLE_c_CHAR];
+8--9;
+10[label=CHAR_	];
+8--10;
+11[label=RETURN];
+7--11;
+12[label=INT_0];
+11--12;
+}
