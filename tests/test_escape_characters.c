@@ -1,5 +1,6 @@
 int main() {
-    char c = '\t';
+    char c;
+    c = '\t';
     !!S
     return 0;
 }
