@@ -218,7 +218,7 @@ function_definition
         tuple<bool, bool> result = getTable()->insert(entry);
         //now you also need to make sure the identifier node has the symbol table node stuff
         size_decl_list.clear(); //reset this too
-        
+
         bool insertSuccess, notShadowing;
         tie(insertSuccess, notShadowing) = result;
         if (!insertSuccess) {
