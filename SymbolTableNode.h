@@ -53,12 +53,13 @@ public:
         types = fail;
         identifier = "";
     }
-    SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc, list<set<int>> params) {
+    SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc, list<set<int>> params, bool Defined) {
         types = typeArr;
         identifier = name;
         sizeList = size_decl_list;
         isFunction = isFunc;
         paramTypes = params;
+        defined = Defined;
         //std::cout << sizeList.size();
     }
     SymbolTableNode2(SymbolTableNode2 const & other){
@@ -76,6 +77,7 @@ public:
     list<int> sizeList; //list of sizes for each dimension
     bool isFunction;
     list<set<int>> paramTypes;
+    bool defined;
 };
 
 

@@ -659,7 +659,6 @@ void outputError(string errmsg1, string errmsg2, bool errtype) {
     deque <char> errQueue;
     while(errInput.peek() != '\n')
         errQueue.push_back(errInput.get());
-
     while(!errQueue.empty()) {
         cerr << errQueue.front();
         errQueue.pop_front();

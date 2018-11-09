@@ -924,6 +924,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
  *        If function call, prints name and args if they are given.
  * @param os is the stream to be printed to
  */
+ //todo check if already in sym table for function call
 void FuncNode:: printNode(std::ostream &os) const{
      switch(funcType)
      {
