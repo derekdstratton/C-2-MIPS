@@ -247,6 +247,10 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 ASTNode::ASTNode() {
 }
 
+int ASTNode::getNodeType() {
+    return ASTNODE;
+}
+
 /**
  * @brief default constructor for TypeNode
  */

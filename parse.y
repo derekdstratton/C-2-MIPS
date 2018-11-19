@@ -20,6 +20,7 @@
 #include "ASTNodes.h"
 #include "include/tree.hh"
 #include "include/tree_util2.hh"
+#include "3ac.cpp"
 
 SymbolTable * table_ptr;
 
@@ -1493,6 +1494,7 @@ int main(int argc, char **argv)
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
+        generate3ac(ast);
     }
 	return 0;
 }

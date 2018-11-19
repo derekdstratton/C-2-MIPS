@@ -10,6 +10,7 @@ using namespace std;
 #include "SymbolTable.h"
 
 #include "yytokentype.h"
+#include "astnodetype.h"
 
 /**
  *
@@ -31,6 +32,7 @@ public:
      */
     static void copyTree(ASTNode*& root, tree<ASTNode*> & ast);
 
+    virtual int getNodeType();
     virtual set<int> getTypes();
     virtual string getName();
     virtual void setSymbolNode(SymbolTableNode2* symtblnd2);
@@ -39,6 +41,9 @@ public:
     virtual int getVal() {
         cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
         return -1;
+    }
+    virtual char getSeqType() {
+        return '\0';
     }
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
@@ -67,8 +72,11 @@ protected:
 class TypeNode : public ASTNode {
 public:
     TypeNode();
-    TypeNode(set<int>& type);;
+    TypeNode(set<int>& type);
 
+    int getNodeType() {
+        return TYPENODE;
+    }
     set<int> getTypes();
     void checkType();
 protected:
@@ -79,6 +87,9 @@ protected:
 class WhileNode : public ASTNode{
 public:
     WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo);
+    int getNodeType() {
+        return WHILENODE;
+    }
 private:
     bool doo;
     void printNode(std:: ostream& os) const;
@@ -88,6 +99,9 @@ class IfNode : public ASTNode {
 public:
     IfNode(ASTNode* expr, ASTNode* stmt);
     IfNode(ASTNode* expr, ASTNode* stmt, ASTNode* stmt2);
+    int getNodeType() {
+        return IFNODE;
+    }
 private:
     bool flag;
     void printNode(std:: ostream& os) const;
@@ -96,6 +110,9 @@ private:
 class UnaryNode : public TypeNode {
 public:
     UnaryNode(int x, ASTNode* child);
+    int getNodeType() {
+        return UNARYNODE;
+    }
 private:
     int nodeType;
     void printNode(std:: ostream& os) const;
@@ -105,6 +122,9 @@ private:
 class BitwiseNode : public ASTNode {
 public:
     BitwiseNode(int x, ASTNode* left, ASTNode* right);
+    int getNodeType() {
+        return BITWISENODE;
+    }
 private:
     int nodeType;
     void printNode(std:: ostream& os) const{
@@ -115,6 +135,9 @@ private:
 class LogicalNode : public ASTNode {
 public:
     LogicalNode(int x, ASTNode* left, ASTNode* right);
+    int getNodeType() {
+        return LOGICALNODE;
+    }
 private:
     int nodeType;
     void printNode(std:: ostream& os) const;
@@ -132,6 +155,9 @@ private:
 class AssignNode : public ASTNode {
 public:
     AssignNode(ASTNode * lvalue, ASTNode * rvalue);
+    int getNodeType() {
+        return ASSIGNNODE;
+    }
 private:
     int nodeVal;
     void printNode(std::ostream& os) const;
@@ -142,7 +168,10 @@ private:
  */
 class NoneNode : public ASTNode {
 public:
-    NoneNode();;
+    NoneNode();
+    int getNodeType() {
+        return NONENODE;
+    }
 private:
     void printNode(std::ostream& os) const;
 };
@@ -153,6 +182,9 @@ private:
 class DeclNode : public ASTNode {
 public:
     DeclNode(ASTNode * first, ASTNode * second);;
+    int getNodeType() {
+        return DECLNODE;
+    }
 private:
     void printNode(std::ostream& os) const;
 };
@@ -164,6 +196,12 @@ class SeqNode : public ASTNode {
 public:
     SeqNode(char seq, ASTNode * first, ASTNode * second);
     SeqNode(char seq, list<ASTNode*> statementList);
+    int getNodeType() {
+        return SEQNODE;
+    }
+    char getSeqType() {
+        return seqType;
+    }
 private:
     char seqType;
     void printNode(std::ostream& os) const;
@@ -176,6 +214,9 @@ public:
     string getName();
     void setSymbolNode(SymbolTableNode2* symtblnd2);
     int getDimensions();
+    int getNodeType() {
+        return IDENTIFIERNODE;
+    }
 private:
     SymbolTableNode2 * symbolTableNode2;
     string identifier;
@@ -189,6 +230,9 @@ public:
     int getVal() {
         return nodeVal;
     }
+    int getNodeType() {
+        return INTNODE;
+    }
 private:
     int nodeVal;
     void printNode(std::ostream& os) const;
@@ -196,7 +240,10 @@ private:
 
 class CharNode : public TypeNode {
 public:
-    CharNode(char val);;
+    CharNode(char val);
+    int getNodeType() {
+        return CHARNODE;
+    }
 private:
     char nodeVal;
     void printNode(std::ostream& os) const;
@@ -204,7 +251,10 @@ private:
 
 class FloatNode : public TypeNode {
 public:
-    FloatNode(float val);;
+    FloatNode(float val);
+    int getNodeType() {
+        return FLOATNODE;
+    }
 private:
     float nodeVal;
     void printNode(std::ostream& os) const;
@@ -212,7 +262,10 @@ private:
 
 class StringNode : public TypeNode {
 public:
-    StringNode(string * val);;
+    StringNode(string * val);
+    int getNodeType() {
+        return STRINGNODE;
+    }
 private:
     string nodeVal;
     void printNode(std::ostream& os) const;
@@ -221,7 +274,10 @@ private:
 
 class CastNode : public TypeNode {
 public:
-    CastNode(ASTNode * type, ASTNode *nodeToCast);;
+    CastNode(ASTNode * type, ASTNode *nodeToCast);
+    int getNodeType() {
+        return CASTNODE;
+    }
 private:
     void printNode(std::ostream& os) const;
 };
@@ -231,7 +287,10 @@ private:
  */
 class RelationalNode : public ASTNode {
 public:
-    RelationalNode(int type, ASTNode * left, ASTNode * right);;
+    RelationalNode(int type, ASTNode * left, ASTNode * right);
+    int getNodeType() {
+        return RELATIONALNODE;
+    }
 private:
     int operationType;
     void printNode(std::ostream& os) const;
@@ -255,7 +314,10 @@ int compareForCast(set<int>& left, set<int>& right);
  */
 class BinaryMathNode : public TypeNode {
 public:
-    BinaryMathNode(int type, ASTNode * left, ASTNode * right);;
+    BinaryMathNode(int type, ASTNode * left, ASTNode * right);
+    int getNodeType() {
+        return BINARYMATHNODE;
+    }
 private:
     int operationType;
     void printNode(std::ostream& os) const;
@@ -265,7 +327,10 @@ private:
 //this is more a question to be answered when getting into functions
 class ReturnNode : public ASTNode {
 public:
-    ReturnNode(ASTNode* child);;
+    ReturnNode(ASTNode* child);
+    int getNodeType() {
+        return RETURNNODE;
+    }
 private:
     void printNode(std::ostream& os) const;
 };
@@ -279,6 +344,9 @@ public:
     ArrayNode(ASTNode* var, list<ASTNode *> sizes);
     list<ASTNode*> getSizes();
     int getDimensions();
+    int getNodeType() {
+        return ARRAYNODE;
+    }
 private:
     list<ASTNode *> sizeList;
     void printNode(std::ostream& os) const;
@@ -292,6 +360,9 @@ class FuncNode : public TypeNode {
 public:
     FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
     string getName();
+    int getNodeType() {
+        return FUNCNODE;
+    }
 private:
     string funcName;
     list<set<int>> paramTypes; //for prototypes
@@ -303,6 +374,9 @@ private:
 class ForNode : public ASTNode {
 public:
     ForNode(list<ASTNode*> ptrList, bool arr[3], ASTNode * stmt);
+    int getNodeType() {
+        return FORNODE;
+    }
 private:
     bool stmtWritten[3];
     void printNode(std::ostream& os) const;
