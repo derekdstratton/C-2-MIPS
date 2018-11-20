@@ -42,3 +42,9 @@ add_executable(ScannerParser SymbolTable.cpp SymbolTableNode.cpp ASTNodes.cpp
 ${BISON_MyParser_OUTPUTS}
 ${FLEX_MyScanner_OUTPUTS}
 )
+
+set(STUFF SymbolTable.cpp SymbolTableNode.cpp ASTNodes.cpp
+        ${BISON_MyParser_OUTPUTS}
+        ${FLEX_MyScanner_OUTPUTS} )
+add_executable(Main main.cpp ${STUFF}
+        )

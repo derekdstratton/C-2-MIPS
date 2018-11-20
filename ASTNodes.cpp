@@ -247,6 +247,10 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 ASTNode::ASTNode() {
 }
 
+int ASTNode::getNodeType() {
+    return ASTNODE;
+}
+
 /**
  * @brief default constructor for TypeNode
  */
@@ -897,6 +901,10 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
+}
+
+int BinaryMathNode::getOpType() {
+    return operationType;
 }
 
 /**
