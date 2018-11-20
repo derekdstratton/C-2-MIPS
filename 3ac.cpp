@@ -7,14 +7,12 @@
 
 using namespace std;
 
+list<string> operands;
+
 list<vector<string>> code;
-list<vector<string>>::iterator codeIt;
-list<vector<string>> instrStack;
 
 int registerCnt = 0;
 int labelCnt = 0;
-
-ASTNode * importantNode;
 
 int localFrame = 0; //stores all the local variables
 
@@ -44,112 +42,93 @@ int decodeSize(set<int> &typeSet) {
     cout << "SHOULDNT BE HERE, TYPE NOT FOUND MAYDAY MAYDAY";
     return -1;
 }
-void insertOperandNode(const string &s) {
-    if (!instrStack.empty()) {
-        instrStack.back().push_back(s);
-        if (instrStack.back().size() == 4) {
-            //Generate 3 Address Code
-            auto item = instrStack.back();
-            //code.push_back(item); use iterator instead
-            if (codeIt != code.end()) {
-                codeIt++;
-            }
-            code.insert(codeIt, item);
-            //Pop it off the instruction stack if we're full
-            instrStack.pop_back();
 
-            if (!instrStack.empty()) {
-                //chain it into the last one
-                auto otherItem = instrStack.back();
-                //get the destination
-                otherItem.push_back(item[1]);
-                //todo this is a temporary solution but along the ideas of what you want
-                //if the size is 4, only then do you push back? that's my thought
-                cout << otherItem[1];
-                //code.push_back(otherItem); use iterator instead
-                if (codeIt != code.end()) {
-                    codeIt++;
-                }
-                code.insert(codeIt, otherItem);
-                instrStack.pop_back();
-            }
-        }
-    }
-}
-
-void makeCode(tree<ASTNode*>::pre_order_iterator it, tree<ASTNode*>::pre_order_iterator end) {
+void makeCode(tree<ASTNode*>::post_order_iterator it, tree<ASTNode*>::post_order_iterator end) {
     while (it != end) {
         int nodeType = (*it)->getNodeType();
-
-        //cout << *it;
-        if (*it == importantNode) {
-            cout << "WOOO THIS MIGHT WORK FOR MMAKING LABELS";
-        }
+        int numChildren = (*it)->getChildren().size();
 
         switch(nodeType) {
+            //Instruction and Operand Nodes
             case ASSIGNNODE: {
-                vector<string> a;
-                a.push_back("ASSIGN");
-                a.push_back("---");
-                instrStack.push_back(a);
+                cout << "ASSIGN DEBUGGING" << endl;
+                for (auto x : operands) {
+                    cout << x << " ";
+                }
+                cout << endl;
+                vector<string> a (4);
+                a[0] = "ASSIGN";
+                auto op = operands.begin();
+                for (int i = numChildren - 1; i >= 0; i--) {
+                    a[i+1] = (*op);
+                    auto prev = op;
+                    op++;
+                    operands.erase(prev);
+                }
+                operands.push_front(a[1]);
+                code.push_back(a);
                 cout << "ASSIGN" << endl;
                 break;
             }
             case BINARYMATHNODE: {
-                vector<string> a;
+                cout << "PLUS DEBUGGING" << endl;
+                for (auto x : operands) {
+                    cout << x << " ";
+                }
+                cout << endl;
+                vector<string> a (4);
                 string s = tokenToString2((*it)->getOpType());
-                a.push_back(s);
-                a.push_back("t" + to_string(registerCnt++)); //temporary register
-                instrStack.push_back(a);
+                a[0] = (s);
+                auto op = operands.begin();
+                for (int i = numChildren - 1; i >= 0; i--) {
+                    a[i+2] = (*op);
+                    auto prev = op;
+                    op++;
+                    operands.erase(prev);
+                }
+                a[1] = ("t" + to_string(registerCnt++)); //temporary register
                 cout << s << endl;
+                code.push_back(a);
+                operands.push_front(a[1]);
                 break;
             }
+            case RELATIONALNODE: {
+                cout << "PLUS DEBUGGING" << endl;
+                for (auto x : operands) {
+                    cout << x << " ";
+                }
+                cout << endl;
+                vector<string> a (4);
+                string s = tokenToString2((*it)->getOpType());
+                a[0] = (s);
+                auto op = operands.begin();
+                for (int i = numChildren - 1; i >= 0; i--) {
+                    a[i+2] = (*op);
+                    auto prev = op;
+                    op++;
+                    operands.erase(prev);
+                }
+                a[1] = ("t" + to_string(registerCnt++)); //temporary register
+                cout << s << endl;
+                code.push_back(a);
+                operands.push_front(a[1]);
+                break;
+            }
+            //Operand Only Nodes
             case IDENTIFIERNODE: {
                 string s = (*it)->getName();
+                operands.push_front(s);
                 cout << s << endl;
-                insertOperandNode(s);
                 break;
             }
             case INTNODE: {
                 string s = to_string((*it)->getVal());
-                cout << s << endl;
-                //todo generate into a function
-                insertOperandNode(s);
-                break;
-            }
-            case RELATIONALNODE: {
-                vector<string> a;
-                string s = tokenToString2((*it)->getOpType());
-                a.push_back(s);
-                a.push_back("t" + to_string(registerCnt++)); //temporary register
-                instrStack.push_back(a);
+                operands.push_front(s);
                 cout << s << endl;
                 break;
             }
+            //Special Nodes
             case IFNODE: {
-                vector<string> a;
-                a.push_back("BREQ");
-                string label = "lab" + to_string(labelCnt++);
-                a.push_back(label);
-                a.push_back("0");
-                instrStack.push_back(a);
-
-                auto statementsIt = it;
-                statementsIt.skip_children();
-                statementsIt++;
-                importantNode = *statementsIt;
-                cout << "Important Node" << importantNode;
-                statementsIt--;
-                cout << "This node 1: " << *statementsIt;
-                cout << "This node 2: " << *it;
-/*
-                //put the label in and then take a step back
-                vector<string> b {label, "---", "---", "---"};
-                if (codeIt != code.end()) {
-                    codeIt++;
-                }
-                code.insert(codeIt, b);
-                codeIt--;*/
                 cout << "IF" << endl;
                 break;
             }
@@ -167,11 +146,14 @@ void makeCode(tree<ASTNode*>::pre_order_iterator it, tree<ASTNode*>::pre_order_i
 
 void generate3ac(const tree<ASTNode*>& ast) {
     ASTNode node;
-    tree<ASTNode*>::pre_order_iterator it = ast.begin();
+    tree<ASTNode*>::post_order_iterator it = ast.begin_post();
 
-    codeIt = code.begin();
+    makeCode(it, ast.end_post());
 
-    makeCode(it, ast.end());
+    for (auto x : operands) {
+        cout << x << " ";
+    }
+    cout << endl;
 
     cout << "===========================" << endl;
 
