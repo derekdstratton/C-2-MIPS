@@ -43,7 +43,12 @@ public:
         return -1;
     }
     virtual char getSeqType() {
+        cout << "WHATCHU MEAN???";
         return '\0';
+    }
+    virtual int getOpType() {
+        cout << "SHOULD NOT BE HERE";
+        return -1;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
@@ -291,6 +296,9 @@ public:
     int getNodeType() {
         return RELATIONALNODE;
     }
+    int getOpType() {
+        return operationType;
+    }
 private:
     int operationType;
     void printNode(std::ostream& os) const;
@@ -318,6 +326,7 @@ public:
     int getNodeType() {
         return BINARYMATHNODE;
     }
+    int getOpType();
 private:
     int operationType;
     void printNode(std::ostream& os) const;

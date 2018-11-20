@@ -903,6 +903,10 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     colNum = columnQueue.size() - yyleng + 1;
 }
 
+int BinaryMathNode::getOpType() {
+    return operationType;
+}
+
 /**
  * @brief binaryMathNode print function
  * @param os is the stream to be printed to
