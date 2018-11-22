@@ -50,6 +50,13 @@ public:
         cout << "SHOULD NOT BE HERE";
         return -1;
     }
+    virtual string walk() {
+        cout << "WAWAEWAWA" << endl;
+        for (auto x : getChildren()) {
+            x->walk();
+        }
+        return "NA";
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
 protected:
@@ -67,6 +74,9 @@ protected:
      * @param iRoot
      */
     static void copyTreeHelper(ASTNode*& src_node, tree<ASTNode*> & ast, typename tree<ASTNode*>::iterator iRoot);
+
+    static int registerCnt;
+    static int labelCnt;
 };
 
 
@@ -98,6 +108,36 @@ public:
 private:
     bool doo;
     void printNode(std:: ostream& os) const;
+    string walk() {
+        string initLabel = "l" + to_string(labelCnt++);
+        cout << initLabel << ": " << endl;
+
+        string s1 = "BREQ";
+        string s2;
+        string s3 = "0";
+        string s4;
+
+        if (!doo) {
+            //while condition
+            s2 = getChildren().front()->walk();
+            s4  = "l" + to_string(labelCnt++);
+            cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+            //then do
+            getChildren().back()->walk();
+        } else {
+            //do
+            getChildren().back()->walk();
+            //then while
+            s2 = getChildren().front()->walk();
+            s4  = "l" + to_string(labelCnt++);
+            cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        }
+
+        cout << "BR" << " " << initLabel << endl;
+        cout << s4 << ":" << endl;
+
+        return "";
+    }
 };
 
 class IfNode : public ASTNode {
@@ -110,6 +150,16 @@ public:
 private:
     bool flag;
     void printNode(std:: ostream& os) const;
+    string walk() {
+        string s1 = "BREQ";
+        string s2 = getChildren().front()->walk();
+        string s3 = "0";
+        string s4 = "l" + to_string(labelCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        getChildren().back()->walk();
+        cout << s4 << ":" << endl;
+        return "";
+    }
 };
 
 class UnaryNode : public TypeNode {
@@ -146,6 +196,14 @@ public:
 private:
     int nodeType;
     void printNode(std:: ostream& os) const;
+    string walk() {
+        string s1 = tokenToString2(nodeType);
+        string s2 = getChildren().front()->walk();
+        string s3 = getChildren().back()->walk();
+        string s4 = "t" + to_string(registerCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        return s4;
+    }
 };
 
 /**
@@ -166,6 +224,13 @@ public:
 private:
     int nodeVal;
     void printNode(std::ostream& os) const;
+    string walk() {
+        string s1 = "ASSIGN";
+        string s2 = getChildren().back()->walk();
+        string s3 = getChildren().front()->walk();
+        cout << s1 << " " << s2 << " " << s3 << endl;
+        return s3;
+    }
 };
 
 /**
@@ -210,6 +275,22 @@ public:
 private:
     char seqType;
     void printNode(std::ostream& os) const;
+    string walk() {
+        switch(seqType) {
+            case 'g': {
+                cout << "CALL" << " " << "main" << endl;
+                break;
+            }
+            default: {
+                cout << "OTHER SEQ NODE" << endl;
+                break;
+            }
+        }
+        for (auto x : getChildren()) {
+            x->walk();
+        }
+        return "";
+    }
 };
 
 class IdentifierNode : public TypeNode {
@@ -227,6 +308,9 @@ private:
     string identifier;
     list<int> sizeList;
     void printNode(std::ostream& os) const;
+    string walk() {
+        return identifier;
+    }
 };
 
 class IntNode : public TypeNode {
@@ -241,6 +325,9 @@ public:
 private:
     int nodeVal;
     void printNode(std::ostream& os) const;
+    string walk() {
+        return to_string(nodeVal);
+    }
 };
 
 class CharNode : public TypeNode {
@@ -302,6 +389,16 @@ public:
 private:
     int operationType;
     void printNode(std::ostream& os) const;
+    string walk() {
+        string s1 = tokenToString2(operationType);
+        auto it = getChildren().begin();
+        string s2 = (*it)->walk();
+        it++;
+        string s3 = (*it)->walk();
+        string s4 = "t" + to_string(registerCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        return s4;
+    }
 };
 
 int computeTypeOrder(set<int>& typeSet);
@@ -330,6 +427,16 @@ public:
 private:
     int operationType;
     void printNode(std::ostream& os) const;
+    string walk() {
+        string s1 = tokenToString2(operationType);
+        auto it = getChildren().begin();
+        string s2 = (*it)->walk();
+        it++;
+        string s3 = (*it)->walk();
+        string s4 = "t" + to_string(registerCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        return s4;
+    }
 };
 
 //todo could/should this be generalized to other control flow breaks?
@@ -378,6 +485,31 @@ private:
     list<pair<string, set<int>>> args; //for definitions
     void printNode(std::ostream& os) const;
     int funcType; //0 for prototype, 1 for definition, 2 for call
+    string walk() {
+        //cout << "FUNCTION (TODO)" << endl;
+        switch (funcType) {
+            case 0:
+                cout << "PROTOTYPE- DO NOTHING" << endl;
+                break;
+            case 1:
+                cout << "PROCENTRY " << funcName << endl;
+                break; //todo output how many parameters and how many local variables
+                    //num local variables known after doing a walk, based on offset symbol table
+            case 2:
+                cout << "CALL " << funcName << endl;
+                break;
+            default:
+                break;
+        }
+        for (auto a : getChildren()) {
+            a->walk();
+        }
+        if (funcType == 1) {
+            cout << "ENDPROC" << endl;
+        }
+        //todo switch(funcType)
+        return "";
+    }
 };
 
 class ForNode : public ASTNode {

@@ -5,6 +5,9 @@ extern int yyleng;
 
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
 
+int ASTNode::registerCnt = 0;
+int ASTNode::labelCnt = 0;
+
 /**
  * @brief converts a defined token into a string
  * @param token is the token to be converted
