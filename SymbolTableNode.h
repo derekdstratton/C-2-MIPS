@@ -79,6 +79,10 @@ public:
     bool isFunction;
     list<set<int>> paramTypes;
     bool defined;
+
+    //really bad style- used in 3ac
+    int offset;
+    string tempreg;
 };
 
 
