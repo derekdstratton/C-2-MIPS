@@ -15,7 +15,6 @@
 #include <cfloat>
 
 #include "SymbolTable.h"
-#include "SymbolTableNode.h"
 #include "ASTNodes.h"
 #include "parser.hpp"
 #include "ASTNodes.h"
@@ -32,13 +31,6 @@ extern bool debug[5];
 extern char* fileName;
 extern int lineNum;
 deque <char> columnQueue;
-
-//Symbol Table Enum types for node construction
-type_specifiers type_specifier = Int; //default type specifier of "int" for everything
-type_qualifiers type_qualifier = NoTQ;
-storage_class_specifiers storage_class_specifier = NoSCS;
-signed_or_unsigneds signed_or_unsigned = NoSU;
-map<string, SymbolTableNode> struct_or_union_symbols;
 
 stringstream sourceStream;
 extern string newOutputFile;
@@ -556,77 +548,7 @@ return {
         for(int i = 0; i < yyleng; i++)
             columnQueue.pop_back();
         outputError("Too long", "Identifier name too long.", true);
-    }/*
-    string s = yytext;
-    //Constructing a Symbol Table node
-    SymbolTableNode x = SymbolTableNode();
-    x.setName(s);
-    x.setLineNumber(yylineno);
-    x.setColumnNumber(columnQueue.size() - yyleng + 1);
-    x.setTypeSpecifier(type_specifier);
-    x.setTypeQualifier(type_qualifier);
-    x.setStorageClassSpecifier(storage_class_specifier);
-    x.setSignedOrUnsigned(signed_or_unsigned);
-    if (getTable()->getMode()) {
-        //currently in insert mode
-        if (!insertModeFlag) {
-            //this is a change from insert to lookup, UNLESS you're a typedef
-            //todo check to see if you're a typedef
-            getTable()->setMode(false); //now you're in lookup mode
-            //lookup mode operations
-            tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
-            map<string, SymbolTableNode>::iterator it;
-            string status;
-            tie(it, status) = result;
-            if (status == "not") {
-            for(int i = 0; i < yyleng; i++) {
-                columnQueue.pop_back();
-            }
-                to_token_file(ERROR, "ERROR");
-                outputError("Not found", "Identifier not defined.", false);
-            }
-            yylval.symtblnode = new SymbolTableNode(it->second);
-        } else {
-            //this is a normal insert
-            pair<string, SymbolTableNode> entry = make_pair(s,x);
-            tuple<bool, bool> result = getTable()->insert(entry);
-            bool insertSuccess, notShadowing;
-            tie(insertSuccess, notShadowing) = result;
-            if (!insertSuccess) {
-                for(int i = 0; i < yyleng; i++)
-                    columnQueue.pop_back();
-                to_token_file(ERROR, "ERROR");
-                outputError("Already exists", "Variable already exists on this scope.", false);
-            } else if (!notShadowing) {
-                for(int i = 0; i < yyleng; i++)
-                    columnQueue.pop_back();
-                outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
-            }
-            //todo this is just sloppy, this should be returned in the insert tuple.
-            tuple<map<string, SymbolTableNode>::iterator, string> result2 = getTable()->search(s);
-            map<string, SymbolTableNode>::iterator it;
-            string status;
-            tie(it, status) = result2;
-            yylval.symtblnode = new SymbolTableNode(it->second);
-        }
-    } else {
-        //cout << "going else" << endl;
-        //currently in lookup mode
-        //lookup mode operations
-        //Lookup Mode
-        tuple<map<string, SymbolTableNode>::iterator, string> result = getTable()->search(s);
-        map<string, SymbolTableNode>::iterator it;
-        string status;
-        tie(it, status) = result;
-        if (status == "not") {
-            for(int i = 0; i < yyleng; i++)
-                columnQueue.pop_back();
-            to_token_file(ERROR, "ERROR");
-            outputError("Not found", "Identifier not defined.", false);
-        }
-        //todo what are we supposed to do with the iterator, yylval?
-        //yylval.symtblnode = new SymbolTableNode(it->second); //todo this might need to be new SymbolTableNode(), deep copy
-    }*/
+    }
     yylval.sval = new string(yytext);
     return ( IDENTIFIER );
 }

@@ -20,7 +20,6 @@
 #include "ASTNodes.h"
 #include "include/tree.hh"
 #include "include/tree_util2.hh"
-#include "3ac.cpp"
 
 SymbolTable * table_ptr;
 
