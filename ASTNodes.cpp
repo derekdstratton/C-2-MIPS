@@ -422,6 +422,11 @@ int TypeNode::getNodeType() {
     return TYPENODE;
 }
 
+string TypeNode::walk() {
+    //cout << "PURE TYPENODE HERE" << endl;
+    return "";
+}
+
 /**
  * @brief AssignNode constructor. Makes a types set based on the lval and a temporary list of child nodes.
  * @param lvalue is the lval of the assignment expression
@@ -758,6 +763,11 @@ int NoneNode::getNodeType() {
     return NONENODE;
 }
 
+string NoneNode::walk() {
+    //cout << PURE NONENODE
+    return "";
+}
+
 /**
  * @brief DeclNode constructor. Creates a temp list of children
  * @param first is the first child node
@@ -880,10 +890,11 @@ string SeqNode::walk() {
     switch(seqType) {
         case 'g': {
             cout << "CALL" << " " << "main" << endl;
+            cout << "TERMINATE" << endl;
             break;
         }
         default: {
-            cout << "OTHER SEQ NODE" << endl;
+            //cout << "OTHER SEQ NODE" << endl;
             break;
         }
     }
@@ -1015,6 +1026,9 @@ void CharNode::printNode(std::ostream &os) const {
 int CharNode::getNodeType() {
     return CHARNODE;
 }
+string CharNode::walk() {
+    return to_string(nodeVal);
+}
 
 /**
  * @brief FloatNode constructor. inserts type FLOAT into set of types.
@@ -1026,6 +1040,10 @@ FloatNode::FloatNode(float val) {
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
+}
+
+string FloatNode::walk() {
+    return to_string(nodeVal);
 }
 
 /**
@@ -1061,6 +1079,11 @@ void StringNode::printNode(std::ostream &os) const {
 
 int StringNode::getNodeType() {
     return STRINGNODE;
+}
+
+string StringNode::walk() {
+    cout << "TODO STRING NODES SCARY" << endl;
+    return "";
 }
 
 /**
@@ -1253,6 +1276,13 @@ int ReturnNode::getNodeType() {
     return RETURNNODE;
 }
 
+string ReturnNode::walk() {
+    string ret = getChildren().front()->walk();
+    cout << "RETURN " << ret << endl;
+    return "";
+    //return ASTNode::walk();
+}
+
 /**
  * @brief ArrayNode constructor creates a templist with the identifier and the dimensions
  * @param var is the identifier along with the type
@@ -1394,20 +1424,31 @@ string FuncNode::walk() {
             cout << "PROTOTYPE- DO NOTHING" << endl;
             break;
         case 1:
-            cout << "PROCENTRY " << funcName << endl;
-            break; //todo output how many parameters and how many local variables
-            //num local variables known after doing a walk, based on offset symbol table
-        case 2:
-            cout << "CALL " << funcName << endl;
+            cout << funcName << ": " << endl;
+            for (auto a : getChildren()) {
+                a->walk();
+            }
+            cout << "RETURN" << endl;
             break;
+            //num local variables known after doing a walk, based on offset symbol table
+        case 2: {
+            int stackSpace = 0;
+            for (auto item : paramTypes) {
+                stackSpace += getByteSize(item);
+            }
+            cout << "Allocate stack space (params, locals, return) - todo" << endl; //todo
+            cout << "ALLOCATE " << stackSpace << endl;
+            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
+                string ret = a->walk();
+                cout << "PUSHPARAM " << ret << endl;
+            }
+            cout << "CALL " << funcName << endl;
+            cout << "Deallocate stack space (params, locals, return) - todo" << endl; //todo
+            cout << "DEALLOCATE " << stackSpace << endl;
+            break;
+        }
         default:
             break;
-    }
-    for (auto a : getChildren()) {
-        a->walk();
-    }
-    if (funcType == 1) {
-        cout << "ENDPROC" << endl;
     }
     return "";
 }

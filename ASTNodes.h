@@ -67,6 +67,21 @@ public:
 protected:
     set<int> types;
     void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ * Left is the declarator (variable), right is a list of sizes
+ */
+class ArrayNode : public TypeNode {
+public:
+    ArrayNode(ASTNode* var, list<ASTNode *> sizes);
+    list<ASTNode*> getSizes() override;
+    int getDimensions() override;
+    int getNodeType() override;
+private:
+    list<ASTNode *> sizeList;
+    void printNode(std::ostream& os) const override;
 };
 
 /**
@@ -186,16 +201,59 @@ private:
     string walk() override;
 };
 
+
 /**
  *
  */
-class WhileNode : public ASTNode{
+class LogicalNode : public ASTNode {
 public:
-    WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo);
+    LogicalNode(int x, ASTNode* left, ASTNode* right);
     int getNodeType() override;
 private:
-    bool doo;
+    int nodeType;
     void printNode(std:: ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ * Nodes for relations
+ */
+class RelationalNode : public ASTNode {
+public:
+    RelationalNode(int type, ASTNode * left, ASTNode * right);
+    int getNodeType() override;
+    int getOpType() override;
+private:
+    int operationType;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ *
+ */
+class ReturnNode : public ASTNode {
+public:
+    explicit ReturnNode(ASTNode* child);
+    int getNodeType() override;
+private:
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+
+/**
+ * Sequence of statements, left to right
+ */
+class SeqNode : public ASTNode {
+public:
+    SeqNode(char seq, ASTNode * first, ASTNode * second);
+    SeqNode(char seq, list<ASTNode*> statementList);
+    int getNodeType() override;
+    char getSeqType() override;
+private:
+    char seqType;
+    void printNode(std::ostream& os) const override;
     string walk() override;
 };
 
@@ -214,80 +272,17 @@ private:
 /**
  *
  */
-class LogicalNode : public ASTNode {
+class WhileNode : public ASTNode{
 public:
-    LogicalNode(int x, ASTNode* left, ASTNode* right);
+    WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo);
     int getNodeType() override;
 private:
-    int nodeType;
+    bool doo;
     void printNode(std:: ostream& os) const override;
     string walk() override;
 };
 
-/**
- * Represents an empty node. Used for empty/not used statements
- */
-class NoneNode : public ASTNode {
-public:
-    NoneNode();
-    int getNodeType() override;
-private:
-    void printNode(std::ostream& os) const override;
-};
-
-/**
- * Sequence of statements, left to right
- */
-class SeqNode : public ASTNode {
-public:
-    SeqNode(char seq, ASTNode * first, ASTNode * second);
-    SeqNode(char seq, list<ASTNode*> statementList);
-    int getNodeType() override;
-    char getSeqType() override;
-private:
-    char seqType;
-    void printNode(std::ostream& os) const override;
-    string walk() override;
-};
-
-/**
- * Nodes for relations
- */
-class RelationalNode : public ASTNode {
-public:
-    RelationalNode(int type, ASTNode * left, ASTNode * right);
-    int getNodeType() override;
-    int getOpType() override;
-private:
-    int operationType;
-    void printNode(std::ostream& os) const override;
-    string walk() override;
-};
-
-//todo could/should this be generalized to other control flow breaks?
-//this is more a question to be answered when getting into functions
-class ReturnNode : public ASTNode {
-public:
-    explicit ReturnNode(ASTNode* child);
-    int getNodeType() override;
-private:
-    void printNode(std::ostream& os) const override;
-};
-
-
-/**
- * Left is the declarator (variable), right is a list of sizes
- */
-class ArrayNode : public TypeNode {
-public:
-    ArrayNode(ASTNode* var, list<ASTNode *> sizes);
-    list<ASTNode*> getSizes() override;
-    int getDimensions() override;
-    int getNodeType() override;
-private:
-    list<ASTNode *> sizeList;
-    void printNode(std::ostream& os) const override;
-};
+//Leaf Nodes
 
 /**
  *
@@ -332,6 +327,7 @@ public:
 private:
     char nodeVal;
     void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**
@@ -344,6 +340,7 @@ public:
 private:
     float nodeVal;
     void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**
@@ -356,6 +353,19 @@ public:
 private:
     string nodeVal;
     void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ * Represents an empty node. Used for empty/not used statements
+ */
+class NoneNode : public ASTNode {
+public:
+    NoneNode();
+    int getNodeType() override;
+private:
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 #endif //PROJECT_ASTNODES_H
