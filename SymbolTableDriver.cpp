@@ -44,8 +44,8 @@ int main() {
                 cout << "Type an identifier to search for:" << endl;
                 string ab;
                 cin >> ab;
-                tuple<map<string, SymbolTableNode2>::iterator, string> retr = s.search(ab);
-                map<string, SymbolTableNode2>::iterator it;
+                tuple<SymbolTableNode2*, string> retr = s.search(ab);
+                SymbolTableNode2* it;
                 string status;
                 tie(it, status) = retr;
                 if (status == "top") {

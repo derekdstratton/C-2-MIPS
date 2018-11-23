@@ -20,7 +20,6 @@
 #include "ASTNodes.h"
 #include "include/tree.hh"
 #include "include/tree_util2.hh"
-#include "3ac.cpp"
 
 SymbolTable * table_ptr;
 
@@ -153,11 +152,15 @@ translation_unit
 	: external_declaration {
 	list<ASTNode*> tmp;
 	tmp.push_back($1);
-	root_ptr = $$;
 	$$ = new SeqNode('g', tmp);
+	root_ptr = $$;
 	handleProd("translation_unit -> external_declaration\n");}
 	| translation_unit external_declaration {
-	$$ = new SeqNode('g', $1, $2);
+	list<ASTNode*> seq = $1->getChildren();
+    seq.push_back($2);
+    $$ = new SeqNode('g', seq);
+
+	//$$ = new SeqNode('g', $1, $2);
 	root_ptr = $$;
 	handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
@@ -1494,7 +1497,8 @@ int main(int argc, char **argv)
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
-        generate3ac(ast);
+        root_ptr->walk();
+        //generate3ac(ast); deprecate this
     }
 	return 0;
 }

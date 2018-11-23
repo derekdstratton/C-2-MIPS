@@ -24,12 +24,6 @@ ADD_FLEX_BISON_DEPENDENCY(MyScanner MyParser)
 #include_directories(${PROJECT_BINARY_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
 
-# AST
-
-add_executable(Tree tree.cpp)
-
-add_executable(Tree2 tree2.cpp)
-
 # http://www.webgraphviz.com/
 
 # copy over the test files
@@ -42,9 +36,3 @@ add_executable(ScannerParser SymbolTable.cpp SymbolTableNode.cpp ASTNodes.cpp
 ${BISON_MyParser_OUTPUTS}
 ${FLEX_MyScanner_OUTPUTS}
 )
-
-set(STUFF SymbolTable.cpp SymbolTableNode.cpp ASTNodes.cpp
-        ${BISON_MyParser_OUTPUTS}
-        ${FLEX_MyScanner_OUTPUTS} )
-add_executable(Main main.cpp ${STUFF}
-        )

@@ -1,74 +1,57 @@
 #ifndef PROJECT_ASTNODES_H
 #define PROJECT_ASTNODES_H
 
+//Included libraries
+
 #include <list>
 #include <string>
 #include <iostream>
 
-using namespace std;
 #include "include/tree.hh"
 #include "SymbolTable.h"
-
 #include "yytokentype.h"
 #include "astnodetype.h"
 
-/**
- *
- * @param token
- * @return
- */
-string tokenToString2(int token);
+using namespace std;
 
+//Helper Functions
+
+string tokenToString2(int token);
+int getByteSize(set<int> typeSet);
+int computeTypeOrder(set<int>& typeSet);
+int compareForCast(set<int>& left, set<int>& right);
+
+/**
+ * Main base class for all Abstract Syntax Tree nodes
+ */
 class ASTNode {
 public:
     ASTNode();
-
     list<ASTNode*> getChildren();
-
-    /** Copies the ASTNode into a tree.hh tree
-     *
-     * @param root
-     * @param ast A tree.hh to be copied into
-     */
     static void copyTree(ASTNode*& root, tree<ASTNode*> & ast);
-
     virtual int getNodeType();
     virtual set<int> getTypes();
     virtual string getName();
     virtual void setSymbolNode(SymbolTableNode2* symtblnd2);
     virtual int getDimensions();
     virtual list<ASTNode*> getSizes();
-    virtual int getVal() {
-        cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
-        return -1;
-    }
-    virtual char getSeqType() {
-        cout << "WHATCHU MEAN???";
-        return '\0';
-    }
-    virtual int getOpType() {
-        cout << "SHOULD NOT BE HERE";
-        return -1;
-    }
-
+    virtual int getVal();
+    virtual char getSeqType();
+    virtual int getOpType();
+    virtual string walk();
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
 protected:
-    set<int> types;
     int lineNum;
     int colNum;
     list<ASTNode *> childrenNodes;
     //source code?
+    static int registerCnt;
+    static int labelCnt;
+    static SymbolTable table3ac;
+    //private helper functions
     virtual void printNode(std::ostream& os) const;
-
-    /**
-     *
-     * @param src_node
-     * @param ast
-     * @param iRoot
-     */
     static void copyTreeHelper(ASTNode*& src_node, tree<ASTNode*> & ast, typename tree<ASTNode*>::iterator iRoot);
 };
-
 
 /**
  * In the future this might contain other things like pointers or [], see abstract_declarator
@@ -77,75 +60,28 @@ protected:
 class TypeNode : public ASTNode {
 public:
     TypeNode();
-    TypeNode(set<int>& type);
-
-    int getNodeType() {
-        return TYPENODE;
-    }
-    set<int> getTypes();
+    explicit TypeNode(set<int>& type);
+    int getNodeType() override;
+    set<int> getTypes() override;
     void checkType();
 protected:
-    set<int> types; //todo figure out how this should know types like array and pointer in the int set. encode it.
-    void printNode(std::ostream& os) const;
+    set<int> types;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
-class WhileNode : public ASTNode{
+/**
+ * Left is the declarator (variable), right is a list of sizes
+ */
+class ArrayNode : public TypeNode {
 public:
-    WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo);
-    int getNodeType() {
-        return WHILENODE;
-    }
+    ArrayNode(ASTNode* var, list<ASTNode *> sizes);
+    list<ASTNode*> getSizes() override;
+    int getDimensions() override;
+    int getNodeType() override;
 private:
-    bool doo;
-    void printNode(std:: ostream& os) const;
-};
-
-class IfNode : public ASTNode {
-public:
-    IfNode(ASTNode* expr, ASTNode* stmt);
-    IfNode(ASTNode* expr, ASTNode* stmt, ASTNode* stmt2);
-    int getNodeType() {
-        return IFNODE;
-    }
-private:
-    bool flag;
-    void printNode(std:: ostream& os) const;
-};
-
-class UnaryNode : public TypeNode {
-public:
-    UnaryNode(int x, ASTNode* child);
-    int getNodeType() {
-        return UNARYNODE;
-    }
-private:
-    int nodeType;
-    void printNode(std:: ostream& os) const;
-};
-
-//does not include tilde
-class BitwiseNode : public ASTNode {
-public:
-    BitwiseNode(int x, ASTNode* left, ASTNode* right);
-    int getNodeType() {
-        return BITWISENODE;
-    }
-private:
-    int nodeType;
-    void printNode(std:: ostream& os) const{
-        os << "BITWISE_" << tokenToString2(nodeType);
-    }
-};
-
-class LogicalNode : public ASTNode {
-public:
-    LogicalNode(int x, ASTNode* left, ASTNode* right);
-    int getNodeType() {
-        return LOGICALNODE;
-    }
-private:
-    int nodeType;
-    void printNode(std:: ostream& os) const;
+    list<ASTNode *> sizeList;
+    void printNode(std::ostream& os) const override;
 };
 
 /**
@@ -157,28 +93,54 @@ private:
  * Child 2 is the rvalue, op1
  * (op2 is blank)
  */
-class AssignNode : public ASTNode {
+class AssignNode : public TypeNode {
 public:
     AssignNode(ASTNode * lvalue, ASTNode * rvalue);
-    int getNodeType() {
-        return ASSIGNNODE;
-    }
+    int getNodeType() override;
 private:
     int nodeVal;
-    void printNode(std::ostream& os) const;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+
+/**
+ * Simple math operators: +, -, *, /, %
+ * left and right MUST both be TypeNode types or it will be bad
+ */
+class BinaryMathNode : public TypeNode {
+public:
+    BinaryMathNode(int type, ASTNode * left, ASTNode * right);
+    int getNodeType() override;
+    int getOpType() override;
+private:
+    int operationType;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**
- * Represents an empty node. Used for empty/not used statements
+ *
+ * does not include tilde
  */
-class NoneNode : public ASTNode {
+class BitwiseNode : public TypeNode {
 public:
-    NoneNode();
-    int getNodeType() {
-        return NONENODE;
-    }
+    BitwiseNode(int x, ASTNode* left, ASTNode* right);
+    int getNodeType() override;
 private:
-    void printNode(std::ostream& os) const;
+    int nodeType;
+    void printNode(std:: ostream& os) const override;
+};
+
+/**
+ * Right hand side is a TypeNode, left is the Type to cast to
+ */
+class CastNode : public TypeNode {
+public:
+    CastNode(ASTNode * type, ASTNode *nodeToCast);
+    int getNodeType() override;
+private:
+    void printNode(std::ostream& os) const override;
 };
 
 /**
@@ -187,104 +149,70 @@ private:
 class DeclNode : public ASTNode {
 public:
     DeclNode(ASTNode * first, ASTNode * second);;
-    int getNodeType() {
-        return DECLNODE;
-    }
+    int getNodeType() override;
 private:
-    void printNode(std::ostream& os) const;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**
- * Sequence of statements, left to right
+ * For loop node with everything in appropriate positions
  */
-class SeqNode : public ASTNode {
+class ForNode : public ASTNode {
 public:
-    SeqNode(char seq, ASTNode * first, ASTNode * second);
-    SeqNode(char seq, list<ASTNode*> statementList);
-    int getNodeType() {
-        return SEQNODE;
-    }
-    char getSeqType() {
-        return seqType;
+    ForNode(list<ASTNode*> ptrList, bool arr[3], ASTNode * stmt);
+    int getNodeType() override {
+        return FORNODE;
     }
 private:
-    char seqType;
-    void printNode(std::ostream& os) const;
+    bool stmtWritten[3];
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
-class IdentifierNode : public TypeNode {
+/**
+ * @brief node for functions. Stores function name, parameter types if it is a prototype/definition
+ */
+class FuncNode : public TypeNode {
 public:
-    IdentifierNode(string * name);
-    ~IdentifierNode();
-    string getName();
-    void setSymbolNode(SymbolTableNode2* symtblnd2);
-    int getDimensions();
-    int getNodeType() {
-        return IDENTIFIERNODE;
-    }
+    FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
+    string getName() override;
+    int getNodeType() override;
 private:
-    SymbolTableNode2 * symbolTableNode2;
-    string identifier;
-    list<int> sizeList;
-    void printNode(std::ostream& os) const;
+    string funcName;
+    list<set<int>> paramTypes; //for prototypes
+    list<pair<string, set<int>>> args; //for definitions
+    void printNode(std::ostream& os) const override;
+    int funcType; //0 for prototype, 1 for definition, 2 for call
+    string walk() override;
 };
 
-class IntNode : public TypeNode {
+/**
+ * Node for if, including the expression to evaluate and stuff in the braces
+ */
+class IfNode : public ASTNode {
 public:
-    IntNode(int val);
-    int getVal() {
-        return nodeVal;
-    }
-    int getNodeType() {
-        return INTNODE;
-    }
+    IfNode(ASTNode* expr, ASTNode* stmt);
+    IfNode(ASTNode* expr, ASTNode* stmt, ASTNode* stmt2);
+    int getNodeType() override;
 private:
-    int nodeVal;
-    void printNode(std::ostream& os) const;
-};
-
-class CharNode : public TypeNode {
-public:
-    CharNode(char val);
-    int getNodeType() {
-        return CHARNODE;
-    }
-private:
-    char nodeVal;
-    void printNode(std::ostream& os) const;
-};
-
-class FloatNode : public TypeNode {
-public:
-    FloatNode(float val);
-    int getNodeType() {
-        return FLOATNODE;
-    }
-private:
-    float nodeVal;
-    void printNode(std::ostream& os) const;
-};
-
-class StringNode : public TypeNode {
-public:
-    StringNode(string * val);
-    int getNodeType() {
-        return STRINGNODE;
-    }
-private:
-    string nodeVal;
-    void printNode(std::ostream& os) const;
+    bool flag; //Set to true if it's an if node, set to 0 if it's an if else node
+    void printNode(std:: ostream& os) const override;
+    string walk() override;
 };
 
 
-class CastNode : public TypeNode {
+/**
+ *
+ */
+class LogicalNode : public ASTNode {
 public:
-    CastNode(ASTNode * type, ASTNode *nodeToCast);
-    int getNodeType() {
-        return CASTNODE;
-    }
+    LogicalNode(int x, ASTNode* left, ASTNode* right);
+    int getNodeType() override;
 private:
-    void printNode(std::ostream& os) const;
+    int nodeType;
+    void printNode(std:: ostream& os) const override;
+    string walk() override;
 };
 
 /**
@@ -293,102 +221,151 @@ private:
 class RelationalNode : public ASTNode {
 public:
     RelationalNode(int type, ASTNode * left, ASTNode * right);
-    int getNodeType() {
-        return RELATIONALNODE;
-    }
-    int getOpType() {
-        return operationType;
-    }
+    int getNodeType() override;
+    int getOpType() override;
 private:
     int operationType;
-    void printNode(std::ostream& os) const;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
-
-int computeTypeOrder(set<int>& typeSet);
 
 /**
- * If returns a value > 0, then the right side needs casted to be bigger
- * If returns a value < 0, then the left side needs casted to be bigger
- * If returns 0, no casting is needed
- * @param left
- * @param right
- * @return
+ *
  */
-int compareForCast(set<int>& left, set<int>& right);
-
-/*
- * Simple math operators: +, -, *, /, %
- * left and right MUST both be TypeNode types or it will be bad
- */
-class BinaryMathNode : public TypeNode {
-public:
-    BinaryMathNode(int type, ASTNode * left, ASTNode * right);
-    int getNodeType() {
-        return BINARYMATHNODE;
-    }
-    int getOpType();
-private:
-    int operationType;
-    void printNode(std::ostream& os) const;
-};
-
-//todo could/should this be generalized to other control flow breaks?
-//this is more a question to be answered when getting into functions
 class ReturnNode : public ASTNode {
 public:
-    ReturnNode(ASTNode* child);
-    int getNodeType() {
-        return RETURNNODE;
-    }
+    explicit ReturnNode(ASTNode* child);
+    int getNodeType() override;
 private:
-    void printNode(std::ostream& os) const;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 
 /**
- * Left is the declarator (variable), right is a list of sizes
+ * Sequence of statements, left to right
  */
-class ArrayNode : public TypeNode {
+class SeqNode : public ASTNode {
 public:
-    ArrayNode(ASTNode* var, list<ASTNode *> sizes);
-    list<ASTNode*> getSizes();
-    int getDimensions();
-    int getNodeType() {
-        return ARRAYNODE;
-    }
+    SeqNode(char seq, ASTNode * first, ASTNode * second);
+    SeqNode(char seq, list<ASTNode*> statementList);
+    int getNodeType() override;
+    char getSeqType() override;
 private:
-    list<ASTNode *> sizeList;
-    void printNode(std::ostream& os) const;
+    char seqType;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
-
 
 /**
- * @brief node for functions. Stores function name, parameter types if it is a prototype/definition
+ *
  */
-class FuncNode : public TypeNode {
+class UnaryNode : public TypeNode {
 public:
-    FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
-    string getName();
-    int getNodeType() {
-        return FUNCNODE;
-    }
+    UnaryNode(int x, ASTNode* child);
+    int getNodeType() override;
 private:
-    string funcName;
-    list<set<int>> paramTypes; //for prototypes
-    list<pair<string, set<int>>> args; //for definitions
-    void printNode(std::ostream& os) const;
-    int funcType; //0 for prototype, 1 for definition, 2 for call
+    int nodeType;
+    void printNode(std:: ostream& os) const override;
 };
 
-class ForNode : public ASTNode {
+/**
+ *
+ */
+class WhileNode : public ASTNode{
 public:
-    ForNode(list<ASTNode*> ptrList, bool arr[3], ASTNode * stmt);
-    int getNodeType() {
-        return FORNODE;
-    }
+    WhileNode(ASTNode* expr, ASTNode* stmt, bool dooo);
+    int getNodeType() override;
 private:
-    bool stmtWritten[3];
-    void printNode(std::ostream& os) const;
+    bool doo;
+    void printNode(std:: ostream& os) const override;
+    string walk() override;
+};
+
+//Leaf Nodes
+
+/**
+ *
+ */
+class IdentifierNode : public TypeNode {
+public:
+    explicit IdentifierNode(string * name);
+    ~IdentifierNode();
+    string getName() override;
+    void setSymbolNode(SymbolTableNode2* symtblnd2) override;
+    int getDimensions() override;
+    int getNodeType() override;
+private:
+    SymbolTableNode2 * symbolTableNode2;
+    string identifier;
+    list<int> sizeList;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ *
+ */
+class IntNode : public TypeNode {
+public:
+    explicit IntNode(int val);
+    int getVal() override;
+    int getNodeType() override;
+private:
+    int nodeVal;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ *
+ */
+class CharNode : public TypeNode {
+public:
+    explicit CharNode(char val);
+    int getNodeType() override;
+private:
+    char nodeVal;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ *
+ */
+class FloatNode : public TypeNode {
+public:
+    explicit FloatNode(float val);
+    int getNodeType() override;
+private:
+    float nodeVal;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ *
+ */
+class StringNode : public TypeNode {
+public:
+    explicit StringNode(string * val);
+    int getNodeType() override;
+private:
+    string nodeVal;
+    void printNode(std::ostream& os) const override;
+    string walk() override;
+};
+
+/**
+ * Represents an empty node. Used for empty/not used statements
+ */
+class NoneNode : public ASTNode {
+public:
+    NoneNode();
+    int getNodeType() override;
+private:
+    void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 #endif //PROJECT_ASTNODES_H
