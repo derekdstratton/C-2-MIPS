@@ -491,6 +491,9 @@ string AssignNode::walk() {
     string s1 = "ASSIGN";
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
+    if (getChildren().back()->getNodeType() == ARRAYNODE) {
+        s2 = "(" + s2 + ")";
+    }
     cout << s1 << " " << s2 << " " << s3 << endl;
     return s3;
 }
@@ -796,13 +799,16 @@ int DeclNode::getNodeType() {
 }
 
 string DeclNode::walk() {
+    if (getChildren().back()->getNodeType() == ARRAYNODE) {
+        cout << "ARRAYNODE DECL GOES HERE" << endl;
+        return "";
+    }
     auto type = getChildren().front()->getTypes();
     int offset = getByteSize(type);
     SymbolTableNode2 * s = new SymbolTableNode2();
     s->offset = offset;
     //s->tempreg = todo maybe later will we need to assign a temporary register? arrays need a pointer?
-    auto pair = make_pair(getChildren().back()->getName(), *s);
-    table3ac.insert(pair);
+    table3ac.insert(make_pair(getChildren().back()->getName(), *s));
 
     return "";
 }
@@ -1239,8 +1245,14 @@ string BinaryMathNode::walk() {
     string s1 = tokenToString2(operationType);
     auto it = getChildren().begin();
     string s2 = (*it)->walk();
+    if ((*it)->getNodeType() == ARRAYNODE) {
+        s2 = "(" + s2 + ")";
+    }
     it++;
     string s3 = (*it)->walk();
+    if ((*it)->getNodeType() == ARRAYNODE) {
+        s3 = "(" + s3 + ")";
+    }
     string s4 = "t" + to_string(registerCnt++);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
     return s4;
@@ -1325,6 +1337,29 @@ void ArrayNode::printNode(std::ostream &os) const {
 
 int ArrayNode::getNodeType() {
     return ARRAYNODE;
+}
+
+string ArrayNode::walk() {
+    string s1 = "t" + to_string(registerCnt++);
+    cout << "ADDR " << getChildren().front()->getName() << " " << s1 << endl;
+    //s1 is the base address
+    string s2 = "t" + to_string(registerCnt++);
+    cout << "MUL " << getChildren().back()->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
+    //s2 is the offset
+    string s3 = "t" + to_string(registerCnt++);
+    cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
+    /* todo multidimensional arrays
+    string s2;
+    string s3;
+    for (auto x : sizeList) {
+        s2 = "t" + to_string(registerCnt++);
+        cout << "MUL " << x->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
+        //s2 is the offset
+        s3 = "t" + to_string(registerCnt++);
+        cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
+    }
+    */
+    return s3;
 }
 
 /**
