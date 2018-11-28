@@ -1373,7 +1373,7 @@ int ArrayNode::getNodeType() {
 
 string ArrayNode::walk() {
     string s1 = "t" + to_string(registerCnt++);
-    string name = getChildren().front()->getName()
+    string name = getChildren().front()->getName();
     cout << "ADDR " << name << " " << s1 << endl;
     vector<string> v = {"ADDR", name, "---", s1};
     main3ac.push_back(v);
