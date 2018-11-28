@@ -7,6 +7,7 @@ extern int yylineno;
 extern deque <char> columnQueue;
 extern int yyleng;
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
+extern char* fileName;
 
 //Static Variables
 
@@ -493,10 +494,24 @@ string AssignNode::walk() {
     string s1 = "ASSIGN";
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
+    string s4;
+    int temp = 0;
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }
-    cout << s1 << " " << s2 << " " << s3 << endl;
+    ifstream istream;
+    istream.open(fileName);
+    for(int i = 0; i < lineNum; ++i)
+    {
+        getline(istream, s4);
+    }
+
+    while(s4[temp] == ' ')
+        temp++;
+
+    s4.erase(1, temp - 1);
+
+    cout << s1 << " " << s2 << " " << s3 << "    #" << s4 << endl;
     vector<string> v = {s1, s2, "---", s3};
     main3ac.push_back(v);
     return s3;
@@ -919,6 +934,9 @@ string SeqNode::walk() {
             cout << "CALL" << " " << "main" << endl;
             vector<string> v = {"CALL", "main", "---", "---"};
             main3ac.push_back(v);
+
+
+
             cout << "HALT" << endl;
             vector<string> v2 = {"HALT", "---", "---", "---"};
             main3ac.push_back(v2);
@@ -942,7 +960,6 @@ string SeqNode::walk() {
  */
 IdentifierNode::IdentifierNode(string *name) {
     identifier = *name;
-
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
 }
@@ -1282,7 +1299,22 @@ string BinaryMathNode::walk() {
         s3 = "(" + s3 + ")";
     }
     string s4 = "t" + to_string(registerCnt++);
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    string s5;
+
+    int temp = 0;
+    ifstream istream;
+    istream.open(fileName);
+    for(int i = 0; i < lineNum; ++i)
+    {
+        getline(istream, s5);
+    }
+
+    while(s5[temp] == ' ')
+        temp++;
+
+    s5.erase(1, temp - 1);
+
+    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     return s4;

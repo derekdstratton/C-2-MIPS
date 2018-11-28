@@ -6,6 +6,7 @@
 #include <list>
 #include <string>
 #include <iostream>
+#include <fstream>
 
 #include "include/tree.hh"
 #include "SymbolTable.h"
