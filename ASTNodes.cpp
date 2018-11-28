@@ -1344,7 +1344,7 @@ string ArrayNode::walk() {
     cout << "ADDR " << getChildren().front()->getName() << " " << s1 << endl;
     //s1 is the base address
     string s2 = "t" + to_string(registerCnt++);
-    cout << "MUL " << getChildren().back()->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
+    cout << "STAR " << getChildren().back()->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
     //s2 is the offset
     string s3 = "t" + to_string(registerCnt++);
     cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
@@ -1507,6 +1507,53 @@ void ForNode::printNode(std::ostream &os) const{
 }
 
 string ForNode::walk() {
-    //todo needs implemented
+    if (stmtWritten[0]) {
+        getChildren().front()->walk();
+    }
+
+    string initLabel = "l" + to_string(labelCnt++);
+    cout << initLabel << ": " << endl;
+
+    string endLabel = "l" + to_string(labelCnt++);
+
+    if (stmtWritten[1]) {
+        auto it = getChildren().begin();
+        if (stmtWritten[0])
+            it++;
+        string s1 = "BREQ";
+        string s2 = (*it)->walk();
+        string s3 = "0";
+        cout << s1 << " " << s2 << " " << s3 << " " << endLabel << endl;
+
+    }
+
+    if (stmtWritten[2]) {
+        auto it = getChildren().begin();
+        if (stmtWritten[0])
+            it++;
+        if (stmtWritten[1])
+            it++;
+        (*it)->walk();
+    }
+    /*if (!doo) {
+        //while condition
+        s2 = getChildren().front()->walk();
+        s4  = "l" + to_string(labelCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        //then do
+        getChildren().back()->walk();
+    } else {
+        //do
+        getChildren().back()->walk();
+        //then while
+        s2 = getChildren().front()->walk();
+        s4  = "l" + to_string(labelCnt++);
+        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    }*/
+    getChildren().back()->walk();
+    cout << "BR" << " " << initLabel << endl;
+    cout << endLabel << ":" << endl;
+
+    return "";
     return "";
 }
