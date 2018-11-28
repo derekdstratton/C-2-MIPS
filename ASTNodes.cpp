@@ -14,6 +14,7 @@ int ASTNode::registerCnt = 0;
 int ASTNode::labelCnt = 0;
 auto tmp = new SymbolTable();
 SymbolTable ASTNode::table3ac = *tmp;
+vector<vector<string>> ASTNode::main3ac;
 
 //Helper Functions
 
@@ -325,7 +326,7 @@ int ASTNode::getOpType() {
  * @return
  */
 string ASTNode::walk() {
-    cout << "WAWAEWAWA" << endl;
+    cout << "WALKING UNDEFINED NODE" << endl;
     for (auto x : getChildren()) {
         x->walk();
     }
@@ -343,10 +344,11 @@ int ASTNode::getVal() {
 
 /**
  * @brief default constructor for TypeNode
+ * default- MUST set type in derived constructor
+   also must CHECK type in derived constructor after setting it.
  */
 TypeNode::TypeNode() {
-    //default- MUST set type in derived constructor
-    //also must CHECK type in derived constructor after setting it.
+
 }
 
 /**
@@ -495,6 +497,8 @@ string AssignNode::walk() {
         s2 = "(" + s2 + ")";
     }
     cout << s1 << " " << s2 << " " << s3 << endl;
+    vector<string> v = {s1, s2, "---", s3};
+    main3ac.push_back(v);
     return s3;
 }
 
@@ -536,6 +540,8 @@ int WhileNode::getNodeType() {
 string WhileNode::walk() {
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ": " << endl;
+    vector<string> v = {"LABEL", initLabel, "---", "---"};
+    main3ac.push_back(v);
 
     string s1 = "BREQ";
     string s2;
@@ -547,6 +553,8 @@ string WhileNode::walk() {
         s2 = getChildren().front()->walk();
         s4  = "l" + to_string(labelCnt++);
         cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        vector<string> v = {s1, s2, s3, s4};
+        main3ac.push_back(v);
         //then do
         getChildren().back()->walk();
     } else {
@@ -556,10 +564,16 @@ string WhileNode::walk() {
         s2 = getChildren().front()->walk();
         s4  = "l" + to_string(labelCnt++);
         cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+        vector<string> v = {s1, s2, s3, s4};
+        main3ac.push_back(v);
     }
 
     cout << "BR" << " " << initLabel << endl;
+    vector<string> v2 = {"BR", "---", "---", initLabel};
+    main3ac.push_back(v2);
     cout << s4 << ":" << endl;
+    vector<string> v3 = {"LABEL", s4, "---", "---"};
+    main3ac.push_back(v3);
 
     return "";
 }
@@ -623,8 +637,12 @@ string IfNode::walk() {
     string s3 = "0";
     string s4 = "l" + to_string(labelCnt++);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
     getChildren().back()->walk();
     cout << s4 << ":" << endl;
+    vector<string> v2 = {"LABEL", s4, "---", "---"};
+    main3ac.push_back(v2);
     //todo handle else statement (flag == 0)
     return "";
 }
@@ -745,6 +763,8 @@ string LogicalNode::walk() {
     string s3 = getChildren().back()->walk();
     string s4 = "t" + to_string(registerCnt++);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
     return s4;
 }
 
@@ -895,8 +915,14 @@ char SeqNode::getSeqType() {
 string SeqNode::walk() {
     switch(seqType) {
         case 'g': {
+            cout << "TODO- MUST ALLOCATE LOCALS FOR MAIN" << endl;
             cout << "CALL" << " " << "main" << endl;
-            cout << "TERMINATE" << endl;
+            vector<string> v = {"CALL", "main", "---", "---"};
+            main3ac.push_back(v);
+            cout << "HALT" << endl;
+            vector<string> v2 = {"HALT", "---", "---", "---"};
+            main3ac.push_back(v2);
+            cout << "TODO- MUST DEALLOCATE LOCALS FOR MAIN" << endl;
             break;
         }
         default: {
@@ -1162,6 +1188,8 @@ string RelationalNode::walk() {
     string s3 = (*it)->walk();
     string s4 = "t" + to_string(registerCnt++);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
     return s4;
 }
 
@@ -1255,6 +1283,8 @@ string BinaryMathNode::walk() {
     }
     string s4 = "t" + to_string(registerCnt++);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
     return s4;
 }
 
@@ -1291,8 +1321,10 @@ int ReturnNode::getNodeType() {
 string ReturnNode::walk() {
     string ret = getChildren().front()->walk();
     cout << "RETURN " << ret << endl;
+    vector<string> v = {"RETURN", "---", "---", "---"};
+    //todo what should the return value be?
+    main3ac.push_back(v);
     return "";
-    //return ASTNode::walk();
 }
 
 /**
@@ -1341,13 +1373,22 @@ int ArrayNode::getNodeType() {
 
 string ArrayNode::walk() {
     string s1 = "t" + to_string(registerCnt++);
-    cout << "ADDR " << getChildren().front()->getName() << " " << s1 << endl;
+    string name = getChildren().front()->getName();
+    cout << "ADDR " << name << " " << s1 << endl;
+    vector<string> v = {"ADDR", name, "---", s1};
+    main3ac.push_back(v);
     //s1 is the base address
     string s2 = "t" + to_string(registerCnt++);
-    cout << "STAR " << getChildren().back()->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
+    string index_offset = to_string(getChildren().back()->getVal());
+    string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
+    cout << "STAR " << index_offset << " " << size_of << " " << s2 << endl;
+    vector<string> v2 = {"STAR", index_offset, size_of, s2};
+    main3ac.push_back(v2);
     //s2 is the offset
     string s3 = "t" + to_string(registerCnt++);
     cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
+    vector<string> v3 = {"PLUS", s1, s2, s3};
+    main3ac.push_back(v3);
     /* todo multidimensional arrays
     string s2;
     string s3;
@@ -1455,16 +1496,20 @@ int FuncNode::getNodeType() {
 
 string FuncNode::walk() {
     switch (funcType) {
-        case 0:
+        case 0: {
             cout << "PROTOTYPE- DO NOTHING" << endl;
             break;
-        case 1:
+        }
+        case 1: {
             cout << funcName << ": " << endl;
             for (auto a : getChildren()) {
                 a->walk();
             }
             cout << "RETURN" << endl;
+            vector<string> v = {"RETURN", "---", "---", "---"};
+            main3ac.push_back(v);
             break;
+        }
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
             int stackSpace = 0;
@@ -1510,9 +1555,10 @@ string ForNode::walk() {
     if (stmtWritten[0]) {
         getChildren().front()->walk();
     }
-
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ": " << endl;
+    vector<string> v = {"LABEL", initLabel, "---", "---"};
+    main3ac.push_back(v);
 
     string endLabel = "l" + to_string(labelCnt++);
 
@@ -1524,6 +1570,8 @@ string ForNode::walk() {
         string s2 = (*it)->walk();
         string s3 = "0";
         cout << s1 << " " << s2 << " " << s3 << " " << endLabel << endl;
+        vector<string> v = {s1, s2, s3, endLabel};
+        main3ac.push_back(v);
 
     }
 
@@ -1535,25 +1583,13 @@ string ForNode::walk() {
             it++;
         (*it)->walk();
     }
-    /*if (!doo) {
-        //while condition
-        s2 = getChildren().front()->walk();
-        s4  = "l" + to_string(labelCnt++);
-        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
-        //then do
-        getChildren().back()->walk();
-    } else {
-        //do
-        getChildren().back()->walk();
-        //then while
-        s2 = getChildren().front()->walk();
-        s4  = "l" + to_string(labelCnt++);
-        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
-    }*/
     getChildren().back()->walk();
     cout << "BR" << " " << initLabel << endl;
+    vector<string> v2 = {"BR", "---", "---", initLabel};
+    main3ac.push_back(v2);
     cout << endLabel << ":" << endl;
+    vector<string> v3 = {"LABEL", endLabel, "---", "---"};
+    main3ac.push_back(v3);
 
-    return "";
     return "";
 }

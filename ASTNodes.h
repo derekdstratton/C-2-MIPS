@@ -48,6 +48,7 @@ protected:
     static int registerCnt;
     static int labelCnt;
     static SymbolTable table3ac;
+    static vector<vector<string>> main3ac;
     //private helper functions
     virtual void printNode(std::ostream& os) const;
     static void copyTreeHelper(ASTNode*& src_node, tree<ASTNode*> & ast, typename tree<ASTNode*>::iterator iRoot);
