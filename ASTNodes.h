@@ -82,6 +82,7 @@ public:
 private:
     list<ASTNode *> sizeList;
     void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**
