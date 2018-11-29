@@ -19,6 +19,23 @@ vector<vector<string>> ASTNode::main3ac;
 
 //Helper Functions
 
+string getFileLine(int lineNum){
+    ifstream istream;
+    istream.open(fileName);
+    string s;
+    int temp = 0;
+    for(int i = 0; i < lineNum; ++i)
+    {
+        getline(istream, s);
+    }
+
+    while(s[temp] == ' ')
+        temp++;
+
+    s.erase(1, temp - 1);
+    return s;
+}
+
 /**
  * Returns the size in bytes of a type
  * @param typeSet
@@ -143,6 +160,10 @@ string tokenToString2(int token) {
  */
 list<ASTNode *> ASTNode::getChildren() {
     return childrenNodes;
+}
+
+int ASTNode::getLineNum(){
+    return lineNum;
 }
 
 /**
@@ -499,17 +520,8 @@ string AssignNode::walk() {
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }
-    ifstream istream;
-    istream.open(fileName);
-    for(int i = 0; i < lineNum; ++i)
-    {
-        getline(istream, s4);
-    }
 
-    while(s4[temp] == ' ')
-        temp++;
-
-    s4.erase(1, temp - 1);
+    s4 = getFileLine(lineNum);
 
     cout << s1 << " " << s2 << " " << s3 << "    #" << s4 << endl;
     vector<string> v = {s1, s2, "---", s3};
@@ -553,8 +565,10 @@ int WhileNode::getNodeType() {
 }
 
 string WhileNode::walk() {
+    string s5;
+    s5 = getFileLine(getChildren().front()->getLineNum());
     string initLabel = "l" + to_string(labelCnt++);
-    cout << initLabel << ": " << endl;
+    cout << initLabel << ":     #" << s5 << endl;
     vector<string> v = {"LABEL", initLabel, "---", "---"};
     main3ac.push_back(v);
 
@@ -566,6 +580,7 @@ string WhileNode::walk() {
     if (!doo) {
         //while condition
         s2 = getChildren().front()->walk();
+
         s4  = "l" + to_string(labelCnt++);
         cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
         vector<string> v = {s1, s2, s3, s4};
@@ -651,7 +666,10 @@ string IfNode::walk() {
     string s2 = getChildren().front()->walk();
     string s3 = "0";
     string s4 = "l" + to_string(labelCnt++);
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    string s5;
+    s5 = getFileLine(getChildren().front()->getLineNum());
+
+    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     getChildren().back()->walk();
@@ -1301,18 +1319,7 @@ string BinaryMathNode::walk() {
     string s4 = "t" + to_string(registerCnt++);
     string s5;
 
-    int temp = 0;
-    ifstream istream;
-    istream.open(fileName);
-    for(int i = 0; i < lineNum; ++i)
-    {
-        getline(istream, s5);
-    }
-
-    while(s5[temp] == ' ')
-        temp++;
-
-    s5.erase(1, temp - 1);
+    s5 = getFileLine(lineNum);
 
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
     vector<string> v = {s1, s2, s3, s4};
@@ -1587,8 +1594,12 @@ string ForNode::walk() {
     if (stmtWritten[0]) {
         getChildren().front()->walk();
     }
+    string s5;
+    s5 = getFileLine(getChildren().front()->getLineNum());
+
+
     string initLabel = "l" + to_string(labelCnt++);
-    cout << initLabel << ": " << endl;
+    cout << initLabel << ":     #" << s5 << endl;
     vector<string> v = {"LABEL", initLabel, "---", "---"};
     main3ac.push_back(v);
 

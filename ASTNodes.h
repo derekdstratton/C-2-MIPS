@@ -30,6 +30,7 @@ public:
     ASTNode();
     list<ASTNode*> getChildren();
     static void copyTree(ASTNode*& root, tree<ASTNode*> & ast);
+    virtual int getLineNum();
     virtual int getNodeType();
     virtual set<int> getTypes();
     virtual string getName();
