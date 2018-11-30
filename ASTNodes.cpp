@@ -1188,16 +1188,20 @@ int CastNode::getNodeType() {
 string CastNode::walk(){//only need to cast in 3ac if between double/float and anything else
     string s1;
     string s2;
+    vector<string> v;
     if(*(getChildren().front()->getTypes().begin()) == 298 || *(getChildren().front()->getTypes().begin()) == 299){
         s1 = getChildren().back()->walk();
         s2 = "f" + to_string(floatRegisterCnt++);
         cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+        v = {"ASSIGN", s1, "---", s2};
     }
     else{
         s1 = getChildren().back()->walk();
         s2 = "t" + to_string(registerCnt++);
         cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+        v = {"ASSIGN", s1, "---", s2};
     }
+    main3ac.push_back(v);
     return s2;
 }
 
