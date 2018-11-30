@@ -68,9 +68,11 @@ $(function() {
 <div class="textblock"><code>#include &lt;list&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
+<code>#include &lt;fstream&gt;</code><br />
 <code>#include &quot;<a class="el" href="tree_8hh_source.html">include/tree.hh</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="_symbol_table_8h_source.html">SymbolTable.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="yytokentype_8h_source.html">yytokentype.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="astnodetype_8h_source.html">astnodetype.h</a>&quot;</code><br />
 </div>
 <p><a href="_a_s_t_nodes_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -80,23 +82,36 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_type_node.html">TypeNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_while_node.html">WhileNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_if_node.html">IfNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_unary_node.html">UnaryNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitwise_node.html">BitwiseNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_logical_node.html">LogicalNode</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_array_node.html">ArrayNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_assign_node.html">AssignNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_none_node.html">NoneNode</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_binary_math_node.html">BinaryMathNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_bitwise_node.html">BitwiseNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cast_node.html">CastNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_decl_node.html">DeclNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_for_node.html">ForNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_func_node.html">FuncNode</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">node for functions. Stores function name, parameter types if it is a prototype/definition  <a href="class_func_node.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_if_node.html">IfNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_logical_node.html">LogicalNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_relational_node.html">RelationalNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_return_node.html">ReturnNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_seq_node.html">SeqNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_unary_node.html">UnaryNode</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_while_node.html">WhileNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_identifier_node.html">IdentifierNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,20 +123,7 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_string_node.html">StringNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_cast_node.html">CastNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_relational_node.html">RelationalNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_binary_math_node.html">BinaryMathNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_return_node.html">ReturnNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_array_node.html">ArrayNode</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_func_node.html">FuncNode</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">node for functions. Stores function name, parameter types if it is a prototype/definition  <a href="class_func_node.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_for_node.html">ForNode</a></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_none_node.html">NoneNode</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -129,6 +131,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a6f7124405608062936d55319a97b00fe"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8h.html#a6f7124405608062936d55319a97b00fe">tokenToString2</a> (int token)</td></tr>
 <tr class="memdesc:a6f7124405608062936d55319a97b00fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts a defined token into a string  <a href="#a6f7124405608062936d55319a97b00fe">More...</a><br /></td></tr>
 <tr class="separator:a6f7124405608062936d55319a97b00fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43ed0c407472f6166427ece2ae9b7608"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8h.html#a43ed0c407472f6166427ece2ae9b7608">getByteSize</a> (<a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt; typeSet)</td></tr>
+<tr class="separator:a43ed0c407472f6166427ece2ae9b7608"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad131d4723bc08e2ef45c72f4783ec7dc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8h.html#ad131d4723bc08e2ef45c72f4783ec7dc">computeTypeOrder</a> (<a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt; &amp;typeSet)</td></tr>
 <tr class="memdesc:ad131d4723bc08e2ef45c72f4783ec7dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns a number based on the first data type found in the set  <a href="#ad131d4723bc08e2ef45c72f4783ec7dc">More...</a><br /></td></tr>
 <tr class="separator:ad131d4723bc08e2ef45c72f4783ec7dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,14 +168,6 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>function to compare two sets for cast </p>
-<p>If returns a value &gt; 0, then the right side needs casted to be bigger If returns a value &lt; 0, then the left side needs casted to be bigger If returns 0, no casting is needed </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">left</td><td></td></tr>
-    <tr><td class="paramname">right</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">left</td><td>is one of the sets to be compared </td></tr>
@@ -210,6 +206,31 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a43ed0c407472f6166427ece2ae9b7608"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43ed0c407472f6166427ece2ae9b7608">&#9670;&nbsp;</a></span>getByteSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int getByteSize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt;&#160;</td>
+          <td class="paramname"><em>typeSet</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the size in bytes of a type </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">typeSet</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
 <a id="a6f7124405608062936d55319a97b00fe"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6f7124405608062936d55319a97b00fe">&#9670;&nbsp;</a></span>tokenToString2()</h2>
 
@@ -227,13 +248,6 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>converts a defined token into a string </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">token</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">token</td><td>is the token to be converted </td></tr>

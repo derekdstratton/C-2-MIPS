@@ -316,6 +316,7 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 
 void ASTNode::output3ac() {
     //Outputs the vector to a file
+    //todo you can make it print pretty later
     ofstream f;
     f.open(THREEACPATH);
     for (auto x : main3ac) {
