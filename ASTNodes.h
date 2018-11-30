@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include "include/tree.hh"
 #include "SymbolTable.h"
@@ -49,6 +50,7 @@ protected:
     //source code?
     static int registerCnt;
     static int labelCnt;
+    static int floatRegisterCnt;
     static SymbolTable table3ac;
     static vector<vector<string>> main3ac;
     //private helper functions
@@ -145,6 +147,7 @@ public:
     int getNodeType() override;
 private:
     void printNode(std::ostream& os) const override;
+    string walk() override;
 };
 
 /**

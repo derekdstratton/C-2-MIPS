@@ -12,6 +12,7 @@ extern char* fileName;
 //Static Variables
 
 int ASTNode::registerCnt = 0;
+int ASTNode::floatRegisterCnt = 0;
 int ASTNode::labelCnt = 0;
 auto tmp = new SymbolTable();
 SymbolTable ASTNode::table3ac = *tmp;
@@ -1093,6 +1094,7 @@ void CharNode::printNode(std::ostream &os) const {
 int CharNode::getNodeType() {
     return CHARNODE;
 }
+
 string CharNode::walk() {
     return to_string(nodeVal);
 }
@@ -1182,6 +1184,22 @@ int CastNode::getNodeType() {
     return CASTNODE;
 }
 
+string CastNode::walk(){//only need to cast in 3ac if between double/float and anything else
+    string s1;
+    string s2;
+    if(*(getChildren().front()->getTypes().begin()) == 298 || *(getChildren().front()->getTypes().begin()) == 299){
+        s1 = getChildren().back()->walk();
+        s2 = "f" + to_string(floatRegisterCnt++);
+        cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+    }
+    else{
+        s1 = getChildren().back()->walk();
+        s2 = "t" + to_string(registerCnt++);
+        cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+    }
+    return s2;
+}
+
 /**
  * @brief RelationalNode constructor. creates a temporary list of child nodes
  * @param type is the type of relational operator
@@ -1222,7 +1240,9 @@ string RelationalNode::walk() {
     it++;
     string s3 = (*it)->walk();
     string s4 = "t" + to_string(registerCnt++);
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
+    string s5;
+    s5 = getFileLine(lineNum);
+    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "     #" << s5 << endl;
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     return s4;
@@ -1306,17 +1326,23 @@ int BinaryMathNode::getNodeType() {
 
 string BinaryMathNode::walk() {
     string s1 = tokenToString2(operationType);
-    auto it = getChildren().begin();
-    string s2 = (*it)->walk();
-    if ((*it)->getNodeType() == ARRAYNODE) {
+
+    string s2 = getChildren().front()->walk();
+    if(getChildren().front()->getNodeType() == ARRAYNODE){
         s2 = "(" + s2 + ")";
     }
-    it++;
-    string s3 = (*it)->walk();
-    if ((*it)->getNodeType() == ARRAYNODE) {
+
+    string s3 = getChildren().back()->walk();
+    if(getChildren().back()->getNodeType() == ARRAYNODE){
         s3 = "(" + s3 + ")";
     }
-    string s4 = "t" + to_string(registerCnt++);
+
+    string s4;
+    if(s2.find('.') == std::string::npos && s3.find('.') == std::string::npos) // checks if there is a '.' in either string, means need float register
+        s4 = "t" + to_string(registerCnt++);
+    else
+        s4 = "f" + to_string(floatRegisterCnt++);
+
     string s5;
 
     s5 = getFileLine(lineNum);
@@ -1411,21 +1437,22 @@ int ArrayNode::getNodeType() {
 }
 
 string ArrayNode::walk() {
+    string s4 = getFileLine(lineNum);
     string s1 = "t" + to_string(registerCnt++);
     string name = getChildren().front()->getName();
-    cout << "ADDR " << name << " " << s1 << endl;
+    cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
     vector<string> v = {"ADDR", name, "---", s1};
     main3ac.push_back(v);
     //s1 is the base address
     string s2 = "t" + to_string(registerCnt++);
     string index_offset = to_string(getChildren().back()->getVal());
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
-    cout << "STAR " << index_offset << " " << size_of << " " << s2 << endl;
+    cout << "STAR " << index_offset << " " << size_of << " " << s2 << "     #" << s4 << endl;
     vector<string> v2 = {"STAR", index_offset, size_of, s2};
     main3ac.push_back(v2);
     //s2 is the offset
     string s3 = "t" + to_string(registerCnt++);
-    cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
+    cout << "PLUS " << s1 << " " << s2 << " " << s3 << "     #" << s4 << endl;
     vector<string> v3 = {"PLUS", s1, s2, s3};
     main3ac.push_back(v3);
     /* todo multidimensional arrays
@@ -1449,10 +1476,9 @@ string ArrayNode::walk() {
  *        Additionally makes a TypeNode as a child denoting return type.
  *        If function call, sets given arguments as children nodes.
  * @param name is the function name
- * @param type
+ * @param typef
  * @param params
  */
- //todo finish function calls
 FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type)
 {
     funcName = name;

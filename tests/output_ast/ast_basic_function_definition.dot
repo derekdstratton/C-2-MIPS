@@ -6,14 +6,6 @@ graph G {
 1--2;
 3[label=TYPE_INT];
 2--3;
-4[label=COMPOUND];
-2--4;
-5[label=DECLARATIONS];
-4--5;
-6[label=DECLARATION];
-5--6;
-7[label=TYPE_INT];
-6--7;
 8[label=VARIABLE_x_INT];
 6--8;
 9[label=STATEMENTS];

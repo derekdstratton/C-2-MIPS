@@ -584,9 +584,9 @@ direct_declarator
 	isFunction = true;
 
 	tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
-        SymbolTableNode2* it;
-        string status;
-        tie(it, status) = result;
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
         if(status != "not") //another function was found
         {
             cerr << "Error on line " << yylineno << ": Function already exists." << endl;
@@ -605,8 +605,8 @@ direct_declarator
             //now you also need to make sure the identifier node has the symbol table node stuff
             size_decl_list.clear(); //reset this too
         }
-        paramList.clear();
-        isFunction = false;
+    paramList.clear();
+    isFunction = false;
 
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
