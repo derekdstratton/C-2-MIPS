@@ -43,7 +43,7 @@
  *
  * `git clone https://github.com/derekdstratton/C-2-MIPS`
  *
-    `cmake Best-C-Compiler`
+    `cmake C-2-MIPS`
 
     `make`
 
