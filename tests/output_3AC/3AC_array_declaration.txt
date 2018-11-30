@@ -1,0 +1,10 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 8:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 8:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 

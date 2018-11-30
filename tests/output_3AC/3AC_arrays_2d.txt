@@ -1,0 +1,21 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 4:  x[0][0] = 1; 
+ADDR x --- t0 
+COMMENT:  line 4:  x[0][0] = 1; 
+STAR 0 4 t1 
+COMMENT:  line 4:  x[0][0] = 1; 
+PLUS t0 t1 t2 
+COMMENT:  line 4:  x[0][0] = 1; 
+ASSIGN 1 --- t2 
+COMMENT:  line 5:  y = x[0][0]; 
+ADDR x --- t3 
+COMMENT:  line 5:  y = x[0][0]; 
+STAR 0 4 t4 
+COMMENT:  line 5:  y = x[0][0]; 
+PLUS t3 t4 t5 
+COMMENT:  line 5:  y = x[0][0]; 
+ASSIGN (t5) --- y 
+COMMENT:  line 6:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 

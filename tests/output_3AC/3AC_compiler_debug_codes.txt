@@ -1,0 +1,11 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 4:  x = 3; 
+ASSIGN 3 --- x 
+COMMENT:  line 6:  x = 4; 
+ASSIGN 4 --- x 
+COMMENT:  line 8:  x = 6; 
+ASSIGN 6 --- x 
+COMMENT:  line 11:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- ---
