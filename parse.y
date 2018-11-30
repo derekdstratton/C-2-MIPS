@@ -47,14 +47,16 @@ string TOKENPATH;
 string PRODPATH;
 string SYMBOLPATH;
 string ASTPATH;
+string THREEACPATH;
 extern FILE * yyin;
-bool debug[6]; // -d, -l, -s, productions flag, -o, -a
+bool debug[7]; // -d, -l, -s, productions flag, -o, -a, -3
 // -d enable debugging
 // -l produces a list of tokens and their values to a file
 // -s dumps symbol table at key points to a file
 // -p prints all productions to a file
 // -o name a file to output interspersed reductions to
 // -a prints AST to a file named ast.dot
+// -3 prints 3AC to a file
 char* fileName;
 
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
@@ -1417,6 +1419,8 @@ int main(int argc, char **argv)
                     }
                     else if(strcmp(argv[i],"-a") == 0)
                         debug[5] = true;
+                    else if(strcmp(argv[i],"-3") == 0)
+                        debug[6] = true;
                     else
                         cout << argv[1] << " is not a valid command line argument." << endl;
                 }
@@ -1497,9 +1501,23 @@ int main(int argc, char **argv)
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
+    }
+    if(debug[6])
+    {
         root_ptr->walk();
-        root_ptr->output3ac("3ac.txt");
-        //generate3ac(ast); deprecate this
+        string outputF = argv[argc-1];
+        outputF.erase(0, 11);
+        outputF.erase(outputF.length()-2, 2);
+        outputF = "tests/output_3AC/3AC_" + outputF;
+        outputF += ".txt";
+        THREEACPATH = outputF;
+        tree<ASTNode*> ast;
+        ASTNode::copyTree(root_ptr, ast);
+        kptree::print_tree_bracketed(ast);
+        root_ptr->walk();
+        /*ofstream ofs;
+        ofs.open(THREEACPATH, std::ofstream::out | std::ofstream::trunc);*/ // to clear file if wanted
+        root_ptr->output3ac();
     }
 	return 0;
 }

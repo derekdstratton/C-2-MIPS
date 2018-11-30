@@ -43,7 +43,7 @@ public:
     virtual int getOpType();
     virtual string walk();
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
-    static void output3ac(string filename);
+    static void output3ac();
 protected:
     int lineNum;
     int colNum;
