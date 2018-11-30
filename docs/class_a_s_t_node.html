@@ -64,6 +64,7 @@ $(function() {
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="class_a_s_t_node-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -78,18 +79,16 @@ Inheritance diagram for ASTNode:</div>
  <div class="center">
   <img src="class_a_s_t_node.png" usemap="#ASTNode_map" alt=""/>
   <map id="ASTNode_map" name="ASTNode_map">
-<area href="class_assign_node.html" alt="AssignNode" shape="rect" coords="107,56,204,80"/>
-<area href="class_bitwise_node.html" alt="BitwiseNode" shape="rect" coords="107,112,204,136"/>
-<area href="class_decl_node.html" alt="DeclNode" shape="rect" coords="107,168,204,192"/>
-<area href="class_for_node.html" alt="ForNode" shape="rect" coords="107,224,204,248"/>
-<area href="class_if_node.html" alt="IfNode" shape="rect" coords="107,280,204,304"/>
-<area href="class_logical_node.html" alt="LogicalNode" shape="rect" coords="107,336,204,360"/>
-<area href="class_none_node.html" alt="NoneNode" shape="rect" coords="107,392,204,416"/>
-<area href="class_relational_node.html" alt="RelationalNode" shape="rect" coords="107,448,204,472"/>
-<area href="class_return_node.html" alt="ReturnNode" shape="rect" coords="107,504,204,528"/>
-<area href="class_seq_node.html" alt="SeqNode" shape="rect" coords="107,560,204,584"/>
-<area href="class_type_node.html" alt="TypeNode" shape="rect" coords="107,616,204,640"/>
-<area href="class_while_node.html" alt="WhileNode" shape="rect" coords="107,672,204,696"/>
+<area href="class_decl_node.html" alt="DeclNode" shape="rect" coords="107,56,204,80"/>
+<area href="class_for_node.html" alt="ForNode" shape="rect" coords="107,112,204,136"/>
+<area href="class_if_node.html" alt="IfNode" shape="rect" coords="107,168,204,192"/>
+<area href="class_logical_node.html" alt="LogicalNode" shape="rect" coords="107,224,204,248"/>
+<area href="class_none_node.html" alt="NoneNode" shape="rect" coords="107,280,204,304"/>
+<area href="class_relational_node.html" alt="RelationalNode" shape="rect" coords="107,336,204,360"/>
+<area href="class_return_node.html" alt="ReturnNode" shape="rect" coords="107,392,204,416"/>
+<area href="class_seq_node.html" alt="SeqNode" shape="rect" coords="107,448,204,472"/>
+<area href="class_type_node.html" alt="TypeNode" shape="rect" coords="107,504,204,528"/>
+<area href="class_while_node.html" alt="WhileNode" shape="rect" coords="107,560,204,584"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -101,6 +100,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a641dd79e032ed64143323a4e9086476f"><td class="memItemLeft" align="right" valign="top">list&lt; <a class="el" href="class_a_s_t_node.html">ASTNode</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a641dd79e032ed64143323a4e9086476f">getChildren</a> ()</td></tr>
 <tr class="memdesc:a641dd79e032ed64143323a4e9086476f"><td class="mdescLeft">&#160;</td><td class="mdescRight">helper function to access <a class="el" href="class_a_s_t_node.html">ASTNode</a> children  <a href="#a641dd79e032ed64143323a4e9086476f">More...</a><br /></td></tr>
 <tr class="separator:a641dd79e032ed64143323a4e9086476f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe71b0b705eb0eb5ea86a1897fb82612"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#afe71b0b705eb0eb5ea86a1897fb82612">getLineNum</a> ()</td></tr>
+<tr class="separator:afe71b0b705eb0eb5ea86a1897fb82612"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09904c5c8700338de63a94e906bfc565"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a09904c5c8700338de63a94e906bfc565">getNodeType</a> ()</td></tr>
+<tr class="separator:a09904c5c8700338de63a94e906bfc565"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0461ecf412194de512c647d570ec779"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#aa0461ecf412194de512c647d570ec779">getTypes</a> ()</td></tr>
 <tr class="memdesc:aa0461ecf412194de512c647d570ec779"><td class="mdescLeft">&#160;</td><td class="mdescRight">function to get set types from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class  <a href="#aa0461ecf412194de512c647d570ec779">More...</a><br /></td></tr>
 <tr class="separator:aa0461ecf412194de512c647d570ec779"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -108,21 +111,29 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a9927d12011d0ef53dd0f2f0c97566ad1"><td class="mdescLeft">&#160;</td><td class="mdescRight">function to get name from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class  <a href="#a9927d12011d0ef53dd0f2f0c97566ad1">More...</a><br /></td></tr>
 <tr class="separator:a9927d12011d0ef53dd0f2f0c97566ad1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a082d6ef84f3513f6a24cf99c6e5fe897"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a082d6ef84f3513f6a24cf99c6e5fe897">setSymbolNode</a> (<a class="el" href="class_symbol_table_node2.html">SymbolTableNode2</a> *symtblnd2)</td></tr>
-<tr class="memdesc:a082d6ef84f3513f6a24cf99c6e5fe897"><td class="mdescLeft">&#160;</td><td class="mdescRight">function to set <a class="el" href="class_symbol_table_node.html">SymbolTableNode</a> in an <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class  <a href="#a082d6ef84f3513f6a24cf99c6e5fe897">More...</a><br /></td></tr>
+<tr class="memdesc:a082d6ef84f3513f6a24cf99c6e5fe897"><td class="mdescLeft">&#160;</td><td class="mdescRight">function to set SymbolTableNode in an <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class  <a href="#a082d6ef84f3513f6a24cf99c6e5fe897">More...</a><br /></td></tr>
 <tr class="separator:a082d6ef84f3513f6a24cf99c6e5fe897"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f4f66d982ecf7796ee4f669eea9225f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a6f4f66d982ecf7796ee4f669eea9225f">getDimensions</a> ()</td></tr>
 <tr class="separator:a6f4f66d982ecf7796ee4f669eea9225f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2417b9a3bfbd7cda0a1aa535443d7d9f"><td class="memItemLeft" align="right" valign="top">virtual list&lt; <a class="el" href="class_a_s_t_node.html">ASTNode</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a2417b9a3bfbd7cda0a1aa535443d7d9f">getSizes</a> ()</td></tr>
 <tr class="memdesc:a2417b9a3bfbd7cda0a1aa535443d7d9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">function to get sizes from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class  <a href="#a2417b9a3bfbd7cda0a1aa535443d7d9f">More...</a><br /></td></tr>
 <tr class="separator:a2417b9a3bfbd7cda0a1aa535443d7d9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a296b672555b845e6b1f2891197639f46"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a296b672555b845e6b1f2891197639f46">getVal</a> ()</td></tr>
-<tr class="separator:a296b672555b845e6b1f2891197639f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54dcc978e5e30e18eccb2408b914da78"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a54dcc978e5e30e18eccb2408b914da78">getVal</a> ()</td></tr>
+<tr class="separator:a54dcc978e5e30e18eccb2408b914da78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab2fb5dd650e721a1735827a014b8ece6"><td class="memItemLeft" align="right" valign="top">virtual char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#ab2fb5dd650e721a1735827a014b8ece6">getSeqType</a> ()</td></tr>
+<tr class="separator:ab2fb5dd650e721a1735827a014b8ece6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7420258d020e1a1f72a12e0110b9b8d9"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a7420258d020e1a1f72a12e0110b9b8d9">getOpType</a> ()</td></tr>
+<tr class="separator:a7420258d020e1a1f72a12e0110b9b8d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4e789c9fa70e4823dff1fe767adad4f"><td class="memItemLeft" align="right" valign="top">virtual string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#ac4e789c9fa70e4823dff1fe767adad4f">walk</a> ()</td></tr>
+<tr class="separator:ac4e789c9fa70e4823dff1fe767adad4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a371f8a73e05d108ceb04df35bed22603"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a371f8a73e05d108ceb04df35bed22603">copyTree</a> (<a class="el" href="class_a_s_t_node.html">ASTNode</a> *&amp;root, <a class="el" href="classtree.html">tree</a>&lt; <a class="el" href="class_a_s_t_node.html">ASTNode</a> *&gt; &amp;ast)</td></tr>
 <tr class="memdesc:a371f8a73e05d108ceb04df35bed22603"><td class="mdescLeft">&#160;</td><td class="mdescRight">copies AST generated by parser into a tree form <a class="el" href="tree_8hh.html">tree.hh</a>  <a href="#a371f8a73e05d108ceb04df35bed22603">More...</a><br /></td></tr>
 <tr class="separator:a371f8a73e05d108ceb04df35bed22603"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2aa199eedcb6be9aa3b9533b394835e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#ac2aa199eedcb6be9aa3b9533b394835e">output3ac</a> ()</td></tr>
+<tr class="separator:ac2aa199eedcb6be9aa3b9533b394835e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -138,8 +149,6 @@ Static Protected Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a376b1ab4b2c4aa2923b12b18a5b3804b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a376b1ab4b2c4aa2923b12b18a5b3804b">types</a></td></tr>
-<tr class="separator:a376b1ab4b2c4aa2923b12b18a5b3804b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3a7477f1dbfe738d89ddda8afbb96d1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#af3a7477f1dbfe738d89ddda8afbb96d1">lineNum</a></td></tr>
 <tr class="separator:af3a7477f1dbfe738d89ddda8afbb96d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f1b35d466521db60913511f55447aec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a9f1b35d466521db60913511f55447aec">colNum</a></td></tr>
@@ -147,13 +156,28 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a24b2f4cccb1b1d28c8f3f4af2acc299c"><td class="memItemLeft" align="right" valign="top">list&lt; <a class="el" href="class_a_s_t_node.html">ASTNode</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a24b2f4cccb1b1d28c8f3f4af2acc299c">childrenNodes</a></td></tr>
 <tr class="separator:a24b2f4cccb1b1d28c8f3f4af2acc299c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
+Static Protected Attributes</h2></td></tr>
+<tr class="memitem:ac1e50ab8c688e589bc259a1c37cd968a"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#ac1e50ab8c688e589bc259a1c37cd968a">registerCnt</a> = 0</td></tr>
+<tr class="separator:ac1e50ab8c688e589bc259a1c37cd968a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08f117b6b04797070024680590463992"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a08f117b6b04797070024680590463992">labelCnt</a> = 0</td></tr>
+<tr class="separator:a08f117b6b04797070024680590463992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3edf0b64a455c009f711d1b4bd83d04a"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a3edf0b64a455c009f711d1b4bd83d04a">floatRegisterCnt</a> = 0</td></tr>
+<tr class="separator:a3edf0b64a455c009f711d1b4bd83d04a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2db95a85f9b867c8c0a6df0edbbe810"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_symbol_table.html">SymbolTable</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#aa2db95a85f9b867c8c0a6df0edbbe810">table3ac</a> = *<a class="el" href="_a_s_t_nodes_8cpp.html#a05e8a26e8520d5656447e76fe27a028e">tmp</a></td></tr>
+<tr class="separator:aa2db95a85f9b867c8c0a6df0edbbe810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad379637b42c577ddbd45c4cd248b8f35"><td class="memItemLeft" align="right" valign="top">static vector&lt; vector&lt; string &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#ad379637b42c577ddbd45c4cd248b8f35">main3ac</a></td></tr>
+<tr class="separator:ad379637b42c577ddbd45c4cd248b8f35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
 <tr class="memitem:a4829ba5a65c6d91518dd7ff137d19e25"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_a_s_t_node.html#a4829ba5a65c6d91518dd7ff137d19e25">operator&lt;&lt;</a> (std::ostream &amp;os, const <a class="el" href="class_a_s_t_node.html">ASTNode</a> &amp;node)</td></tr>
 <tr class="memdesc:a4829ba5a65c6d91518dd7ff137d19e25"><td class="mdescLeft">&#160;</td><td class="mdescRight">extraction operator overload to print <a class="el" href="class_a_s_t_node.html">ASTNode</a> to a stream  <a href="#a4829ba5a65c6d91518dd7ff137d19e25">More...</a><br /></td></tr>
 <tr class="separator:a4829ba5a65c6d91518dd7ff137d19e25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Main base class for all Abstract Syntax Tree nodes </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a1196ed4f19c0b62cdc42fe35946b91d2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1196ed4f19c0b62cdc42fe35946b91d2">&#9670;&nbsp;</a></span>ASTNode()</h2>
 
@@ -209,11 +233,8 @@ Friends</h2></td></tr>
 </div><div class="memdoc">
 
 <p>copies AST generated by parser into a tree form <a class="el" href="tree_8hh.html">tree.hh</a> </p>
-<p>Copies the <a class="el" href="class_a_s_t_node.html">ASTNode</a> into a <a class="el" href="tree_8hh.html">tree.hh</a> tree</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">root</td><td></td></tr>
-    <tr><td class="paramname">ast</td><td>A <a class="el" href="tree_8hh.html">tree.hh</a> to be copied into</td></tr>
     <tr><td class="paramname">root</td><td>is the root of the parser AST tree </td></tr>
     <tr><td class="paramname">ast</td><td>is the <a class="el" href="tree_8hh.html">tree.hh</a> tree </td></tr>
   </table>
@@ -265,9 +286,6 @@ Friends</h2></td></tr>
 <p>helper function to copy AST into a <a class="el" href="tree_8hh.html">tree.hh</a> tree </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">src_node</td><td></td></tr>
-    <tr><td class="paramname">ast</td><td></td></tr>
-    <tr><td class="paramname">iRoot</td><td></td></tr>
     <tr><td class="paramname">src_node</td><td>is the root node of the AST generated by parser </td></tr>
     <tr><td class="paramname">ast</td><td>is the <a class="el" href="tree_8hh.html">tree.hh</a> tree to be copied to </td></tr>
     <tr><td class="paramname">iRoot</td><td>is the iterator to iterate through the children </td></tr>
@@ -319,8 +337,34 @@ Friends</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_array_node.html#abbac3a0155304a75b8b79d1ad265cc52">ArrayNode</a>, and <a class="el" href="class_identifier_node.html#a4376d30cda782af68e20cef1f8ccf82f">IdentifierNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_identifier_node.html#ab5de3e652307003783883e63739b2a63">IdentifierNode</a>, and <a class="el" href="class_array_node.html#abb90c7fd5702dcf8c571ae06694dec7d">ArrayNode</a>.</p>
+
+</div>
+</div>
+<a id="afe71b0b705eb0eb5ea86a1897fb82612"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe71b0b705eb0eb5ea86a1897fb82612">&#9670;&nbsp;</a></span>getLineNum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::getLineNum </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -350,7 +394,91 @@ Friends</h2></td></tr>
 <p>function to get name from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class </p>
 <dl class="section return"><dt>Returns</dt><dd>returns a null pointer </dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_func_node.html#a5e70c3abc9e6594b461d3fad6c252035">FuncNode</a>, and <a class="el" href="class_identifier_node.html#ad45bb849bf3c22a6d309071226095213">IdentifierNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_identifier_node.html#a0ef53eca9c9af6126133d086b2dfc694">IdentifierNode</a>, and <a class="el" href="class_func_node.html#aa8d19b9aae8a3cdf4805db77cd24f404">FuncNode</a>.</p>
+
+</div>
+</div>
+<a id="a09904c5c8700338de63a94e906bfc565"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09904c5c8700338de63a94e906bfc565">&#9670;&nbsp;</a></span>getNodeType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::getNodeType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Reimplemented in <a class="el" href="class_none_node.html#a4decfdb5d84ee26d8ee874dbfe182702">NoneNode</a>, <a class="el" href="class_string_node.html#a0493545aac8f856c64bb84e7ae0295c4">StringNode</a>, <a class="el" href="class_float_node.html#a693737f3ba058ae41d6c8de02123db70">FloatNode</a>, <a class="el" href="class_char_node.html#ac237e9c125575386c15c4eb2d195addc">CharNode</a>, <a class="el" href="class_int_node.html#a286d4ba151994870cb3523ddbffc8a02">IntNode</a>, <a class="el" href="class_identifier_node.html#a57fbadc972c83e5e680ac8f56b4eb0d3">IdentifierNode</a>, <a class="el" href="class_while_node.html#a8b4412decb452992505f527056b3f809">WhileNode</a>, <a class="el" href="class_unary_node.html#a0c6bd86bc20a06e94d5be2924b8c6a0c">UnaryNode</a>, <a class="el" href="class_seq_node.html#a1f065c2a87bc4df744e2523d5a8f2c12">SeqNode</a>, <a class="el" href="class_return_node.html#a0c109ddd3dc4122280f1e901758556fc">ReturnNode</a>, <a class="el" href="class_relational_node.html#a5db7cfdfdf716f2e3a98e22f0cd89601">RelationalNode</a>, <a class="el" href="class_logical_node.html#a555df6478f76b18bf27d965c710bea9e">LogicalNode</a>, <a class="el" href="class_if_node.html#a951faffe55859b239f7573244c649aca">IfNode</a>, <a class="el" href="class_func_node.html#ae1fbdee6f936a196fb8072b926df8e75">FuncNode</a>, <a class="el" href="class_for_node.html#a907029a59a1e7d425c18c104931ce538">ForNode</a>, <a class="el" href="class_decl_node.html#abbd7a0d82373623fdf5f34f0e5ed8c97">DeclNode</a>, <a class="el" href="class_cast_node.html#a65148cfa812680822b800b3ddb6ad7cf">CastNode</a>, <a class="el" href="class_bitwise_node.html#a3ace93bccf2c8070fa6bd9e012fb4e61">BitwiseNode</a>, <a class="el" href="class_binary_math_node.html#ae7eb5ff9db22dcc533411a377b70d3d0">BinaryMathNode</a>, <a class="el" href="class_assign_node.html#a7f5962a4a7e9113506243902cd328cd8">AssignNode</a>, <a class="el" href="class_array_node.html#a6a12b98673b3ccedd2762a68bab98a77">ArrayNode</a>, and <a class="el" href="class_type_node.html#ae4d420c4e79f0deee0ea9bcf02b5f4dc">TypeNode</a>.</p>
+
+</div>
+</div>
+<a id="a7420258d020e1a1f72a12e0110b9b8d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7420258d020e1a1f72a12e0110b9b8d9">&#9670;&nbsp;</a></span>getOpType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::getOpType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Reimplemented in <a class="el" href="class_relational_node.html#af86ae86e4a9c0bffd694f5028f78d3df">RelationalNode</a>, and <a class="el" href="class_binary_math_node.html#a754c9328f301b097e77a9e3f64ee410e">BinaryMathNode</a>.</p>
+
+</div>
+</div>
+<a id="ab2fb5dd650e721a1735827a014b8ece6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2fb5dd650e721a1735827a014b8ece6">&#9670;&nbsp;</a></span>getSeqType()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">char ASTNode::getSeqType </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Reimplemented in <a class="el" href="class_seq_node.html#a726f2b6aa00bcc83dcdb5df86c42d1ff">SeqNode</a>.</p>
 
 </div>
 </div>
@@ -380,7 +508,7 @@ Friends</h2></td></tr>
 <p>function to get sizes from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class </p>
 <dl class="section return"><dt>Returns</dt><dd>returns an empty <a class="el" href="class_a_s_t_node.html">ASTNode</a> pointer list </dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_array_node.html#a029ef5fe57ac7af446b036b95be167de">ArrayNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_array_node.html#a19beda3e5a9408d855d07f3ca8f6d901">ArrayNode</a>.</p>
 
 </div>
 </div>
@@ -410,12 +538,12 @@ Friends</h2></td></tr>
 <p>function to get set types from <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class </p>
 <dl class="section return"><dt>Returns</dt><dd>returns an empty set that is sad </dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_type_node.html#a5ddb233162c5430ff21db3d60c9537d0">TypeNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_type_node.html#ae61446492b831590f1e7695e98a05a19">TypeNode</a>.</p>
 
 </div>
 </div>
-<a id="a296b672555b845e6b1f2891197639f46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a296b672555b845e6b1f2891197639f46">&#9670;&nbsp;</a></span>getVal()</h2>
+<a id="a54dcc978e5e30e18eccb2408b914da78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a54dcc978e5e30e18eccb2408b914da78">&#9670;&nbsp;</a></span>getVal()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -424,7 +552,7 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual int ASTNode::getVal </td>
+          <td class="memname">int ASTNode::getVal </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -432,12 +560,38 @@ Friends</h2></td></tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_int_node.html#a27ed6fcf37b88eb593400240e90aa0e5">IntNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_int_node.html#a29a86d3fda6e85d1c3accd6c19c1d849">IntNode</a>.</p>
+
+</div>
+</div>
+<a id="ac2aa199eedcb6be9aa3b9533b394835e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2aa199eedcb6be9aa3b9533b394835e">&#9670;&nbsp;</a></span>output3ac()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ASTNode::output3ac </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -473,7 +627,7 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="class_type_node.html#a8e0d42bf0a9a6bb9f91f884efbc46255">TypeNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_type_node.html#af862036b97f5fd155220ba3d70a57ba9">TypeNode</a>.</p>
 
 </div>
 </div>
@@ -501,7 +655,7 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>function to set <a class="el" href="class_symbol_table_node.html">SymbolTableNode</a> in an <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class </p>
+<p>function to set SymbolTableNode in an <a class="el" href="class_a_s_t_node.html">ASTNode</a>. Should not be used for base class </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">symtblnd2</td><td>is the symbol table node to be inserted </td></tr>
@@ -509,7 +663,35 @@ Friends</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="class_identifier_node.html#af89b0455f252b910bdae3d6003136277">IdentifierNode</a>.</p>
+<p>Reimplemented in <a class="el" href="class_identifier_node.html#a2f05767816eca0b79e2924dbb003bc54">IdentifierNode</a>.</p>
+
+</div>
+</div>
+<a id="ac4e789c9fa70e4823dff1fe767adad4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4e789c9fa70e4823dff1fe767adad4f">&#9670;&nbsp;</a></span>walk()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">string ASTNode::walk </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+<p>Reimplemented in <a class="el" href="class_type_node.html#a90940f7e52a1a8101d4250f8b1d1b61d">TypeNode</a>.</p>
 
 </div>
 </div>
@@ -605,6 +787,50 @@ Friends</h2></td></tr>
 
 </div>
 </div>
+<a id="a3edf0b64a455c009f711d1b4bd83d04a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3edf0b64a455c009f711d1b4bd83d04a">&#9670;&nbsp;</a></span>floatRegisterCnt</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::floatRegisterCnt = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a08f117b6b04797070024680590463992"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08f117b6b04797070024680590463992">&#9670;&nbsp;</a></span>labelCnt</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::labelCnt = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a id="af3a7477f1dbfe738d89ddda8afbb96d1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af3a7477f1dbfe738d89ddda8afbb96d1">&#9670;&nbsp;</a></span>lineNum</h2>
 
@@ -627,8 +853,8 @@ Friends</h2></td></tr>
 
 </div>
 </div>
-<a id="a376b1ab4b2c4aa2923b12b18a5b3804b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a376b1ab4b2c4aa2923b12b18a5b3804b">&#9670;&nbsp;</a></span>types</h2>
+<a id="ad379637b42c577ddbd45c4cd248b8f35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad379637b42c577ddbd45c4cd248b8f35">&#9670;&nbsp;</a></span>main3ac</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -637,12 +863,56 @@ Friends</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt;int&gt; ASTNode::types</td>
+          <td class="memname">vector&lt; vector&lt; string &gt; &gt; ASTNode::main3ac</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="ac1e50ab8c688e589bc259a1c37cd968a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1e50ab8c688e589bc259a1c37cd968a">&#9670;&nbsp;</a></span>registerCnt</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int ASTNode::registerCnt = 0</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa2db95a85f9b867c8c0a6df0edbbe810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2db95a85f9b867c8c0a6df0edbbe810">&#9670;&nbsp;</a></span>table3ac</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_symbol_table.html">SymbolTable</a> ASTNode::table3ac = *<a class="el" href="_a_s_t_nodes_8cpp.html#a05e8a26e8520d5656447e76fe27a028e">tmp</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">

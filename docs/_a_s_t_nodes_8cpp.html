@@ -71,6 +71,10 @@ $(function() {
 Functions</h2></td></tr>
 <tr class="memitem:add1fd25dc968f1a9e5d47241a7b54578"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#add1fd25dc968f1a9e5d47241a7b54578">outputError</a> (string errmsg1, string errmsg2, bool errtype)</td></tr>
 <tr class="separator:add1fd25dc968f1a9e5d47241a7b54578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a14034045754110f49a0c1e492878c4"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a6a14034045754110f49a0c1e492878c4">getFileLine</a> (int lineNum)</td></tr>
+<tr class="separator:a6a14034045754110f49a0c1e492878c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43ed0c407472f6166427ece2ae9b7608"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a43ed0c407472f6166427ece2ae9b7608">getByteSize</a> (<a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt; typeSet)</td></tr>
+<tr class="separator:a43ed0c407472f6166427ece2ae9b7608"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6f7124405608062936d55319a97b00fe"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a6f7124405608062936d55319a97b00fe">tokenToString2</a> (int token)</td></tr>
 <tr class="memdesc:a6f7124405608062936d55319a97b00fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">converts a defined token into a string  <a href="#a6f7124405608062936d55319a97b00fe">More...</a><br /></td></tr>
 <tr class="separator:a6f7124405608062936d55319a97b00fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -92,6 +96,12 @@ Variables</h2></td></tr>
 <tr class="separator:ac0af87ffa1a966ac64701ee6681ffdd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b5865350b5ca5c1d69f429c2a652953"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a1b5865350b5ca5c1d69f429c2a652953">yyleng</a></td></tr>
 <tr class="separator:a1b5865350b5ca5c1d69f429c2a652953"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25c8761bc1f523fe6a53db546ae83add"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a25c8761bc1f523fe6a53db546ae83add">fileName</a></td></tr>
+<tr class="separator:a25c8761bc1f523fe6a53db546ae83add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcd14b69aafaa14244d4bae6a7f80f93"><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#afcd14b69aafaa14244d4bae6a7f80f93">THREEACPATH</a></td></tr>
+<tr class="separator:afcd14b69aafaa14244d4bae6a7f80f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05e8a26e8520d5656447e76fe27a028e"><td class="memItemLeft" align="right" valign="top">auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_a_s_t_nodes_8cpp.html#a05e8a26e8520d5656447e76fe27a028e">tmp</a> = new <a class="el" href="class_symbol_table.html">SymbolTable</a>()</td></tr>
+<tr class="separator:a05e8a26e8520d5656447e76fe27a028e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="a9640b19d06d0f91b9251835f2051beaf"></a>
@@ -156,6 +166,49 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>returns a number. The number is larger for longer data types </dd></dl>
+
+</div>
+</div>
+<a id="a43ed0c407472f6166427ece2ae9b7608"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43ed0c407472f6166427ece2ae9b7608">&#9670;&nbsp;</a></span>getByteSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int getByteSize </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="_c_make_lists_8txt.html#a3c11d09704ca7f324b069224220df05f">set</a>&lt; int &gt;&#160;</td>
+          <td class="paramname"><em>typeSet</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns the size in bytes of a type </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">typeSet</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a6a14034045754110f49a0c1e492878c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a14034045754110f49a0c1e492878c4">&#9670;&nbsp;</a></span>getFileLine()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string getFileLine </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>lineNum</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -267,6 +320,48 @@ Variables</h2></td></tr>
       <table class="memname">
         <tr>
           <td class="memname">deque&lt;char&gt; columnQueue</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a25c8761bc1f523fe6a53db546ae83add"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25c8761bc1f523fe6a53db546ae83add">&#9670;&nbsp;</a></span>fileName</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">char* fileName</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="afcd14b69aafaa14244d4bae6a7f80f93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afcd14b69aafaa14244d4bae6a7f80f93">&#9670;&nbsp;</a></span>THREEACPATH</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">string THREEACPATH</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a05e8a26e8520d5656447e76fe27a028e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05e8a26e8520d5656447e76fe27a028e">&#9670;&nbsp;</a></span>tmp</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">auto tmp = new <a class="el" href="class_symbol_table.html">SymbolTable</a>()</td>
         </tr>
       </table>
 </div><div class="memdoc">
