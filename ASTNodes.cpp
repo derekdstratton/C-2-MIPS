@@ -313,6 +313,19 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
     }
 }
 
+void ASTNode::output3ac(string filename) {
+    //Outputs the vector to a file
+    fstream f;
+    f.open(filename);
+    for (auto x : main3ac) {
+        for (auto y: x) {
+            f << y << " ";
+        }
+        f << endl;
+    }
+    f.close();
+}
+
 /**
  * @brief default constructor for ASTNode
  */
