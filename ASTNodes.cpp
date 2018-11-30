@@ -34,6 +34,7 @@ string getFileLine(int lineNum){
         temp++;
 
     s.erase(1, temp - 1);
+    s = "line " + to_string(lineNum) + ": " + s;
     return s;
 }
 
