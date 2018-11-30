@@ -1,0 +1,13 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 3:  x = 2; 
+ASSIGN 2 --- x 
+COMMENT:  line 4:  if (x < 3) { 
+LESSTH x 3 t0 
+BREQ t0 0 l0 
+COMMENT:  line 6:  y = 4; 
+ASSIGN 4 --- y 
+COMMENT:  line 7:  x = 4; 
+ASSIGN 4 --- x 
+LABEL l0 --- --- 
+RETURN --- --- ---

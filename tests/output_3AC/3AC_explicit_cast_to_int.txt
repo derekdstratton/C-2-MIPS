@@ -1,0 +1,11 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 4:  x = 'b'; 
+ASSIGN 98 --- x 
+COMMENT:  line 5:  y = (int) x; 
+ASSIGN x --- t0 
+COMMENT:  line 5:  y = (int) x; 
+ASSIGN t0 --- y 
+COMMENT:  line 6:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- ---

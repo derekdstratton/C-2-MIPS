@@ -1514,7 +1514,6 @@ int main(int argc, char **argv)
         tree<ASTNode*> ast;
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
-        root_ptr->walk();
         /*ofstream ofs;
         ofs.open(THREEACPATH, std::ofstream::out | std::ofstream::trunc);*/ // to clear file if wanted
         root_ptr->output3ac();

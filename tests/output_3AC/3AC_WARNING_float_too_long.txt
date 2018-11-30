@@ -1,0 +1,7 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 3:  x = 1.999999999999999999999999999999999999999999999999; 
+ASSIGN 2.000000 --- x 
+COMMENT:  line 4:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 

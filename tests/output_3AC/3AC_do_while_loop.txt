@@ -1,0 +1,15 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 3:  k = 0; 
+ASSIGN 0 --- k 
+LABEL l0 --- --- 
+COMMENT:  line 5:  k++; 
+PLUS k 1 t0 
+COMMENT:  line 6:  } while (k < 6); 
+LESSTH k 6 t1 
+BREQ t1 0 l1 
+BR --- --- l0 
+LABEL l1 --- --- 
+COMMENT:  line 7:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- ---
