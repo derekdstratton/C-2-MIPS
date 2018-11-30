@@ -8,6 +8,7 @@ extern deque <char> columnQueue;
 extern int yyleng;
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
 extern char* fileName;
+extern string THREEACPATH;
 
 //Static Variables
 
@@ -313,6 +314,21 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
     }
 }
 
+void ASTNode::output3ac() {
+    //Outputs the vector to a file
+    ofstream f;
+    f.open(THREEACPATH);
+    for (auto x : main3ac) {
+        for (auto y: x) {
+            cout << y << " ";
+            f << y << " ";
+        }
+        f << endl;
+        cout << endl;
+    }
+    f.close();
+}
+
 /**
  * @brief default constructor for ASTNode
  */
@@ -526,7 +542,10 @@ string AssignNode::walk() {
     s4 = getFileLine(lineNum);
 
     cout << s1 << " " << s2 << " " << s3 << "    #" << s4 << endl;
+
+    vector<string> v2 = {"COMMENT: ", s4};
     vector<string> v = {s1, s2, "---", s3};
+    main3ac.push_back(v2);
     main3ac.push_back(v);
     return s3;
 }
@@ -571,6 +590,7 @@ string WhileNode::walk() {
     s5 = getFileLine(getChildren().front()->getLineNum());
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ":     #" << s5 << endl;
+    vector<string> v4 = {"COMMENT: ", s5};
     vector<string> v = {"LABEL", initLabel, "---", "---"};
     main3ac.push_back(v);
 
@@ -672,6 +692,7 @@ string IfNode::walk() {
     s5 = getFileLine(getChildren().front()->getLineNum());
 
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
+    vector<string> v3 = {"COMMENT: ", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     getChildren().back()->walk();
@@ -1188,16 +1209,23 @@ int CastNode::getNodeType() {
 string CastNode::walk(){//only need to cast in 3ac if between double/float and anything else
     string s1;
     string s2;
+    vector<string> v;
     if(*(getChildren().front()->getTypes().begin()) == 298 || *(getChildren().front()->getTypes().begin()) == 299){
         s1 = getChildren().back()->walk();
         s2 = "f" + to_string(floatRegisterCnt++);
         cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+        v = {"ASSIGN", s1, "---", s2};
     }
     else{
         s1 = getChildren().back()->walk();
         s2 = "t" + to_string(registerCnt++);
         cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
+        v = {"ASSIGN", s1, "---", s2};
     }
+    vector<string> v2;
+    v2 = {"COMMENT: ", getFileLine(lineNum)};
+    main3ac.push_back(v2);
+    main3ac.push_back(v);
     return s2;
 }
 
@@ -1244,7 +1272,9 @@ string RelationalNode::walk() {
     string s5;
     s5 = getFileLine(lineNum);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "     #" << s5 << endl;
+    vector<string> v2 = {"COMMENT: ", s5};
     vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v2);
     main3ac.push_back(v);
     return s4;
 }
@@ -1349,7 +1379,9 @@ string BinaryMathNode::walk() {
     s5 = getFileLine(lineNum);
 
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
+    vector<string> v2 = {"COMMENT: ", s5};
     vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v2);
     main3ac.push_back(v);
     return s4;
 }
@@ -1387,8 +1419,10 @@ int ReturnNode::getNodeType() {
 string ReturnNode::walk() {
     string ret = getChildren().front()->walk();
     cout << "RETURN " << ret << endl;
+    vector<string> v2 = {"COMMENT: ", getFileLine(lineNum)};
     vector<string> v = {"RETURN", "---", "---", "---"};
     //todo what should the return value be?
+    main3ac.push_back(v2);
     main3ac.push_back(v);
     return "";
 }
@@ -1443,6 +1477,8 @@ string ArrayNode::walk() {
     string name = getChildren().front()->getName();
     cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
     vector<string> v = {"ADDR", name, "---", s1};
+    vector<string> v4 = {"COMMENT: ", s4};
+    main3ac.push_back(v4);
     main3ac.push_back(v);
     //s1 is the base address
     string s2 = "t" + to_string(registerCnt++);
@@ -1450,11 +1486,13 @@ string ArrayNode::walk() {
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
     cout << "STAR " << index_offset << " " << size_of << " " << s2 << "     #" << s4 << endl;
     vector<string> v2 = {"STAR", index_offset, size_of, s2};
+    main3ac.push_back(v4);
     main3ac.push_back(v2);
     //s2 is the offset
     string s3 = "t" + to_string(registerCnt++);
     cout << "PLUS " << s1 << " " << s2 << " " << s3 << "     #" << s4 << endl;
     vector<string> v3 = {"PLUS", s1, s2, s3};
+    main3ac.push_back(v4);
     main3ac.push_back(v3);
     /* todo multidimensional arrays
     string s2;
@@ -1628,6 +1666,8 @@ string ForNode::walk() {
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ":     #" << s5 << endl;
     vector<string> v = {"LABEL", initLabel, "---", "---"};
+    vector<string> v4 = {"COMMENT: ", s5};
+    main3ac.push_back(v4);
     main3ac.push_back(v);
 
     string endLabel = "l" + to_string(labelCnt++);
