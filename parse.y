@@ -1498,7 +1498,7 @@ int main(int argc, char **argv)
         ASTNode::copyTree(root_ptr, ast);
         kptree::print_tree_bracketed(ast);
         root_ptr->walk();
-        root_ptr->output3ac("3ac.txt");
+        root_ptr->output3ac("3ac-stuff.txt");
         //generate3ac(ast); deprecate this
     }
 	return 0;
