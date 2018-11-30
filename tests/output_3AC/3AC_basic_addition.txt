@@ -1,0 +1,13 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 5:  x = 2; 
+ASSIGN 2 --- x 
+COMMENT:  line 6:  y = x; 
+ASSIGN x --- y 
+COMMENT:  line 7:  z = x + y; 
+PLUS x y t0 
+COMMENT:  line 7:  z = x + y; 
+ASSIGN t0 --- z 
+COMMENT:  line 8:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 

@@ -1,0 +1,18 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 3:  for(i = 0; i < 3; i++) 
+ASSIGN 0 --- i 
+COMMENT:  line 3:  for(i = 0; i < 3; i++) 
+LABEL l0 --- --- 
+COMMENT:  line 3:  for(i = 0; i < 3; i++) 
+LESSTH i 3 t0 
+BREQ t0 0 l1 
+COMMENT:  line 3:  for(i = 0; i < 3; i++) 
+PLUS i 1 t1 
+COMMENT:  line 5:  i = i + 1; 
+PLUS i 1 t2 
+COMMENT:  line 5:  i = i + 1; 
+ASSIGN t2 --- i 
+BR --- --- l0 
+LABEL l1 --- --- 
+RETURN --- --- ---

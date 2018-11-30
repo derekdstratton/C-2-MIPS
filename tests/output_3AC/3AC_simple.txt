@@ -1,0 +1,5 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 2:  return 0; 
+RETURN --- --- --- 
+RETURN --- --- --- 

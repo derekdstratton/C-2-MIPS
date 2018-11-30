@@ -1,0 +1,9 @@
+CALL main --- --- 
+HALT --- --- --- 
+COMMENT:  line 3:  x = 1 + 2.0; 
+ASSIGN 1 --- f0 
+COMMENT:  line 3:  x = 1 + 2.0; 
+PLUS f0 2.000000 f1 
+COMMENT:  line 3:  x = 1 + 2.0; 
+ASSIGN f1 --- x 
+RETURN --- --- --- 
