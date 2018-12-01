@@ -20,6 +20,7 @@
 #include "ASTNodes.h"
 #include "include/tree.hh"
 #include "include/tree_util2.hh"
+#include "generateMIPS.cpp"
 
 SymbolTable * table_ptr;
 
@@ -1517,6 +1518,8 @@ int main(int argc, char **argv)
         /*ofstream ofs;
         ofs.open(THREEACPATH, std::ofstream::out | std::ofstream::trunc);*/ // to clear file if wanted
         root_ptr->output3ac();
+        auto tac = root_ptr->get3ac();
+        generateMIPS(tac);
     }
 	return 0;
 }

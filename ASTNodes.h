@@ -44,6 +44,7 @@ public:
     virtual string walk();
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
     static void output3ac();
+    static vector<vector<string>> get3ac();
 protected:
     int lineNum;
     int colNum;

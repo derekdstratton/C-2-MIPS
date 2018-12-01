@@ -330,6 +330,10 @@ void ASTNode::output3ac() {
     f.close();
 }
 
+vector<vector<string>> ASTNode::get3ac() {
+    return main3ac;
+}
+
 /**
  * @brief default constructor for ASTNode
  */
