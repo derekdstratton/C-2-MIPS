@@ -15,6 +15,7 @@
 #include <list>
 #include <utility>
 #include <deque>
+#include <stack>
 
 #include "SymbolTable.h"
 #include "ASTNodes.h"
@@ -28,8 +29,6 @@ SymbolTable * table_ptr;
 
 using namespace std;
 
-/* Global Variables */
-//SymbolTable * table_ptr;
 ASTNode * idNode;
 set<int> types;
 //list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
@@ -68,6 +67,8 @@ extern int yyleng;
 stringstream prodStream;
 
 ASTNode * root_ptr;
+
+stack<ASTNode*> assignNodes;
 
 /* Function declarations */
 
@@ -433,7 +434,10 @@ init_declarator
 	$$ = $1;
 	handleProd("init_declarator -> declarator\n");}
 	| declarator ASSIGN initializer {
-	$$ = new AssignNode($1, $3);
+	$$ = $1;
+	//auto a = new AssignNode($1, $3);
+	assignNodes.push($1);
+	assignNodes.push($3);
 	handleProd("init_declarator -> declarator ASSIGN initializer\n");}
 	;
 
@@ -810,6 +814,16 @@ compound_statement
 	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
+    while (!assignNodes.empty()) {
+        auto right = assignNodes.top();
+        assignNodes.pop();
+        auto left = assignNodes.top();
+        assignNodes.pop();
+        auto newNode = new AssignNode(left, right);
+        auto place = $3->getChildren();
+        place.push_front(newNode);
+        $3 = new SeqNode('s', place);
+    }
     $$ = new SeqNode('c', $2, $3);
 	handleProd("compound_statement -> OPENCUR declaration_list statement_list CLOSCUR\n");}
 	;
