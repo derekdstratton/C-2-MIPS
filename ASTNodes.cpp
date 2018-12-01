@@ -717,6 +717,8 @@ UnaryNode::UnaryNode(int x, ASTNode *child) {
     list <ASTNode*> tempList;
     tempList.push_back(child);
     nodeType = x;
+    types = child->getTypes();
+    childrenNodes = tempList;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -732,6 +734,24 @@ void UnaryNode::printNode(std::ostream &os) const {
 
 int UnaryNode::getNodeType() {
     return UNARYNODE;
+}
+
+string UnaryNode::walk() {
+    string s = getChildren().front()->walk();
+    string s2 = "l" + to_string(labelCnt++);
+    switch (nodeType) {
+        case MINUS: {
+            cout << "NEG " << s << " " << s2 << endl;
+            vector<string> v2 = {"NEG", s, "---", s2};
+            main3ac.push_back(v2);
+            return s2;
+        }
+        //todo do other cases for unary?
+        default: {
+            cout << "UNARY DEFAULT CASE" << endl;
+            return "";
+        }
+    }
 }
 
 /**
@@ -1269,10 +1289,10 @@ int RelationalNode::getOpType() {
 
 string RelationalNode::walk() {
     string s1 = tokenToString2(operationType);
-    auto it = getChildren().begin();
-    string s2 = (*it)->walk();
-    it++;
-    string s3 = (*it)->walk();
+    auto list_copy = getChildren();
+    string s2 = list_copy.front()->walk();
+    list_copy.pop_front();
+    string s3 = list_copy.front()->walk();
     string s4 = "t" + to_string(registerCnt++);
     string s5;
     s5 = getFileLine(lineNum);
@@ -1678,11 +1698,11 @@ string ForNode::walk() {
     string endLabel = "l" + to_string(labelCnt++);
 
     if (stmtWritten[1]) {
-        auto it = getChildren().begin();
+        auto list_copy = getChildren();
         if (stmtWritten[0])
-            it++;
+            list_copy.pop_front();
         string s1 = "BREQ";
-        string s2 = (*it)->walk();
+        string s2 = list_copy.front()->walk();
         string s3 = "0";
         cout << s1 << " " << s2 << " " << s3 << " " << endLabel << endl;
         vector<string> v = {s1, s2, s3, endLabel};
@@ -1691,12 +1711,12 @@ string ForNode::walk() {
     }
 
     if (stmtWritten[2]) {
-        auto it = getChildren().begin();
+        auto list_copy = getChildren();
         if (stmtWritten[0])
-            it++;
+            list_copy.pop_front();
         if (stmtWritten[1])
-            it++;
-        (*it)->walk();
+            list_copy.pop_front();
+        list_copy.front()->walk();
     }
     getChildren().back()->walk();
     cout << "BR" << " " << initLabel << endl;

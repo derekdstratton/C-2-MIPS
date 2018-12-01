@@ -276,6 +276,7 @@ public:
 private:
     int nodeType;
     void printNode(std:: ostream& os) const override;
+    string walk() override;
 };
 
 /**
