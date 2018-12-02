@@ -19,7 +19,6 @@ using namespace std;
 
 //Helper Functions
 
-string tokenToString2(int token);
 int getByteSize(set<int> typeSet);
 int computeTypeOrder(set<int>& typeSet);
 int compareForCast(set<int>& left, set<int>& right);

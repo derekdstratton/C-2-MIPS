@@ -651,10 +651,11 @@ string BinaryMathNode::walk() {
     }
 
     string s4;
-    if(s2.find('.') == std::string::npos && s3.find('.') == std::string::npos) // checks if there is a '.' in either string, means need float register
-        s4 = "t" + to_string(registerCnt++);
-    else
+    if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299) ||
+            getChildren().back()->getTypes().count(298) || getChildren().back()->getTypes().count(299))
         s4 = "f" + to_string(floatRegisterCnt++);
+    else
+        s4 = "t" + to_string(registerCnt++);
 
     string s5;
 
@@ -771,7 +772,7 @@ string CastNode::walk(){//only need to cast in 3ac if between double/float and a
     string s1;
     string s2;
     vector<string> v;
-    if(*(getChildren().front()->getTypes().begin()) == 298 || *(getChildren().front()->getTypes().begin()) == 299){
+    if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299)){
         s1 = getChildren().back()->walk();
         s2 = "f" + to_string(floatRegisterCnt++);
         v = {"ASSIGN", s1, "---", s2};
@@ -1011,6 +1012,9 @@ string FuncNode::walk() {
             vector<string> v = {"LABEL", funcName, "---", "---"};
             main3ac.push_back(v);
 
+            currentFuncOffsets.emplace("_RETURN_ADDRESS_", stackCnt);
+            stackCnt += 4; //todo I'm assuming each address is 4 bytes
+
             for (auto arg : args) {
                 currentFuncOffsets.emplace(arg.first, stackCnt);
                 stackCnt += getByteSize(arg.second);
@@ -1034,6 +1038,13 @@ string FuncNode::walk() {
             stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
             vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v);
+
+            vector<string> v7 = {"PUSHRA", "---", "---", "---"}; //pushes the return address on the stack
+            //doing this allows for nested function calls/recursion so each stack frame saves the location
+            //of its caller on the stack. This is at the top of the stack, and must be loaded whenever
+            //returning from a function
+            main3ac.push_back(v7);
+
             for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
                 string ret = a->walk();
                 //todo should the pushparam instruction know the type?

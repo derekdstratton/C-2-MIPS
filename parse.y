@@ -31,7 +31,6 @@ using namespace std;
 
 ASTNode * idNode;
 set<int> types;
-//list<ASTNode *> typesNotDeclaredYet; //they need to be hooked up with their symbol table node once the type is known
 
 list<int> size_decl_list;
 list<ASTNode*> idList;
