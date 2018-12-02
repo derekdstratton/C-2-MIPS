@@ -4,9 +4,9 @@ ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
     os << "Identifier: " << node.identifier;
     os << ", Types: ";
     for (int item : node.types) {
-        os << item << "_";
+        os << tokenToString2(item) << "_";
     }
-    if (node.sizeList.size() > 0) {
+    if (!node.sizeList.empty()) {
         os << ", Array dimensions: " << node.sizeList.size();
         os << ", Size per dim: ";
         for (auto i : node.sizeList) {
@@ -21,8 +21,6 @@ ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
             }
         }
     }
-
-
     return os;
 }
 
