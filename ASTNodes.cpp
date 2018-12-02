@@ -424,7 +424,7 @@ list<ASTNode*> ArrayNode::getSizes() {
  * @param os is the stream to be printed to
  */
 void ArrayNode::printNode(std::ostream &os) const {
-    os << "ARRAY"; //todo maybe provide more info about the array?
+    os << "ARRAY";
 }
 
 /**
@@ -460,7 +460,7 @@ string ArrayNode::walk() {
     vector<string> v3 = {"PLUS", s1, s2, s3};
     main3ac.push_back(v4);
     main3ac.push_back(v3);
-    /* todo multidimensional arrays
+    /* multidimensional arrays should go here, put algorithm here
     string s2;
     string s3;
     for (auto x : sizeList) {
@@ -1368,6 +1368,12 @@ void SeqNode::printNode(std::ostream &os) const {
         case 'i':
             os << "IDENTIFIER_LIST";
             break;
+        case 'p':
+            os << "PARAMETER_LIST";
+            break;
+        case 'x':
+            os << "EXPRESSION_LIST";
+            break;
         default:
             os << "UNDEFINED_SEQUENCE";
             break;
@@ -1476,9 +1482,18 @@ string UnaryNode::walk() {
             main3ac.push_back(v2);
             return s2;
         }
-        //todo do other cases for unary?
+        case PLUS: {
+            //do nothing
+            return "";
+        }
+        case BANG: {
+            vector<string> v = {"NOT", s, "---", s2};
+            main3ac.push_back(v);
+            return s2;
+        }
         default: {
-            cout << "UNARY DEFAULT CASE" << endl;
+            //pointers, address, and bitwise complement
+            cerr << "UNARY NOT IMPLEMENTED" << endl;
             return "";
         }
     }

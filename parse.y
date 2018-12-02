@@ -159,12 +159,11 @@ translation_unit
 	$$ = new SeqNode('g', tmp);
 	root_ptr = $$;
 	handleProd("translation_unit -> external_declaration\n");}
+
 	| translation_unit external_declaration {
 	list<ASTNode*> seq = $1->getChildren();
     seq.push_back($2);
     $$ = new SeqNode('g', seq);
-
-	//$$ = new SeqNode('g', $1, $2);
 	root_ptr = $$;
 	handleProd("translation_unit -> translation_unit external_declaration\n");}
 	;
@@ -173,6 +172,7 @@ external_declaration
 	: function_definition {
 	$$ = $1;
 	handleProd("external_declaration -> function_definition\n");}
+
 	| declaration {
 	$$ = $1;
 	handleProd("external_declaration -> declaration\n");}
@@ -185,12 +185,14 @@ function_definition
 	paramList.clear();
 	definitionList.clear();
 	handleProd("function_definition -> declarator compound_statement\n");}
+
 	| declarator declaration_list compound_statement {
 	$$ = new ASTNode();
 	isFunction = false;
     paramList.clear();
     definitionList.clear();
 	handleProd("function_definition -> declarator declaration_list compound_statement\n");}
+
 	| declaration_specifiers declarator compound_statement {
 	list<set<int>> types;
 	types.push_back($1->getTypes());
@@ -198,7 +200,6 @@ function_definition
 	tmpList.push_back($3);
 	$$ = new FuncNode($2->getName(), types, tmpList, definitionList, 1);
 	isFunction = true;
-
     tuple<SymbolTableNode2*, string> result = getTable()->search($2->getName());
     SymbolTableNode2* it;
     string status;
@@ -209,8 +210,6 @@ function_definition
         {
             cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
             exit(0);
-            //outputError("Bad function", "Trying to redeclare a function", false);
-            //cout << "BAD BAD BAD AVOCADO" << endl; //todo throw error
         }
         else
             it->defined = 1;
@@ -235,12 +234,13 @@ function_definition
             outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
         }
     }
-
     isFunction = false;
     paramList.clear();
     definitionList.clear();
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
+
 	| declaration_specifiers declarator declaration_list compound_statement {
+	//weird production, skip it
 	$$ = new ASTNode();
 	isFunction = false;
     paramList.clear();
@@ -252,8 +252,8 @@ declaration
 	: declaration_specifiers SEMI {
 	$$ = $1; //this is an incredibly strange and useless line
 	handleProd("declaration -> declaration_specifiers SEMI\n");}
+
 	| declaration_specifiers init_declarator_list SEMI {
-	//types = $1->getTypes();
 	string name = idNode->getName();
     set<int> x = $1->getTypes();
     SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
@@ -266,7 +266,6 @@ declaration
 	size_decl_list.clear(); //reset this too
 	paramList.clear();
 	isFunction = false;
-
     bool insertSuccess, notShadowing;
     tie(insertSuccess, notShadowing) = result;
     if (!insertSuccess) {
@@ -274,7 +273,6 @@ declaration
     } else if (!notShadowing) {
         outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
     }
-
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
@@ -284,6 +282,7 @@ declaration_list
     seq.push_back($1);
     $$ = new SeqNode('d', seq);
 	handleProd("declaration_list -> declaration\n");}
+
 	| declaration_list declaration {
 	list<ASTNode*> seq = $1->getChildren();
     seq.push_back($2);
@@ -297,26 +296,31 @@ declaration_specifiers
     tmp.insert($1);
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> storage_class_specifier\n");}
+
 	| storage_class_specifier declaration_specifiers {
 	set<int> x = $2->getTypes();
     x.insert($1);
     $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> storage_class_specifier declaration_specifiers\n");}
+
 	| type_specifier {
 	set<int> tmp;
     tmp.insert($1);
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_specifier\n");}
+
 	| type_specifier declaration_specifiers {
 	set<int> x = $2->getTypes();
     x.insert($1);
     $$ = new TypeNode(x);
 	handleProd("declaration_specifiers -> type_specifier declaration_specifiers\n");}
+
 	| type_qualifier {
 	set<int> tmp;
     tmp.insert($1);
     $$ = new TypeNode(tmp);
 	handleProd("declaration_specifiers -> type_qualifier\n");}
+
 	| type_qualifier declaration_specifiers {
 	set<int> x = $2->getTypes();
     x.insert($1);
@@ -371,10 +375,10 @@ type_specifier
 	$$ = UNSIGNED;
 	handleProd("type_specifier -> UNSIGNED\n");}
 	| struct_or_union_specifier {
-	$$ = -1; //also temp
+	$$ = -1; //unused
 	handleProd("type_specifier -> struct_or_union_specifier\n");}
 	| enum_specifier {
-	$$ = -1; //temporary lol
+	$$ = -1; //unused
 	handleProd("type_specifier -> enum_specifier\n");}
 	| TYPEDEF_NAME {
 	$$ = TYPEDEF_NAME;
@@ -435,7 +439,6 @@ init_declarator
 	handleProd("init_declarator -> declarator\n");}
 	| declarator ASSIGN initializer {
 	$$ = $1;
-	//auto a = new AssignNode($1, $3);
 	assignNodes.push($1);
 	assignNodes.push($3);
 	handleProd("init_declarator -> declarator ASSIGN initializer\n");}
@@ -453,16 +456,19 @@ specifier_qualifier_list
 	tmp.insert($1);
 	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_specifier\n");}
+
 	| type_specifier specifier_qualifier_list {
 	set<int> x = $2->getTypes();
 	x.insert($1);
 	$$ = new TypeNode(x);
 	handleProd("specifier_qualifier_list -> type_specifier specifier_qualifier_list\n");}
+
 	| type_qualifier {
 	set<int> tmp;
 	tmp.insert($1);
 	$$ = new TypeNode(tmp);
 	handleProd("specifier_qualifier_list -> type_qualifier\n");}
+
 	| type_qualifier specifier_qualifier_list {
 	set<int> x = $2->getTypes();
     x.insert($1);
@@ -534,24 +540,24 @@ direct_declarator
 	: identifier {
 	$$ = $1;
 	handleProd("direct_declarator -> identifier\n");}
+
 	| OPENPAR declarator CLOSEPAR {
 	$$ = $2;
 	handleProd("direct_declarator -> OPENPAR declarator CLOSEPAR\n");}
+
 	| direct_declarator OPENSQ CLOSSQ {
 	list<ASTNode *> empty;
 	$$ = new ArrayNode(idNode, empty);
-	//todo what should i put in the size_decl_list? nothing because it's not declared. should i worry about this case?
-	//todo its ok derek just think about apple salad burrito. i think its ok to just leave it tho
 	handleProd("direct_declarator -> direct_declarator OPENSQ CLOSSQ\n");}
+
 	| direct_declarator OPENSQ constant_expression CLOSSQ {
 	list<ASTNode*> sizes = $1->getSizes(); //only returns a list with contents if good, otherwise returns empty list
 	sizes.push_back($3);
 	$$ = new ArrayNode(idNode, sizes);
-	//the following assumes that $3 is an integer constant when declaring the array. other constant
-	//expressions will break, and thus should throw an error todo
-	size_decl_list.push_back($3->getVal()); //this butter work
-	//cout << size_decl_list.size();
+	//the following assumes that $3 is an integer constant when declaring the array.
+	size_decl_list.push_back($3->getVal());
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
+
 	| direct_declarator OPENPAR CLOSEPAR {
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
@@ -567,7 +573,6 @@ direct_declarator
         cerr << "Error on line " << yylineno << ": Function already exists." << endl;
         exit(0);
         outputError("Bad function", "Function already exists", false);
-        //cout << "WOAH NELLY" << endl; //todo throw error
     }
     else
     {
@@ -582,8 +587,8 @@ direct_declarator
     }
     paramList.clear();
     isFunction = false;
-
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
+
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
@@ -599,7 +604,6 @@ direct_declarator
             cerr << "Error on line " << yylineno << ": Function already exists." << endl;
             exit(0);
             outputError("Bad function", "Function already exists", false);
-            //cout << "WOAH NELLY" << endl; //todo throw error
         }
         else
         {
@@ -614,10 +618,11 @@ direct_declarator
         }
     paramList.clear();
     isFunction = false;
-
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
+
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
-	//throw an error, because it's legacy code and bad.
+	//This is legacy code and bad.
+	cerr << "Why are you doing that?" << endl;
 	$$ = new ASTNode();
 	handleProd("direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n");}
 	;
@@ -645,38 +650,42 @@ type_qualifier_list
 
 parameter_type_list
 	: parameter_list {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("parameter_type_list -> parameter_list\n");}
 	| parameter_list COMMA ELIPSIS {
-	list <pair<string,int>> empty;
-	$$ = new ASTNode(); //todo deal with this?
+	//not handling elipsis
+	$$ = new ASTNode();
 	handleProd("parameter_type_list -> parameter_list COMMA ELIPSIS\n");}
 	;
 
 parameter_list
 	: parameter_declaration {
-    $$ = new ASTNode();
+    $$ = $1;
 	handleProd("parameter_list -> parameter_declaration\n");}
 	| parameter_list COMMA parameter_declaration {
-	$$ = new ASTNode();
+	list<ASTNode*> seq = $1->getChildren();
+    seq.push_back($3);
+    $$ = new SeqNode('p', seq);
 	handleProd("parameter_list -> parameter_list COMMA parameter_declaration\n");}
 	;
 
 parameter_declaration
 	: declaration_specifiers declarator {
-	paramList.push_back($1->getTypes()); //todo temp
+	paramList.push_back($1->getTypes());
 	auto it = $1->getTypes().begin();
 	pair<string, set<int>> tmpPair ($2->getName(), $1->getTypes());
     definitionList.push_back(tmpPair);
 	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
+
 	| declaration_specifiers {
 	$$ = new ASTNode();
-	paramList.push_back($1->getTypes()); //todo temp
+	paramList.push_back($1->getTypes());
 	handleProd("parameter_declaration -> declaration_specifiers\n");}
+
 	| declaration_specifiers abstract_declarator {
 	$$ = new ASTNode();
-	paramList.push_back($1->getTypes()); //todo temp
+	paramList.push_back($1->getTypes());
 	handleProd("parameter_declaration -> declaration_specifiers abstract_declarator\n");}
 	;
 
@@ -693,9 +702,11 @@ initializer
 	: assignment_expression {
 	$$ = $1;
 	handleProd("initializer -> assignment_expression\n");}
+
 	| OPENCUR initializer_list CLOSCUR {
 	$$ = new ASTNode(); //array init
 	handleProd("initializer -> OPENCUR initializer_list CLOSCUR\n");}
+
 	| OPENCUR initializer_list COMMA CLOSCUR {
 	$$ = new ASTNode(); //array init
 	handleProd("initializer -> OPENCUR initializer_list COMMA CLOSCUR\n");}
@@ -715,7 +726,8 @@ type_name
 	$$ = $1;
 	handleProd("type_name -> specifier_qualifier_list\n");}
 	| specifier_qualifier_list abstract_declarator {
-	$$ = new ASTNode(); //$1 is a TypeNode. Add the type from abstract to it (pointer or array)
+	//This production lets you cast/find sizeof with arrays/pointers/functions
+	$$ = new ASTNode();
 	handleProd("type_name -> specifier_qualifier_list abstract_declarator\n");}
 	;
 
@@ -784,7 +796,7 @@ statement
 
 labeled_statement
 	: identifier COLON statement {
-	$$ = new ASTNode(); //this is for a goto, no symbol table, just dump
+	$$ = new ASTNode(); //this is for a goto label
 	handleProd("labeled_statement -> identifier COLON statement\n");}
 	| CASE constant_expression COLON statement {
 	$$ = new ASTNode();
@@ -834,6 +846,7 @@ statement_list
 	tmp.push_back($1);
 	$$ = new SeqNode('s', tmp);
 	handleProd("statement_list -> statement\n");}
+
 	| statement_list statement {
 	list<ASTNode*> seq = $1->getChildren();
 	seq.push_back($2);
@@ -937,7 +950,9 @@ expression
 	$$ = $1;
 	handleProd("expression -> assignment_expression\n");}
 	| expression COMMA assignment_expression {
-	$$ = new ASTNode();
+	list<ASTNode*> seq = $1->getChildren();
+    seq.push_back($3);
+    $$ = new SeqNode('x', seq);
 	handleProd("expression -> expression COMMA assignment_expression\n");}
 	;
 
@@ -965,7 +980,7 @@ assignment_expression
         case SUB_ASSIGN:
             $$ = new AssignNode($1, new BinaryMathNode(MINUS, $1, $3));
             break;
-        //todo bitwise assigns
+        //bitwise assigns
 	    default:
 	        break;
 	}
@@ -1013,7 +1028,7 @@ conditional_expression
 	$$ = $1;
 	handleProd("conditional_expression -> logical_or_expression\n");}
 	| logical_or_expression TERNARY expression COLON conditional_expression {
-	$$ = new ASTNode(); //this should be an if node
+	$$ = new IfNode($1, $3, $5);
 	handleProd("conditional_expression -> logical_or_expression TERNARY expression COLON conditional_expression \n");}
 	;
 
@@ -1181,8 +1196,8 @@ unary_expression
 	        $$ = new ASTNode();
 	        break;
 	}
-	//$$ = new ASTNode();
 	handleProd("unary_expression -> unary_operator cast_expression\n");}
+
 	| SIZEOF unary_expression {
 	$$ = new ASTNode();
 	handleProd("unary_expression -> SIZEOF unary_expression\n");}
@@ -1230,12 +1245,15 @@ postfix_expression
     tie(it, status) = result;
 	if(status == "not")
 	{
-	    cout << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
+	    cerr << "FUNCTION NOT FOUND" << endl;
+	    exit(0);
 	}
 	else if(status != "not")
 	{
-	    if(it->defined != 1)
-	        cout << "FUNCTION NOT DEFINED BUDDY" << endl; //todo throw error
+	    if(it->defined != 1) {
+	        cerr << "FUNCTION NOT DEFINED AMIGO" << endl;
+	        exit(0);
+	    }
 	}
 
 	list<set<int>> types;
@@ -1254,12 +1272,10 @@ postfix_expression
     string status;
     tie(node, status) = result;
     if (status != "not") {
-        //cout << *$1 << " found" << endl;
-        //cout << *node << endl;
         types = node->paramTypes;
     } else {
-        //cout << *$1 << " not found " << endl;
-        //todo what to do if not found?
+        cerr << "FUNCTION NOT FOUND" << endl;
+        exit(0);
     }
 
 	list<ASTNode*> tmpList;
@@ -1290,7 +1306,7 @@ primary_expression
 	$$ = $1;
 	handleProd("primary_expression -> constant\n");}
 	| string {
-	$$ = new ASTNode();
+	$$ = $1;
 	handleProd("primary_expression -> string\n");}
 	| OPENPAR expression CLOSEPAR {
 	$$ = $2;
@@ -1299,12 +1315,12 @@ primary_expression
 
 argument_expression_list
 	: assignment_expression {
-	//idList.push_back($1);
 	$$ = $1;
 	handleProd("argument_expression_list -> assignment_expression\n");}
 	| argument_expression_list COMMA assignment_expression {
-	//idList.push_back($3);
-	$$ = new SeqNode('a', $1, $3);
+	list<ASTNode*> seq = $1->getChildren();
+    seq.push_back($3);
+    $$ = new SeqNode('a', seq);
 	handleProd("argument_expression_list -> argument_expression_list COMMA assignment_expression\n");}
 	;
 
@@ -1332,20 +1348,13 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode($1);
-	/*if ($$->getTypes().empty()) {
-	    typesNotDeclaredYet.push_back($$);
-    }*/
 	idNode = $$;
 	tuple<SymbolTableNode2*, string> result = getTable()->search(*$1);
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
     if (status != "not") {
-        //it++;
         $$->setSymbolNode(it);
-        //cout << *$1 << " found" << endl;
-    } else {
-        //cout << *$1 << " not found " << endl;
     }
 	handleProd("identifier -> IDENTIFIER\n");}
 	;

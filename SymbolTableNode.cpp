@@ -1,3 +1,5 @@
+#include <utility>
+
 #include "SymbolTableNode.h"
 
 ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
@@ -32,11 +34,11 @@ SymbolTableNode2::SymbolTableNode2() {
 
 SymbolTableNode2::SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc,
                                    list<set<int>> params, bool Defined) {
-    types = typeArr;
-    identifier = name;
-    sizeList = size_decl_list;
+    types = move(typeArr);
+    identifier = move(name);
+    sizeList = move(size_decl_list);
     isFunction = isFunc;
-    paramTypes = params;
+    paramTypes = move(params);
     defined = Defined;
 }
 
