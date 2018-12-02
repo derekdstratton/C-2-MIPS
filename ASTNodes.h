@@ -46,7 +46,7 @@ public:
     static vector<vector<string>> get3ac();
 protected:
     int lineNum;
-    int colNum;
+    unsigned long long int colNum;
     list<ASTNode *> childrenNodes;
     //source code?
     static int registerCnt;

@@ -1,3 +1,7 @@
+#include <utility>
+
+#include <utility>
+
 //Include statements
 
 #include "ASTNodes.h"
@@ -314,9 +318,8 @@ void ASTNode::printNode(std::ostream &os) const {
  */
 void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename tree<ASTNode *>::iterator iRoot) {
     //Node has children, insert them
-    if (src_node->getChildren().size() != 0) {
+    if (!src_node->getChildren().empty()) {
         for (auto &child : src_node->getChildren()) {
-            //os << *child;
             auto newRoot = ast.append_child(iRoot, child);
             copyTreeHelper(child, ast, newRoot);
         }
@@ -328,7 +331,7 @@ void ASTNode::output3ac() {
     ofstream f;
     f.open(THREEACPATH);
     for (auto x : main3ac) {
-        for (auto y: x) {
+        for (const auto &y: x) {
             cout << setw(18) << left << y;
             f << setw(18) << left << y;
         }
@@ -349,8 +352,7 @@ vector<vector<string>> ASTNode::get3ac() {
 /**
  * @brief default constructor for ASTNode
  */
-ASTNode::ASTNode() {
-}
+ASTNode::ASTNode() = default;
 
 /**
  *
@@ -386,9 +388,7 @@ int ASTNode::getVal() {
  * default- MUST set type in derived constructor
    also must CHECK type in derived constructor after setting it.
  */
-TypeNode::TypeNode() {
-
-}
+TypeNode::TypeNode() = default;
 
 /**
  *
@@ -415,11 +415,9 @@ void TypeNode::checkType() {
     if (types.count(DOUBLE) == 1) {
         typeCount++;
     }
-
     if (typeCount >= 2) {
         goodType = false;
     }
-
     if (!goodType) {
         outputError("Bad type", "Defined type is not a logical type", false);
     }
@@ -633,7 +631,6 @@ string AssignNode::walk() {
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
-    int temp = 0;
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }
@@ -938,7 +935,7 @@ string DeclNode::walk() {
  * @param stmt is the statement or the body of the loop
  */
 ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
-    childrenNodes = ptrList;
+    childrenNodes = move(ptrList);
     childrenNodes.push_back(stmt);
     for(int i = 0; i < 3; ++i)
         stmtWritten[i] = arr[i];
@@ -973,11 +970,9 @@ string ForNode::walk() {
         string s1 = "BREQ";
         string s2 = list_copy.front()->walk();
         string s3 = "0";
-        vector<string> v = {s1, s2, s3, endLabel};
-        main3ac.push_back(v);
-
+        vector<string> v5 = {s1, s2, s3, endLabel};
+        main3ac.push_back(v5);
     }
-
     if (stmtWritten[2]) {
         auto list_copy = getChildren();
         if (stmtWritten[0])
@@ -1008,7 +1003,7 @@ string ForNode::walk() {
  */
 FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type)
 {
-    funcName = name;
+    funcName = move(name);
     funcType = type;
     switch(type)
     {
@@ -1018,7 +1013,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
         }
         case 1: {
             paramTypes = types;
-            args = arguments;
+            args = move(arguments);
             childrenNodes = children;
             auto tempIt = types.begin();
             childrenNodes.push_front(new TypeNode(*tempIt));
@@ -1046,22 +1041,20 @@ void FuncNode::printNode(std::ostream &os) const{
     {
         case 0: {
             os << "FUNCTION_PROTOTYPE_" << funcName;
-            for(auto it = paramTypes.begin(); it != paramTypes.end(); ++it)
-            {
+            for (const auto &paramType : paramTypes) {
                 os << "_";
-                for(auto ite = it->begin(); ite != it->end(); ++ite)
-                    os << tokenToString2(*ite);
+                for (int ite : paramType)
+                    os << tokenToString2(ite);
             }
             break;
         }
         case 1: {
             os << "FUNCTION_DEFINITION_" << funcName;
-            for(auto it = args.begin(); it != args.end(); ++it)
-            {
+            for (const auto &arg : args) {
                 os << "_";
-                os << it->first << "_";
-                for(auto ite = it->second.begin(); ite != it->second.end(); ++ite)
-                    os << tokenToString2(*ite);
+                os << arg.first << "_";
+                for (int ite : arg.second)
+                    os << tokenToString2(ite);
             }
             break;
         }
@@ -1122,7 +1115,7 @@ string FuncNode::walk() {
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
             int stackSpace = 0;
-            for (auto item : paramTypes) {
+            for (const auto &item : paramTypes) {
                 stackSpace += getByteSize(item);
             }
             stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
@@ -1162,7 +1155,7 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt) {
     tempList.push_back(expr);
     tempList.push_back(stmt);
     childrenNodes = tempList;
-    flag = 1;
+    flag = true;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -1181,7 +1174,7 @@ IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
     tempList.push_back(stmt);
     tempList.push_back(stmt2);
     childrenNodes = tempList;
-    flag = 0;
+    flag = false;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
@@ -1279,8 +1272,7 @@ string LogicalNode::walk() {
 /**
  * @brief NoneNode constructor
  */
-NoneNode::NoneNode() {
-}
+NoneNode::NoneNode() = default;
 
 /**
  * @brief NoneNode prints none
@@ -1364,7 +1356,7 @@ string RelationalNode::walk() {
  * @param child is the child ASTNode pointer
  */
 ReturnNode::ReturnNode(ASTNode *child) {
-    if (child == NULL) {
+    if (child == nullptr) {
         list<ASTNode*> emptyList;
         childrenNodes = emptyList;
     } else {
@@ -1475,7 +1467,7 @@ void SeqNode::printNode(std::ostream &os) const {
  * @param statementList is the list of ASTNode pointers
  */
 SeqNode::SeqNode(char seq, list<ASTNode *> statementList) {
-    childrenNodes = statementList;
+    childrenNodes = move(statementList);
 
     seqType = seq;
 
@@ -1641,8 +1633,8 @@ string WhileNode::walk() {
         s2 = getChildren().front()->walk();
 
         s4  = "l" + to_string(labelCnt++);
-        vector<string> v = {s1, s2, s3, s4};
-        main3ac.push_back(v);
+        vector<string> v6 = {s1, s2, s3, s4};
+        main3ac.push_back(v6);
         //then do
         getChildren().back()->walk();
     } else {
@@ -1651,8 +1643,8 @@ string WhileNode::walk() {
         //then while
         s2 = getChildren().front()->walk();
         s4  = "l" + to_string(labelCnt++);
-        vector<string> v = {s1, s2, s3, s4};
-        main3ac.push_back(v);
+        vector<string> v5 = {s1, s2, s3, s4};
+        main3ac.push_back(v5);
     }
     vector<string> v2 = {"BR", "---", "---", initLabel};
     main3ac.push_back(v2);
@@ -1674,7 +1666,7 @@ IdentifierNode::IdentifierNode(string *name) {
 }
 
 int IdentifierNode::getDimensions() {
-    return sizeList.size();
+    return static_cast<int>(sizeList.size());
 }
 
 /**
@@ -1705,7 +1697,7 @@ void IdentifierNode::printNode(std::ostream &os) const {
     for (auto item : types) {
         os << "_" << tokenToString2(item);
     }
-    int dimensions = sizeList.size();
+    int dimensions = static_cast<int>(sizeList.size());
     if (dimensions > 0) {
         os << "_ARR_";
         int i = 1;

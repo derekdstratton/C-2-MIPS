@@ -1254,11 +1254,12 @@ postfix_expression
     string status;
     tie(node, status) = result;
     if (status != "not") {
-        cout << *$1 << " found" << endl;
-        cout << *node << endl;
+        //cout << *$1 << " found" << endl;
+        //cout << *node << endl;
         types = node->paramTypes;
     } else {
-        cout << *$1 << " not found " << endl;
+        //cout << *$1 << " not found " << endl;
+        //todo what to do if not found?
     }
 
 	list<ASTNode*> tmpList;

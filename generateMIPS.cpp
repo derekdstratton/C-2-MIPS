@@ -6,7 +6,7 @@ using namespace std;
 
 void generateMIPS(vector<vector<string>> tac) {
     for (auto line : tac) {
-        if (line[0] == "RETURN") {
+        if (line[0] == "HALT") {
             cout << "woohoo" << endl;
         }
     }
