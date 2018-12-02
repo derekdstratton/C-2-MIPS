@@ -905,19 +905,20 @@ int DeclNode::getNodeType() {
 
 string DeclNode::walk() {
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
-        cout << "ARRAYNODE DECL GOES HERE" << endl;
+        cout << "ARRAYNODE DECL GOES HERE" << endl; //TODO
+        currentFuncOffsets.emplace(getChildren().back()->getChildren().front()->getName(), stackCnt);
+        int k = 1;
+        for (auto i : getChildren().back()->getSizes()) {
+            k *= i->getVal();
+        }
+        cout << "THIS IS K " << k << endl;
+        stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        cout << "THIS IS STACKCNT " << stackCnt << endl;
         return "";
+    } else {
+        currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
+        stackCnt += getByteSize(getChildren().back()->getTypes());
     }
-    auto type = getChildren().front()->getTypes();
-    int offset = getByteSize(type);
-    SymbolTableNode2 * s = new SymbolTableNode2();
-
-    currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
-    stackCnt += getByteSize(getChildren().back()->getTypes());
-    //s->offset = offset;
-    //s->tempreg = todo maybe later will we need to assign a temporary register? arrays need a pointer?
-    //table3ac.insert(make_pair(getChildren().back()->getName(), *s));
-
     return "";
 }
 
@@ -1101,7 +1102,8 @@ int IdentifierNode::getNodeType() {
 }
 
 string IdentifierNode::walk() {
-    return identifier;
+    string s = to_string(currentFuncOffsets[identifier]);
+    return s + "(fp)";
 }
 
 /**
@@ -1522,7 +1524,8 @@ int ArrayNode::getNodeType() {
 string ArrayNode::walk() {
     string s4 = getFileLine(lineNum);
     string s1 = "t" + to_string(registerCnt++);
-    string name = getChildren().front()->getName();
+    int baseOffset = currentFuncOffsets.at(getChildren().front()->getName());
+    string name = to_string(baseOffset) + "(fp)";
     cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
     vector<string> v = {"ADDR", name, "---", s1};
     vector<string> v4 = {"COMMENT", s4};
@@ -1658,8 +1661,10 @@ string FuncNode::walk() {
             currentFuncOffsets.clear();
 
             cout << funcName << ": " << endl;
+            vector<string> v = {"LABEL", funcName, "---", "---"};
+            main3ac.push_back(v);
+
             for (auto arg : args) {
-                //todo "paramName" should be the name of the parameter, which is not in the function node currently
                 currentFuncOffsets.emplace(arg.first, stackCnt);
                 stackCnt += getByteSize(arg.second);
             }
@@ -1668,8 +1673,8 @@ string FuncNode::walk() {
             }
 
             cout << "RETURN" << endl;
-            vector<string> v = {"RETURN", "---", "---", "---"};
-            main3ac.push_back(v);
+            vector<string> v2 = {"RETURN", "---", "---", "---"};
+            main3ac.push_back(v2);
 
             currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
             allFuncOffsets.emplace(funcName, currentFuncOffsets);
@@ -1679,7 +1684,6 @@ string FuncNode::walk() {
         case 2: {
             int stackSpace = 0;
             for (auto item : paramTypes) {
-                cout << "This happened" << endl;
                 stackSpace += getByteSize(item);
             }
             stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
@@ -1688,7 +1692,7 @@ string FuncNode::walk() {
             main3ac.push_back(v);
             for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
                 string ret = a->walk();
-                cout << "PUSHPARAM " << ret << endl; //todo shouldn't the pushparam instruction know the type?
+                cout << "PUSHPARAM " << ret << endl; //todo should the pushparam instruction know the type?
                 vector<string> v2 = {"PUSHPARAM", ret, "---", "---"};
                 main3ac.push_back(v2);
             }
