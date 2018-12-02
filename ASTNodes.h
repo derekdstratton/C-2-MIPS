@@ -58,6 +58,9 @@ protected:
     //private helper functions
     virtual void printNode(std::ostream& os) const;
     static void copyTreeHelper(ASTNode*& src_node, tree<ASTNode*> & ast, typename tree<ASTNode*>::iterator iRoot);
+    static int stackCnt;
+    static map<string, map<string, int>> allFuncOffsets;
+    static map<string, int> currentFuncOffsets;
 };
 
 /**

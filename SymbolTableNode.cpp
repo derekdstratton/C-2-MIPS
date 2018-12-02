@@ -16,7 +16,9 @@ ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
     if (node.isFunction) {
         os << ", Function w/ Params: ";
         for (auto t : node.paramTypes) {
-            os << "type t needs implemented in <<";
+            for (auto q : t) {
+                os << q << "_";
+            }
         }
     }
 

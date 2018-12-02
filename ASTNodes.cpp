@@ -2,6 +2,8 @@
 
 #include "ASTNodes.h"
 
+#include <iomanip>
+
 //Extern variables and functions
 extern int yylineno;
 extern deque <char> columnQueue;
@@ -18,6 +20,9 @@ int ASTNode::labelCnt = 0;
 auto tmp = new SymbolTable();
 SymbolTable ASTNode::table3ac = *tmp;
 vector<vector<string>> ASTNode::main3ac;
+int ASTNode::stackCnt = 0;
+map<string, map<string, int>> ASTNode::allFuncOffsets;
+map<string, int> ASTNode::currentFuncOffsets;
 
 //Helper Functions
 
@@ -316,13 +321,12 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 
 void ASTNode::output3ac() {
     //Outputs the vector to a file
-    //todo you can make it print pretty later
     ofstream f;
     f.open(THREEACPATH);
     for (auto x : main3ac) {
         for (auto y: x) {
-            cout << y << " ";
-            f << y << " ";
+            cout << setw(18) << left << y;
+            f << setw(18) << left << y;
         }
         f << endl;
         cout << endl;
@@ -548,7 +552,7 @@ string AssignNode::walk() {
 
     cout << s1 << " " << s2 << " " << s3 << "    #" << s4 << endl;
 
-    vector<string> v2 = {"COMMENT: ", s4};
+    vector<string> v2 = {"COMMENT", s4};
     vector<string> v = {s1, s2, "---", s3};
     main3ac.push_back(v2);
     main3ac.push_back(v);
@@ -595,7 +599,7 @@ string WhileNode::walk() {
     s5 = getFileLine(getChildren().front()->getLineNum());
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ":     #" << s5 << endl;
-    vector<string> v4 = {"COMMENT: ", s5};
+    vector<string> v4 = {"COMMENT", s5};
     vector<string> v = {"LABEL", initLabel, "---", "---"};
     main3ac.push_back(v);
 
@@ -697,7 +701,7 @@ string IfNode::walk() {
     s5 = getFileLine(getChildren().front()->getLineNum());
 
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
-    vector<string> v3 = {"COMMENT: ", s5};
+    vector<string> v3 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     getChildren().back()->walk();
@@ -907,9 +911,12 @@ string DeclNode::walk() {
     auto type = getChildren().front()->getTypes();
     int offset = getByteSize(type);
     SymbolTableNode2 * s = new SymbolTableNode2();
-    s->offset = offset;
+
+    currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
+    stackCnt += getByteSize(getChildren().back()->getTypes());
+    //s->offset = offset;
     //s->tempreg = todo maybe later will we need to assign a temporary register? arrays need a pointer?
-    table3ac.insert(make_pair(getChildren().back()->getName(), *s));
+    //table3ac.insert(make_pair(getChildren().back()->getName(), *s));
 
     return "";
 }
@@ -996,26 +1003,37 @@ char SeqNode::getSeqType() {
 string SeqNode::walk() {
     switch(seqType) {
         case 'g': {
-            cout << "TODO- MUST ALLOCATE LOCALS FOR MAIN" << endl;
+            cout << "ALLOCATE" << endl;
+            vector<string> v0 = {"ALLOCATE", "TODO", "---", "---"};
+            main3ac.push_back(v0);
+            int allocateLine = main3ac.size()-1;
             cout << "CALL" << " " << "main" << endl;
             vector<string> v = {"CALL", "main", "---", "---"};
             main3ac.push_back(v);
 
-
-
             cout << "HALT" << endl;
             vector<string> v2 = {"HALT", "---", "---", "---"};
             main3ac.push_back(v2);
-            cout << "TODO- MUST DEALLOCATE LOCALS FOR MAIN" << endl;
+            cout << "DEALLOCATE" << endl;
+            vector<string> v3 = {"DEALLOCATE", "TODO", "---", "---"};
+            main3ac.push_back(v3);
+            int deallocateLine = main3ac.size()-1;
+            for (auto x : getChildren()) {
+                x->walk();
+            }
+            int stackSize = allFuncOffsets.at("main").at("_TOTAL_STACK_SIZE_");
+            main3ac[allocateLine][1] = to_string(stackSize);
+            main3ac[deallocateLine][1] = to_string(stackSize);
+
             break;
         }
         default: {
             //cout << "OTHER SEQ NODE" << endl;
+            for (auto x : getChildren()) {
+                x->walk();
+            }
             break;
         }
-    }
-    for (auto x : getChildren()) {
-        x->walk();
     }
     return "";
 }
@@ -1248,7 +1266,7 @@ string CastNode::walk(){//only need to cast in 3ac if between double/float and a
         v = {"ASSIGN", s1, "---", s2};
     }
     vector<string> v2;
-    v2 = {"COMMENT: ", getFileLine(lineNum)};
+    v2 = {"COMMENT", getFileLine(lineNum)};
     main3ac.push_back(v2);
     main3ac.push_back(v);
     return s2;
@@ -1297,7 +1315,7 @@ string RelationalNode::walk() {
     string s5;
     s5 = getFileLine(lineNum);
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "     #" << s5 << endl;
-    vector<string> v2 = {"COMMENT: ", s5};
+    vector<string> v2 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v2);
     main3ac.push_back(v);
@@ -1404,7 +1422,7 @@ string BinaryMathNode::walk() {
     s5 = getFileLine(lineNum);
 
     cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
-    vector<string> v2 = {"COMMENT: ", s5};
+    vector<string> v2 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v2);
     main3ac.push_back(v);
@@ -1442,13 +1460,18 @@ int ReturnNode::getNodeType() {
 }
 
 string ReturnNode::walk() {
-    string ret = getChildren().front()->walk();
-    cout << "RETURN " << ret << endl;
-    vector<string> v2 = {"COMMENT: ", getFileLine(lineNum)};
-    vector<string> v = {"RETURN", "---", "---", "---"};
-    //todo what should the return value be?
+
+    if (getChildren().front()->getNodeType() != NONENODE) {
+        string ret = getChildren().front()->walk();
+        cout << "PUSHRETURN " << ret << endl;
+        vector<string> v = {"PUSHRETURN", ret, "---", "---"};
+        main3ac.push_back(v);
+        currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
+        stackCnt += getByteSize(getChildren().front()->getTypes());
+    }
+    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
     main3ac.push_back(v2);
-    main3ac.push_back(v);
+
     return "";
 }
 
@@ -1502,7 +1525,7 @@ string ArrayNode::walk() {
     string name = getChildren().front()->getName();
     cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
     vector<string> v = {"ADDR", name, "---", s1};
-    vector<string> v4 = {"COMMENT: ", s4};
+    vector<string> v4 = {"COMMENT", s4};
     main3ac.push_back(v4);
     main3ac.push_back(v);
     //s1 is the base address
@@ -1562,6 +1585,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
             break;
         }
         case 2: {
+            paramTypes = types;
             childrenNodes = children;
             break;
         }
@@ -1578,7 +1602,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
  * @param os is the stream to be printed to
  */
  //todo check if already in sym table for function call
-void FuncNode:: printNode(std::ostream &os) const{
+void FuncNode::printNode(std::ostream &os) const{
      switch(funcType)
      {
          case 0: {
@@ -1587,7 +1611,7 @@ void FuncNode:: printNode(std::ostream &os) const{
              {
                  os << "_";
                  for(auto ite = it->begin(); ite != it->end(); ++ite)
-                     os << *ite;
+                     os << tokenToString2(*ite);
              }
              break;
          }
@@ -1598,7 +1622,7 @@ void FuncNode:: printNode(std::ostream &os) const{
                  os << "_";
                  os << it->first << "_";
                  for(auto ite = it->second.begin(); ite != it->second.end(); ++ite)
-                    os << *ite;
+                    os << tokenToString2(*ite);
              }
              break;
          }
@@ -1630,31 +1654,58 @@ string FuncNode::walk() {
             break;
         }
         case 1: {
+            stackCnt = 0;
+            currentFuncOffsets.clear();
+
             cout << funcName << ": " << endl;
+            for (auto arg : args) {
+                //todo "paramName" should be the name of the parameter, which is not in the function node currently
+                currentFuncOffsets.emplace(arg.first, stackCnt);
+                stackCnt += getByteSize(arg.second);
+            }
             for (auto a : getChildren()) {
                 a->walk();
             }
+
             cout << "RETURN" << endl;
             vector<string> v = {"RETURN", "---", "---", "---"};
             main3ac.push_back(v);
+
+            currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+            allFuncOffsets.emplace(funcName, currentFuncOffsets);
             break;
         }
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
             int stackSpace = 0;
             for (auto item : paramTypes) {
+                cout << "This happened" << endl;
                 stackSpace += getByteSize(item);
             }
-            cout << "Allocate stack space (params, locals, return) - todo" << endl; //todo
+            stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
             cout << "ALLOCATE " << stackSpace << endl;
+            vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
+            main3ac.push_back(v);
             for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
                 string ret = a->walk();
-                cout << "PUSHPARAM " << ret << endl;
+                cout << "PUSHPARAM " << ret << endl; //todo shouldn't the pushparam instruction know the type?
+                vector<string> v2 = {"PUSHPARAM", ret, "---", "---"};
+                main3ac.push_back(v2);
             }
             cout << "CALL " << funcName << endl;
-            cout << "Deallocate stack space (params, locals, return) - todo" << endl; //todo
-            cout << "DEALLOCATE " << stackSpace << endl;
-            break;
+            vector<string> v2 = {"CALL", funcName, "---", "---"};
+            main3ac.push_back(v2);
+
+            string s = "t" + to_string(registerCnt++);
+            string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
+            cout << "ASSIGN " << s2 << " " << s << endl;
+            vector<string> v3 = {"ASSIGN", s2 + "(fp)", "---", s};
+            main3ac.push_back(v3);
+
+            cout << "DEALLOCATE " << allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_") << endl;
+            vector<string> v4 = {"DEALLOCATE", to_string(stackSpace), "---", "---"};
+            main3ac.push_back(v4);
+            return s;
         }
         default:
             break;
@@ -1691,7 +1742,7 @@ string ForNode::walk() {
     string initLabel = "l" + to_string(labelCnt++);
     cout << initLabel << ":     #" << s5 << endl;
     vector<string> v = {"LABEL", initLabel, "---", "---"};
-    vector<string> v4 = {"COMMENT: ", s5};
+    vector<string> v4 = {"COMMENT", s5};
     main3ac.push_back(v4);
     main3ac.push_back(v);
 

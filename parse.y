@@ -1221,10 +1221,9 @@ postfix_expression
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
     $$ = new ArrayNode(idNode, sizes); //1D case
-    //$$ = new ASTNode(); //function calls
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
-	| postfix_expression OPENPAR CLOSEPAR {
 
+	| postfix_expression OPENPAR CLOSEPAR {
     tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
     SymbolTableNode2* it;
     string status;
@@ -1244,14 +1243,30 @@ postfix_expression
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), types, empty, args, 2);
 	handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
+
 	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {
+	//function call with parameters
+
 	list<set<int>> types;
+
+	tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
+    SymbolTableNode2* node;
+    string status;
+    tie(node, status) = result;
+    if (status != "not") {
+        cout << *$1 << " found" << endl;
+        cout << *node << endl;
+        types = node->paramTypes;
+    } else {
+        cout << *$1 << " not found " << endl;
+    }
+
 	list<ASTNode*> tmpList;
 	tmpList.push_back($3);
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), types, tmpList, args, 2);
-	//idList.clear();
 	handleProd("postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n");}
+
 	| postfix_expression PERIOD identifier {
 	$$ = new ASTNode(); //structs
 	handleProd("postfix_expression -> postfix_expression PERIOD identifier\n");}
