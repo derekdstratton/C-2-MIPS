@@ -1,12 +1,14 @@
+#include <utility>
+
 #include "SymbolTableNode.h"
 
 ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
     os << "Identifier: " << node.identifier;
     os << ", Types: ";
     for (int item : node.types) {
-        os << item << "_";
+        os << tokenToString2(item) << "_";
     }
-    if (node.sizeList.size() > 0) {
+    if (!node.sizeList.empty()) {
         os << ", Array dimensions: " << node.sizeList.size();
         os << ", Size per dim: ";
         for (auto i : node.sizeList) {
@@ -16,11 +18,11 @@ ostream& operator<<(ostream& os, const SymbolTableNode2& node) {
     if (node.isFunction) {
         os << ", Function w/ Params: ";
         for (auto t : node.paramTypes) {
-            os << "type t needs implemented in <<";
+            for (auto q : t) {
+                os << q << "_";
+            }
         }
     }
-
-
     return os;
 }
 
@@ -32,11 +34,11 @@ SymbolTableNode2::SymbolTableNode2() {
 
 SymbolTableNode2::SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc,
                                    list<set<int>> params, bool Defined) {
-    types = typeArr;
-    identifier = name;
-    sizeList = size_decl_list;
+    types = move(typeArr);
+    identifier = move(name);
+    sizeList = move(size_decl_list);
     isFunction = isFunc;
-    paramTypes = params;
+    paramTypes = move(params);
     defined = Defined;
 }
 
