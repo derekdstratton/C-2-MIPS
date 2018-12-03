@@ -1314,7 +1314,9 @@ primary_expression
 
 argument_expression_list
 	: assignment_expression {
-	$$ = $1;
+	list<ASTNode*> seq;
+	seq.push_back($1);
+	$$ = new SeqNode('a', seq);
 	handleProd("argument_expression_list -> assignment_expression\n");}
 	| argument_expression_list COMMA assignment_expression {
 	list<ASTNode*> seq = $1->getChildren();
