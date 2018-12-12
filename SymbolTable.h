@@ -12,6 +12,9 @@ using namespace std;
 class SymbolTable {
   public:
     SymbolTable();
+    void change(string str, SymbolTableNode2 node) {
+        table.front()[str] = node;
+    }
     tuple<bool, bool> insert(const pair<string, SymbolTableNode2>& item);
     tuple<SymbolTableNode2*, string> search(const string& key, bool topLevelOnly=false);
     void pushLevel();

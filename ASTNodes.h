@@ -187,6 +187,7 @@ public:
     string getName() override;
     int getNodeType() override;
 private:
+    SymbolTableNode2 * symbolTableNode2;
     string funcName;
     list<set<int>> paramTypes; //for prototypes
     list<pair<string, set<int>>> args; //for definitions

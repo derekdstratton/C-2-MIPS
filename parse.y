@@ -201,9 +201,10 @@ function_definition
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-    if(status != "not") //was found, means prototype is in here
+    if(status != "not") //was found, means prototype/defined function is in here
     {
-        if(it->defined == 1)
+        cout << "found another in symbol: " << it->identifier << it->defined << endl;
+        if((it->defined) == true)//function already defined
         {
             cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
             exit(0);
@@ -211,7 +212,12 @@ function_definition
             //cout << "BAD BAD BAD AVOCADO" << endl; //todo throw error
         }
         else
-            it->defined = 1;
+        {
+            cout << "setting " << it->identifier << " to true" << endl;
+            it->defined = true;
+            getTable()->change($2->getName(), *it);
+            //idNode->setSymbolNode(it); //todo
+        }
     }
     else
     {
@@ -253,6 +259,7 @@ declaration
 	| declaration_specifiers init_declarator_list SEMI {
 	//types = $1->getTypes();
 	string name = idNode->getName();
+	cout << "NAME IS " << name << endl;
     set<int> x = $1->getTypes();
     SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
     idNode->setSymbolNode(s);
@@ -548,6 +555,7 @@ direct_declarator
 	//cout << size_decl_list.size();
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 	| direct_declarator OPENPAR CLOSEPAR {
+	cout << "PROTOTYPE PROD" << endl;
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
@@ -559,9 +567,13 @@ direct_declarator
     tie(it, status) = result;
     if(status != "not") //another function was found
     {
-        cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-        exit(0);
-        outputError("Bad function", "Function already exists", false);
+        cout << "found another function same as prototype" << endl;
+        if(it->defined == 1)//if the found function has been defined already
+        {
+            cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+            exit(0);
+        }
+        //outputError("Bad function", "Function already exists", false);
         //cout << "WOAH NELLY" << endl; //todo throw error
     }
     else
@@ -580,6 +592,7 @@ direct_declarator
 
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
+	//cout << "PROTOTYPE PROTOTYPE" << endl;
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
@@ -591,10 +604,12 @@ direct_declarator
     tie(it, status) = result;
         if(status != "not") //another function was found
         {
-            cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-            exit(0);
-            outputError("Bad function", "Function already exists", false);
-            //cout << "WOAH NELLY" << endl; //todo throw error
+            cout << "found another function same as prototype" << endl;
+            if(it->defined == 1)//if the found function has been defined already
+                {
+                        cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+                        exit(0); //todo throw error?
+                }
         }
         else
         {
@@ -1214,9 +1229,10 @@ postfix_expression
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-	if(status == "not")
+	if(status == "not") //a function of the same name was not found
 	{
-	    cout << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
+	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
+	    exit(0);
 	}
 	else if(status != "not")
 	{

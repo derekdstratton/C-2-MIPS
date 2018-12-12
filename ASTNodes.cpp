@@ -1030,6 +1030,14 @@ void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
     //cout << sizeList.size();
 }
 
+/*void FuncNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
+    symbolTableNode2 = symtblnd2;
+    types = symbolTableNode2->types;
+    checkType();
+    //sizeList = symbolTableNode2->sizeList;
+    //cout << sizeList.size();
+}*/
+
 /**
  * @brief Identifier node print function
  * @param os is the stream to be printed to
