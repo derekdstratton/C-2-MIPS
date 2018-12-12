@@ -441,22 +441,22 @@ int ArrayNode::getNodeType() {
  */
 string ArrayNode::walk() {
     string s4 = getFileLine(lineNum);
-    string s1 = "t" + to_string(registerCnt++);
+    string s1 = "$t" + to_string(registerCnt++);
     int baseOffset = currentFuncOffsets.at(getChildren().front()->getName());
-    string name = to_string(baseOffset) + "(fp)";
+    string name = to_string(baseOffset) + "($fp)";
     vector<string> v = {"ADDR", name, "---", s1};
     vector<string> v4 = {"COMMENT", s4};
     main3ac.push_back(v4);
     main3ac.push_back(v);
     //s1 is the base address
-    string s2 = "t" + to_string(registerCnt++);
+    string s2 = "$t" + to_string(registerCnt++);
     string index_offset = to_string(getChildren().back()->getVal());
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
     vector<string> v2 = {"STAR", index_offset, size_of, s2};
     main3ac.push_back(v4);
     main3ac.push_back(v2);
     //s2 is the offset
-    string s3 = "t" + to_string(registerCnt++);
+    string s3 = "$t" + to_string(registerCnt++);
     vector<string> v3 = {"PLUS", s1, s2, s3};
     main3ac.push_back(v4);
     main3ac.push_back(v3);
@@ -541,6 +541,9 @@ int AssignNode::getNodeType() {
  */
 string AssignNode::walk() {
     string s1 = "ASSIGN";
+    if (getChildren().back()->getNodeType() == INTNODE) {
+        s1 = "ASSIGNI"; //load immediately in assembly
+    }
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
@@ -653,9 +656,9 @@ string BinaryMathNode::walk() {
     string s4;
     if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299) ||
             getChildren().back()->getTypes().count(298) || getChildren().back()->getTypes().count(299))
-        s4 = "f" + to_string(floatRegisterCnt++);
+        s4 = "$f" + to_string(floatRegisterCnt++);
     else
-        s4 = "t" + to_string(registerCnt++);
+        s4 = "$t" + to_string(registerCnt++);
 
     string s5;
 
@@ -774,12 +777,12 @@ string CastNode::walk(){//only need to cast in 3ac if between double/float and a
     vector<string> v;
     if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299)){
         s1 = getChildren().back()->walk();
-        s2 = "f" + to_string(floatRegisterCnt++);
+        s2 = "$f" + to_string(floatRegisterCnt++);
         v = {"ASSIGN", s1, "---", s2};
     }
     else{
         s1 = getChildren().back()->walk();
-        s2 = "t" + to_string(registerCnt++);
+        s2 = "$t" + to_string(registerCnt++);
         v = {"ASSIGN", s1, "---", s2};
     }
     vector<string> v2;
@@ -1054,9 +1057,9 @@ string FuncNode::walk() {
             vector<string> v2 = {"CALL", funcName, "---", "---"};
             main3ac.push_back(v2);
 
-            string s = "t" + to_string(registerCnt++);
+            string s = "$t" + to_string(registerCnt++);
             string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
-            vector<string> v3 = {"ASSIGN", s2 + "(fp)", "---", s};
+            vector<string> v3 = {"ASSIGN", s2 + "($fp)", "---", s};
             main3ac.push_back(v3);
             vector<string> v4 = {"DEALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v4);
@@ -1187,7 +1190,7 @@ string LogicalNode::walk() {
     string s1 = tokenToString2(nodeType);
     string s2 = getChildren().front()->walk();
     string s3 = getChildren().back()->walk();
-    string s4 = "t" + to_string(registerCnt++);
+    string s4 = "$t" + to_string(registerCnt++);
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     return s4;
@@ -1265,7 +1268,7 @@ string RelationalNode::walk() {
     string s2 = list_copy.front()->walk();
     list_copy.pop_front();
     string s3 = list_copy.front()->walk();
-    string s4 = "t" + to_string(registerCnt++);
+    string s4 = "$t" + to_string(registerCnt++);
     string s5;
     s5 = getFileLine(lineNum);
     vector<string> v2 = {"COMMENT", s5};
@@ -1657,7 +1660,7 @@ int IdentifierNode::getNodeType() {
 
 string IdentifierNode::walk() {
     string s = to_string(currentFuncOffsets[identifier]);
-    return s + "(fp)";
+    return s + "($fp)";
 }
 
 /**
