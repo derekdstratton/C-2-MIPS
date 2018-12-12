@@ -541,12 +541,12 @@ int AssignNode::getNodeType() {
  */
 string AssignNode::walk() {
     string s1 = "ASSIGN";
-    /*if (getChildren().back()->getNodeType() == INTNODE) {
-        s1 = "ASSIGNI"; //load immediately in assembly
-    }*/
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
+    if (getChildren().front()->getNodeType() == ARRAYNODE) {
+        s3 = "(" + s3 + ")";
+    }
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }

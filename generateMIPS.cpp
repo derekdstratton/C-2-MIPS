@@ -147,7 +147,7 @@ void generateMIPS(vector<vector<string>> tac) {
             line[1] = loadAddress(line[1], mips);
             line[2] = loadAddress(line[2], mips);
             string ret = needsStored(line[3]);
-            mips << "\t" << "mult " << ret << ", " << line[1] << ", " << line[2] << endl;
+            mips << "\t" << "mul " << ret << ", " << line[1] << ", " << line[2] << endl;
             storeInAddress(line[3], ret, mips);
         }
 
@@ -225,6 +225,10 @@ void generateMIPS(vector<vector<string>> tac) {
 
         if (line[0] == "BR") {
             mips << "\t" << "b " << line[3] << endl;
+        }
+
+        if (line[0] == "ADDR" ) {
+            mips << "\t" << "la " << line[3] << ", " << line[1] << endl;
         }
     }
 
