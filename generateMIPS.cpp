@@ -5,11 +5,69 @@
 
 using namespace std;
 
-bool isOffset(const string& s) {
+int registerCnt = 0;
+
+/**
+ * Determines if something is an address, true if it is.
+ * Example:
+ * 4($fp) -> true
+ * $t0 -> false
+ * 6 -> false
+ *
+ * @param s The string being checked
+ * @return True if address, false otherwise
+ */
+bool isAddress(const string& s) {
     return s.find('(') != string::npos;
 }
 
-int registerCnt = 100;
+/**
+ * Takes an argument of an instruction and loads it if it's an address (needs loading).
+ * If so, the address is loaded, and a register is returned.
+ *
+ * @param s
+ * @param mips
+ * @return
+ */
+string loadAddress(const string& s, ostream& mips) {
+    if (isAddress(s)) {
+        string s2 = "$t" + to_string(registerCnt++);
+        mips << "\t" << "lw " << s2 << ", " << s << endl;
+        return s2;
+    } else {
+        return s;
+    }
+}
+
+/**
+ * Takes a part of an instruction where a result should go and determines if its an address.
+ * If it is, it gives it a register and names that register to be stored in storeInAddress.
+ *
+ * @param s
+ * @param mips
+ * @return
+ */
+string needsStored(const string& s) {
+    if (isAddress(s)) {
+        return "$t" + to_string(registerCnt++);
+    } else {
+        return s;
+    }
+}
+
+/**
+ *
+ * @param addr It COULD be an address, but it may not be
+ * @param reg
+ * @param mips
+ * @return
+ */
+void storeInAddress(const string& addr, const string& reg, ostream& mips) {
+    if (isAddress(addr)) {
+        //Store
+        mips << "\t" << "sw " << reg << ", " << addr << endl;
+    }
+}
 
 void generateMIPS(vector<vector<string>> tac) {
     ofstream mips;
@@ -24,69 +82,77 @@ void generateMIPS(vector<vector<string>> tac) {
             mips << line[1] << ":" << endl;
         }
 
+        if (line[0] == "ALLOCATE") {
+            mips << "\taddiu $sp, $sp, -" << line[1] << endl;
+            mips << "\tmove $fp, $sp" << endl;
+        }
+
+        if (line[0] == "DEALLOCATE") {
+            mips << "\taddiu $sp, $sp, " << line[1] << endl;
+            mips << "\tmove $fp, $sp" << endl;
+        }
+
+        if (line[0] == "CALL") {
+            mips << "\tjal " << line[1] << endl;
+        }
+
+        if (line[0] == "RETURN") {
+            mips << "\tjr $ra" << endl;
+        }
+
+        if (line[0] == "PUSHRETURN") {
+            mips << "\tsw " << line[1] << ", " << line[2] << endl;
+        }
+
+        if (line[0] == "HALT") {
+            mips << "\tli $v0, 10" << endl;
+            mips << "\tsyscall" << endl;
+        }
+
         if (line[0] == "ASSIGN") {
-            if (isOffset(line[1])) {
-                //Needs loaded
-                string s = "$t" + to_string(registerCnt++);
-                mips << "\t" << "lw " << s << ", " << line[1] << endl;
-                line[1] = s;
-            }
-            string ret;
-            if (isOffset(line[3])) {
-                ret = "$t" + to_string(registerCnt++);
-            } else {
-                ret = line[3];
-            }
+            line[1] = loadAddress(line[1], mips);
+            string ret = needsStored(line[3]);
             mips << "\t" << "move " << ret << ", " << line[1] << endl;
-            if (isOffset(line[3])) {
-                //Store
-                mips << "\t" << "sw " << ret << ", " << line[3] << endl;
-            }
+            storeInAddress(line[3], ret, mips);
         }
 
         if (line[0] == "ASSIGNI") {
-            if (isOffset(line[1])) {
-                //Needs loaded
-                mips << "\t" << "lw " << "$t6, " << line[1] << endl;
-                line[1] = "$t" + to_string(registerCnt++);
-            }
-            string ret;
-            if (isOffset(line[3])) {
-                ret = "$t" + to_string(registerCnt++);
-            } else {
-                ret = line[3];
-            }
+            line[1] = loadAddress(line[1], mips);
+            string ret = needsStored(line[3]);
             mips << "\t" << "li " << ret << ", " << line[1] << endl;
-            if (isOffset(line[3])) {
-                //Store
-                mips << "\t" << "sw " << ret << ", " << line[3] << endl;
-            }
+            storeInAddress(line[3], ret, mips);
         }
 
         if (line[0] == "PLUS") {
-            if (isOffset(line[1])) {
-                //Needs loaded
-                string s = "$t" + to_string(registerCnt++);
-                mips << "\t" << "lw " << s << ", " << line[1] << endl;
-                line[1] = s;
-            }
-            if (isOffset(line[2])) {
-                //Load
-                string s = "$t" + to_string(registerCnt++);
-                mips << "\t" << "lw " << s << ", " << line[2] << endl;
-                line[2] = s;
-            }
-            string ret;
-            if (isOffset(line[3])) {
-                ret = "$t" + to_string(registerCnt++);
-            } else {
-                ret = line[3];
-            }
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
             mips << "\t" << "add " << ret << ", " << line[1] << ", " << line[2] << endl;
-            if (isOffset(line[3])) {
-                //Store
-                mips << "\t" << "sw " << ret << ", " << line[3] << endl;
-            }
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "MINUS") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "sub " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "STAR") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "mult " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "SLASH") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "div " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
         }
     }
 

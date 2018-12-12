@@ -1012,6 +1012,8 @@ string FuncNode::walk() {
         case 1: {
             stackCnt = 0;
             currentFuncOffsets.clear();
+            vector<string> v9 = {"COMMENT", "Function: " + funcName, "---", "---"};
+            main3ac.push_back(v9);
             vector<string> v = {"LABEL", funcName, "---", "---"};
             main3ac.push_back(v);
 
@@ -1317,17 +1319,17 @@ int ReturnNode::getNodeType() {
  * @return
  */
 string ReturnNode::walk() {
+    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
+    main3ac.push_back(v2);
 
     if (getChildren().front()->getNodeType() != NONENODE) {
         string ret = getChildren().front()->walk();
-        vector<string> v = {"PUSHRETURN", ret, "---", "---"};
+        string return_address = to_string(stackCnt) + "($fp)";
+        vector<string> v = {"PUSHRETURN", ret, return_address, "---"};
         main3ac.push_back(v);
         currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
         stackCnt += getByteSize(getChildren().front()->getTypes());
     }
-    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
-    main3ac.push_back(v2);
-
     return "";
 }
 
@@ -1423,16 +1425,21 @@ int SeqNode::getNodeType() {
 string SeqNode::walk() {
     switch(seqType) {
         case 'g': {
+            vector<string> v9 = {"COMMENT", "START OF PROGRAM", "---", "---"};
+            main3ac.push_back(v9);
             vector<string> v0 = {"ALLOCATE", "TODO", "---", "---"};
             main3ac.push_back(v0);
             int allocateLine = main3ac.size()-1;
             vector<string> v = {"CALL", "main", "---", "---"};
             main3ac.push_back(v);
-            vector<string> v2 = {"HALT", "---", "---", "---"};
-            main3ac.push_back(v2);
+            vector<string> v8 = {"COMMENT", "END OF PROGRAM", "---", "---"};
+            main3ac.push_back(v8);
+            //TODO I could put an ASSIGN here to show "process finished with exit code 0 :] :]
             vector<string> v3 = {"DEALLOCATE", "TODO", "---", "---"};
             main3ac.push_back(v3);
             int deallocateLine = main3ac.size()-1;
+            vector<string> v2 = {"HALT", "---", "---", "---"};
+            main3ac.push_back(v2);
             for (auto x : getChildren()) {
                 x->walk();
             }
