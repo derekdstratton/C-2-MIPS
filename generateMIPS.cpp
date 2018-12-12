@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int registerCnt = 0;
+int registerCnt = 3;
 
 /**
  * Determines if something is an address, true if it is.
@@ -21,6 +21,10 @@ bool isAddress(const string& s) {
     return s.find('(') != string::npos;
 }
 
+bool isImmediate(const string& s) {
+    return s.find('$') == string::npos;
+}
+
 /**
  * Takes an argument of an instruction and loads it if it's an address (needs loading).
  * If so, the address is loaded, and a register is returned.
@@ -34,7 +38,13 @@ string loadAddress(const string& s, ostream& mips) {
         string s2 = "$t" + to_string(registerCnt++);
         mips << "\t" << "lw " << s2 << ", " << s << endl;
         return s2;
-    } else {
+    }
+    else if (isImmediate(s)) {
+        string s2 = "$t" + to_string(registerCnt++);
+        mips << "\t" << "li " << s2 << ", " << s << endl;
+        return s2;
+    }
+    else {
         return s;
     }
 }
@@ -101,6 +111,7 @@ void generateMIPS(vector<vector<string>> tac) {
         }
 
         if (line[0] == "PUSHRETURN") {
+            line[1] = loadAddress(line[1], mips);
             mips << "\tsw " << line[1] << ", " << line[2] << endl;
         }
 
@@ -113,13 +124,6 @@ void generateMIPS(vector<vector<string>> tac) {
             line[1] = loadAddress(line[1], mips);
             string ret = needsStored(line[3]);
             mips << "\t" << "move " << ret << ", " << line[1] << endl;
-            storeInAddress(line[3], ret, mips);
-        }
-
-        if (line[0] == "ASSIGNI") {
-            line[1] = loadAddress(line[1], mips);
-            string ret = needsStored(line[3]);
-            mips << "\t" << "li " << ret << ", " << line[1] << endl;
             storeInAddress(line[3], ret, mips);
         }
 
@@ -153,6 +157,74 @@ void generateMIPS(vector<vector<string>> tac) {
             string ret = needsStored(line[3]);
             mips << "\t" << "div " << ret << ", " << line[1] << ", " << line[2] << endl;
             storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "MODULO") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "rem " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "LESSTH") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "slt " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "GREATH") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "sgt " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "GE_OP") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "sge " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "LE_OP") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "sle " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "EQ_OP") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "seq " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "NE_OP") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            string ret = needsStored(line[3]);
+            mips << "\t" << "sne " << ret << ", " << line[1] << ", " << line[2] << endl;
+            storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "BREQ") {
+            line[1] = loadAddress(line[1], mips);
+            line[2] = loadAddress(line[2], mips);
+            //string ret = needsStored(line[3]);
+            mips << "\t" << "beq " << line[1] << ", " << line[2] << ", " << line[3] << endl;
+            //storeInAddress(line[3], ret, mips);
+        }
+
+        if (line[0] == "BR") {
+            mips << "\t" << "b " << line[3] << endl;
         }
     }
 

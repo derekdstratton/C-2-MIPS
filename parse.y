@@ -1165,10 +1165,12 @@ unary_expression
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
-	$$ = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> INC_OP unary_expression\n");}
 	| DEC_OP unary_expression {
-	$$ = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> DEC_OP unary_expression\n");}
 	| unary_operator cast_expression {
 	switch($1) {
@@ -1290,10 +1292,12 @@ postfix_expression
 	$$ = new ASTNode(); //pointers
 	handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
 	| postfix_expression INC_OP {
-	$$ = new BinaryMathNode(PLUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression INC_OP\n");}
 	| postfix_expression DEC_OP {
-	$$ = new BinaryMathNode(MINUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 

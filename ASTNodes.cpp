@@ -541,9 +541,9 @@ int AssignNode::getNodeType() {
  */
 string AssignNode::walk() {
     string s1 = "ASSIGN";
-    if (getChildren().back()->getNodeType() == INTNODE) {
+    /*if (getChildren().back()->getNodeType() == INTNODE) {
         s1 = "ASSIGNI"; //load immediately in assembly
-    }
+    }*/
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
@@ -886,7 +886,7 @@ string ForNode::walk() {
             list_copy.pop_front();
         string s1 = "BREQ";
         string s2 = list_copy.front()->walk();
-        string s3 = "0";
+        string s3 = "$zero";
         vector<string> v5 = {s1, s2, s3, endLabel};
         main3ac.push_back(v5);
     }
@@ -1137,7 +1137,7 @@ int IfNode::getNodeType() {
 string IfNode::walk() {
     string s1 = "BREQ";
     string s2 = getChildren().front()->walk();
-    string s3 = "0";
+    string s3 = "$zero";
     string s4 = "l" + to_string(labelCnt++);
     string s5;
     s5 = getFileLine(getChildren().front()->getLineNum());
@@ -1574,7 +1574,7 @@ string WhileNode::walk() {
 
     string s1 = "BREQ";
     string s2;
-    string s3 = "0";
+    string s3 = "$zero";
     string s4;
 
     if (!doo) {
