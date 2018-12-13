@@ -203,15 +203,21 @@ function_definition
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-    if(status != "not") //was found, means prototype is in here
+    if(status != "not") //was found, means prototype/defined function is in here
     {
-        if(it->defined == 1)
+        cout << "found another in symbol: " << it->identifier << it->defined << endl;
+        if((it->defined) == true)//function already defined
         {
             cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
             exit(0);
         }
         else
-            it->defined = 1;
+        {
+            cout << "setting " << it->identifier << " to true" << endl;
+            it->defined = true;
+            getTable()->change($2->getName(), *it);
+            //idNode->setSymbolNode(it); //todo
+        }
     }
     else
     {
@@ -254,23 +260,37 @@ declaration
 
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
-    set<int> x = $1->getTypes();
-    SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
-    idNode->setSymbolNode(s);
-    //now insert it into the symbol table
-    pair<string, SymbolTableNode2> entry = make_pair(name,*s);
-    tuple<bool, bool> result = getTable()->insert(entry);
-    //now you also need to make sure the identifier node has the symbol table node stuff
-	$$ = new DeclNode($1, $2);
-	size_decl_list.clear(); //reset this too
-	paramList.clear();
-	isFunction = false;
-    bool insertSuccess, notShadowing;
-    tie(insertSuccess, notShadowing) = result;
-    if (!insertSuccess) {
-        outputError("Already exists", "Variable already exists on this scope.", false);
-    } else if (!notShadowing) {
-        outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+	auto x = getTable()->search(name);
+	cout << "NAME IS " << name << endl;
+
+	tuple<SymbolTableNode2*, string> result = getTable()->search(name);
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
+	if (it->isFunction) {
+	    cout << "DSJLKFJ" << endl;
+	    $$ = new DeclNode($1, $2);
+	}
+	else {
+        set<int> x = $1->getTypes();
+        SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
+        idNode->setSymbolNode(s);
+        //now insert it into the symbol table
+        pair<string, SymbolTableNode2> entry = make_pair(name,*s);
+        tuple<bool, bool> result = getTable()->insert(entry);
+        //now you also need to make sure the identifier node has the symbol table node stuff
+        $$ = new DeclNode($1, $2);
+        size_decl_list.clear(); //reset this too
+        paramList.clear();
+        isFunction = false;
+
+        bool insertSuccess, notShadowing;
+        tie(insertSuccess, notShadowing) = result;
+        if (!insertSuccess && !s->isFunction) {
+            outputError("Already exists", "Variable already exists on this scope.", false);
+        } else if (!notShadowing) {
+            outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+        }
     }
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
@@ -569,9 +589,14 @@ direct_declarator
     tie(it, status) = result;
     if(status != "not") //another function was found
     {
-        cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-        exit(0);
-        outputError("Bad function", "Function already exists", false);
+        cout << "found another function same as prototype" << endl;
+        if(it->defined == 1)//if the found function has been defined already
+        {
+            cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+            exit(0);
+        }
+        //outputError("Bad function", "Function already exists", false);
+        //cout << "WOAH NELLY" << endl; //todo throw error
     }
     else
     {
@@ -589,6 +614,7 @@ direct_declarator
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
+	//cout << "PROTOTYPE PROTOTYPE" << endl;
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
@@ -600,9 +626,12 @@ direct_declarator
     tie(it, status) = result;
         if(status != "not") //another function was found
         {
-            cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-            exit(0);
-            outputError("Bad function", "Function already exists", false);
+            cout << "found another function same as prototype" << endl;
+            if(it->defined == 1)//if the found function has been defined already
+                {
+                        cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+                        exit(0); //todo throw error?
+                }
         }
         else
         {
@@ -1242,9 +1271,9 @@ postfix_expression
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-	if(status == "not")
+	if(status == "not") //a function of the same name was not found
 	{
-	    cerr << "FUNCTION NOT FOUND" << endl;
+	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
 	    exit(0);
 	}
 	else if(status != "not")
