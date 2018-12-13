@@ -1,7 +1,5 @@
 %{
 
-//TODO deal with comments /* */
-
 /* Headers */
 
 #include <string>
@@ -20,6 +18,7 @@
 #include "ASTNodes.h"
 
 #define YYSTYPE ASTNode
+
 /* Global Variables */
 
 list <ASTNode*> empty;
@@ -433,7 +432,6 @@ return {
     to_token_file(CHARACTER_CONSTANT, "CHARACTER_CONSTANT");
     //passing escape characters
     if (yytext[1] == '\\') {
-        //todo export this switch to its own function
         switch(yytext[2]) {
             case 'n':
                 yylval.cval = '\n';
@@ -456,8 +454,8 @@ return {
             case 'v':
                 yylval.cval = '\v';
                 break;
-                //todo deal with octal, hex, weird stuff
             default:
+                //Future- processing of octal/hex escapes
                 yylval.cval = yytext[2];
                 break;
         }
@@ -479,7 +477,6 @@ return {
         //Dealing with escape characters
         if (*lead == '\\') {
             lead++;
-            //todo export this switch to its own function
             switch(*lead) {
                 case 'n':
                     *lag = '\n';
@@ -502,8 +499,8 @@ return {
                 case 'v':
                     *lag = '\v';
                     break;
-                //todo deal with octal, hex, weird stuff
                 default:
+                    //Future- processing of octal/hex escapes
                     *lag = *lead;
                     break;
             }
@@ -524,8 +521,6 @@ return {
             columnQueue.pop_back();
         outputError("Too long", "Floating Constant too long.", true);
     }
-    //todo check size
-    //yylval.node = new ASTNode();
     yylval.fval = atof(yytext);
     return (FLOATING_CONSTANT); }
 {integer} {
@@ -539,7 +534,6 @@ return {
             columnQueue.pop_back();
         outputError("Too long", "Integer Constant too long.", true);
     }
-    //todo check size for a long, c string compare
     yylval.ival = atoi(yytext);
     return (INTEGER_CONSTANT); }
 {identifier} {

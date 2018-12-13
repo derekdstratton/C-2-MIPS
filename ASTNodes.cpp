@@ -1,3 +1,5 @@
+#include <utility>
+
 //Include statements
 
 #include "ASTNodes.h"
@@ -15,12 +17,18 @@ extern string THREEACPATH;
 int ASTNode::registerCnt = 0;
 int ASTNode::floatRegisterCnt = 0;
 int ASTNode::labelCnt = 0;
-auto tmp = new SymbolTable();
-SymbolTable ASTNode::table3ac = *tmp;
 vector<vector<string>> ASTNode::main3ac;
+int ASTNode::stackCnt = 0;
+map<string, map<string, int>> ASTNode::allFuncOffsets;
+map<string, int> ASTNode::currentFuncOffsets;
 
 //Helper Functions
 
+/**
+ *
+ * @param lineNum
+ * @return
+ */
 string getFileLine(int lineNum){
     ifstream istream;
     istream.open(fileName);
@@ -66,96 +74,11 @@ int getByteSize(set<int> typeSet) {
     if (typeSet.count(DOUBLE) == 1) {
         return 8;
     }
-    cout << "SHOULDNT BE HERE BAD TYPE";
+    cerr << "SHOULDNT BE HERE BAD TYPE";
     return -1;
 }
 
-/**
- * @brief converts a defined token into a string
- * @param token is the token to be converted
- * @return returns a string based on which token was passed
- */
-string tokenToString2(int token) {
-    string str;
-    switch (token) {
-        case AND:
-            str = "AND";
-            break;
-        case STAR:
-            str = "STAR";
-            break;
-        case PLUS:
-            str = "PLUS";
-            break;
-        case MINUS:
-            str = "MINUS";
-            break;
-        case TILDE:
-            str = "TILDE";
-            break;
-        case BANG:
-            str = "BANG";
-            break;
-        case BAR:
-            str = "BAR";
-            break;
-        case XOR:
-            str = "XOR";
-            break;
-        case LESSTH:
-            str = "LESSTH";
-            break;
-        case GREATH:
-            str = "GREATH";
-            break;
-        case LE_OP:
-            str = "LE_OP";
-            break;
-        case GE_OP:
-            str = "GE_OP";
-            break;
-        case EQ_OP:
-            str = "EQ_OP";
-            break;
-        case NE_OP:
-            str = "NE_OP";
-            break;
-        case SLASH:
-            str = "DIV";
-            break;
-        case MODULO:
-            str = "MODULO";
-            break;
-        case INT:
-            str = "INT";
-            break;
-        case FLOAT:
-            str = "FLOAT";
-            break;
-        case DOUBLE:
-            str = "DOUBLE";
-            break;
-        case SHORT:
-            str = "SHORT";
-            break;
-        case LONG:
-            str = "LONG";
-            break;
-        case SIGNED:
-            str = "SIGNED";
-            break;
-        case UNSIGNED:
-            str = "UNSIGNED";
-            break;
-        case CHAR:
-            str = "CHAR";
-            break;
-        default:
-            str = "TOKENSTRINGNOTDEFINED";
-            break;
-    }
-    return str;
-}
+//ASTNode Functions
 
 /**
  * @brief helper function to access ASTNode children
@@ -165,6 +88,10 @@ list<ASTNode *> ASTNode::getChildren() {
     return childrenNodes;
 }
 
+/**
+ *
+ * @return
+ */
 int ASTNode::getLineNum(){
     return lineNum;
 }
@@ -189,7 +116,7 @@ void ASTNode::copyTree(ASTNode *&root, tree<ASTNode *> &ast) {
  * @return returns an empty set that is sad
  */
 set<int> ASTNode::getTypes() {
-    cout << "IF YOU'RE SEEING THIS DIE" << endl;
+    cerr << "IF YOU'RE SEEING THIS DIE" << endl;
     set<int> fail;
     return fail;
 }
@@ -199,8 +126,6 @@ set<int> ASTNode::getTypes() {
  * @return
  */
 int ASTNode::getDimensions() {
-    //cout << "IF YOU'RE SEEING THIS MEEEWOA" << endl;
-    //things like int const, float const, should all be 0
     return 0;
 }
 
@@ -209,7 +134,7 @@ int ASTNode::getDimensions() {
  * @return returns a null pointer
  */
 string ASTNode::getName() {
-    cout << "IF YOURE SEEING THIS RIP" << endl;
+    cerr << "IF YOURE SEEING THIS RIP" << endl;
     return nullptr;
 }
 
@@ -227,7 +152,7 @@ list<ASTNode*> ASTNode::getSizes() {
  * @param symtblnd2 is the symbol table node to be inserted
  */
 void ASTNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
-    cout << "IF YOURE SEEING THIS RAVIOLI" << endl;
+    cerr << "IF YOURE SEEING THIS RAVIOLI" << endl;
 }
 
 /**
@@ -247,7 +172,6 @@ std::ostream &operator<<(std::ostream &os, const ASTNode &node) {
  * @return returns a number. The number is larger for longer data types
  */
 int computeTypeOrder(set<int> &typeSet) {
-    //https://www.geeksforgeeks.org/type-conversion-c/
     if (typeSet.count(CHAR) == 1) {
         return 1;
     }
@@ -269,7 +193,7 @@ int computeTypeOrder(set<int> &typeSet) {
     if (typeSet.count(DOUBLE) == 1) {
         return 7;
     }
-    cout << "SHOULDNT BE HERE, TYPE NOT FOUND MAYDAY MAYDAY";
+    cerr << "SHOULDNT BE HERE, TYPE NOT FOUND MAYDAY MAYDAY";
     return -1;
 }
 
@@ -305,9 +229,8 @@ void ASTNode::printNode(std::ostream &os) const {
  */
 void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename tree<ASTNode *>::iterator iRoot) {
     //Node has children, insert them
-    if (src_node->getChildren().size() != 0) {
+    if (!src_node->getChildren().empty()) {
         for (auto &child : src_node->getChildren()) {
-            //os << *child;
             auto newRoot = ast.append_child(iRoot, child);
             copyTreeHelper(child, ast, newRoot);
         }
@@ -316,13 +239,12 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 
 void ASTNode::output3ac() {
     //Outputs the vector to a file
-    //todo you can make it print pretty later
     ofstream f;
     f.open(THREEACPATH);
     for (auto x : main3ac) {
-        for (auto y: x) {
-            cout << y << " ";
-            f << y << " ";
+        for (const auto &y: x) {
+            cout << setw(18) << left << y;
+            f << setw(18) << left << y;
         }
         f << endl;
         cout << endl;
@@ -331,10 +253,17 @@ void ASTNode::output3ac() {
 }
 
 /**
+ *
+ * @return
+ */
+vector<vector<string>> ASTNode::get3ac() {
+    return main3ac;
+}
+
+/**
  * @brief default constructor for ASTNode
  */
-ASTNode::ASTNode() {
-}
+ASTNode::ASTNode() = default;
 
 /**
  *
@@ -348,30 +277,12 @@ int ASTNode::getNodeType() {
  *
  * @return
  */
-char ASTNode::getSeqType() {
-    cout << "WHATCHU MEAN???";
-    return '\0';
-}
-
-/**
- *
- * @return
- */
-int ASTNode::getOpType() {
-    cout << "SHOULD NOT BE HERE";
-    return -1;
-}
-
-/**
- *
- * @return
- */
 string ASTNode::walk() {
-    cout << "WALKING UNDEFINED NODE" << endl;
+    cerr << "WALKING UNDEFINED NODE" << endl;
     for (auto x : getChildren()) {
         x->walk();
     }
-    return "NA";
+    return "";
 }
 
 /**
@@ -379,7 +290,7 @@ string ASTNode::walk() {
  * @return
  */
 int ASTNode::getVal() {
-    cout << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
+    cerr << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
     return -1;
 }
 
@@ -388,9 +299,7 @@ int ASTNode::getVal() {
  * default- MUST set type in derived constructor
    also must CHECK type in derived constructor after setting it.
  */
-TypeNode::TypeNode() {
-
-}
+TypeNode::TypeNode() = default;
 
 /**
  *
@@ -417,11 +326,9 @@ void TypeNode::checkType() {
     if (types.count(DOUBLE) == 1) {
         typeCount++;
     }
-
     if (typeCount >= 2) {
         goodType = false;
     }
-
     if (!goodType) {
         outputError("Bad type", "Defined type is not a logical type", false);
     }
@@ -465,9 +372,104 @@ int TypeNode::getNodeType() {
     return TYPENODE;
 }
 
+/**
+ *
+ * @return
+ */
 string TypeNode::walk() {
-    //cout << "PURE TYPENODE HERE" << endl;
     return "";
+}
+
+
+/**
+ * @brief ArrayNode constructor creates a templist with the identifier and the dimensions
+ * @param var is the identifier along with the type
+ * @param sizes is the dimensions of the array
+ */
+ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
+    list<ASTNode*> tmplist;
+    tmplist = sizes;
+    tmplist.push_front(var);
+    sizeList = sizes;
+    childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+    types = var->getTypes();
+    checkType();
+}
+
+/**
+ *
+ * @return
+ */
+int ArrayNode::getDimensions() {
+    int arrSize = getChildren().front()->getDimensions();
+    int derefs = sizeList.size();
+    return arrSize - derefs;
+}
+
+/**
+ * @brief function to get dimensions of an arrayNode
+ * @return list of ASTNode pointers that are the dimensions
+ */
+list<ASTNode*> ArrayNode::getSizes() {
+    return sizeList;
+}
+
+/**
+ * @brief print function for arrayNode
+ * @param os is the stream to be printed to
+ */
+void ArrayNode::printNode(std::ostream &os) const {
+    os << "ARRAY";
+}
+
+/**
+ *
+ * @return
+ */
+int ArrayNode::getNodeType() {
+    return ARRAYNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string ArrayNode::walk() {
+    string s4 = getFileLine(lineNum);
+    string s1 = "$t" + to_string(registerCnt++);
+    int baseOffset = currentFuncOffsets.at(getChildren().front()->getName());
+    string name = to_string(baseOffset) + "($fp)";
+    vector<string> v = {"ADDR", name, "---", s1};
+    vector<string> v4 = {"COMMENT", s4};
+    main3ac.push_back(v4);
+    main3ac.push_back(v);
+    //s1 is the base address
+    string s2 = "$t" + to_string(registerCnt++);
+    string index_offset = to_string(getChildren().back()->getVal());
+    string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
+    vector<string> v2 = {"STAR", index_offset, size_of, s2};
+    main3ac.push_back(v4);
+    main3ac.push_back(v2);
+    //s2 is the offset
+    string s3 = "$t" + to_string(registerCnt++);
+    vector<string> v3 = {"PLUS", s1, s2, s3};
+    main3ac.push_back(v4);
+    main3ac.push_back(v3);
+    /* multidimensional arrays should go here, put algorithm here
+    string s2;
+    string s3;
+    for (auto x : sizeList) {
+        s2 = "t" + to_string(registerCnt++);
+        cout << "MUL " << x->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
+        //s2 is the offset
+        s3 = "t" + to_string(registerCnt++);
+        cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
+    }
+    */
+    return s3;
 }
 
 /**
@@ -509,9 +511,6 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
     }
 
     types = leftSet;
-
-    //tmplist.push_back(lvalue);
-    //tmplist.push_back(rvalue);
     childrenNodes = tmplist;
 
     lineNum = yylineno;
@@ -526,766 +525,37 @@ void AssignNode::printNode(std::ostream &os) const {
     os << "ASSIGN";
 }
 
+/**
+ *
+ * @return
+ */
 int AssignNode::getNodeType() {
     return ASSIGNNODE;
 }
 
+/**
+ *
+ * @return
+ */
 string AssignNode::walk() {
     string s1 = "ASSIGN";
+    if (getChildren().back()->getNodeType() == INTNODE) {
+        s1 = "ASSIGNI"; //load immediately in assembly
+    }
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
-    int temp = 0;
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }
 
     s4 = getFileLine(lineNum);
 
-    cout << s1 << " " << s2 << " " << s3 << "    #" << s4 << endl;
-
-    vector<string> v2 = {"COMMENT: ", s4};
+    vector<string> v2 = {"COMMENT", s4};
     vector<string> v = {s1, s2, "---", s3};
     main3ac.push_back(v2);
     main3ac.push_back(v);
     return s3;
-}
-
-/**
- * @brief WhileNode constructor. Makes a temporary list of the
- *        children ASTNodes and sets childrenNodes equal to it.
- * @param expr is the while loop expression to be checked
- * @param stmt is the body of the while loop
- * @param dooo is a bool denoting whether this is a while or do-while loop
- */
-WhileNode::WhileNode(ASTNode *expr, ASTNode *stmt, bool dooo) {
-    list<ASTNode*> tempList;
-    tempList.push_back(expr);
-    tempList.push_back(stmt);
-    childrenNodes = tempList;
-    doo = dooo;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for WhileNode, checks if it is a while or a do-while loop.
- * @param os is the stream to be printed to
- */
-void WhileNode::printNode(std::ostream &os) const {
-    if(doo){
-        os << "DO_WHILE";
-    }
-    else{
-        os << "WHILE";
-    }
-}
-
-int WhileNode::getNodeType() {
-    return WHILENODE;
-}
-
-string WhileNode::walk() {
-    string s5;
-    s5 = getFileLine(getChildren().front()->getLineNum());
-    string initLabel = "l" + to_string(labelCnt++);
-    cout << initLabel << ":     #" << s5 << endl;
-    vector<string> v4 = {"COMMENT: ", s5};
-    vector<string> v = {"LABEL", initLabel, "---", "---"};
-    main3ac.push_back(v);
-
-    string s1 = "BREQ";
-    string s2;
-    string s3 = "0";
-    string s4;
-
-    if (!doo) {
-        //while condition
-        s2 = getChildren().front()->walk();
-
-        s4  = "l" + to_string(labelCnt++);
-        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
-        vector<string> v = {s1, s2, s3, s4};
-        main3ac.push_back(v);
-        //then do
-        getChildren().back()->walk();
-    } else {
-        //do
-        getChildren().back()->walk();
-        //then while
-        s2 = getChildren().front()->walk();
-        s4  = "l" + to_string(labelCnt++);
-        cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
-        vector<string> v = {s1, s2, s3, s4};
-        main3ac.push_back(v);
-    }
-
-    cout << "BR" << " " << initLabel << endl;
-    vector<string> v2 = {"BR", "---", "---", initLabel};
-    main3ac.push_back(v2);
-    cout << s4 << ":" << endl;
-    vector<string> v3 = {"LABEL", s4, "---", "---"};
-    main3ac.push_back(v3);
-
-    return "";
-}
-
-/**
- * @brief IfNode constructor for if statement.
- *        Creates a temporary list of child nodes and sets childrenNodes equal to it.
- * @param expr is the expression to be checked
- * @param stmt is the body of the if statement
- */
-IfNode::IfNode(ASTNode *expr, ASTNode *stmt) {
-    list<ASTNode*> tempList;
-    tempList.push_back(expr);
-    tempList.push_back(stmt);
-    childrenNodes = tempList;
-    flag = 1;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief IfNode constructor for if-else statement
- *        Creates a temporary list of child nodes and sets childrenNodes equal to it.
- * @param expr is the expression to be checked
- * @param stmt is the body of the if statement
- * @param stmt2 is the body of the else statement
- */
-IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
-    list<ASTNode*> tempList;
-    tempList.push_back(expr);
-    tempList.push_back(stmt);
-    tempList.push_back(stmt2);
-    childrenNodes = tempList;
-    flag = 0;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for IfNode. Checks if it is an if statement or an if-else statement.
- * @param os is the stream to be printed to
- */
-void IfNode::printNode(std::ostream &os) const {
-    if(flag){
-        os << "IF_NODE";
-    }
-    else{
-        os << "IF_ELSE_NODE";
-    }
-}
-
-int IfNode::getNodeType() {
-    return IFNODE;
-}
-
-string IfNode::walk() {
-    string s1 = "BREQ";
-    string s2 = getChildren().front()->walk();
-    string s3 = "0";
-    string s4 = "l" + to_string(labelCnt++);
-    string s5;
-    s5 = getFileLine(getChildren().front()->getLineNum());
-
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
-    vector<string> v3 = {"COMMENT: ", s5};
-    vector<string> v = {s1, s2, s3, s4};
-    main3ac.push_back(v);
-    getChildren().back()->walk();
-    cout << s4 << ":" << endl;
-    vector<string> v2 = {"LABEL", s4, "---", "---"};
-    main3ac.push_back(v2);
-    //todo handle else statement (flag == 0)
-    return "";
-}
-
-/**
- * @brief UnaryNode constructor. Creates a temporary list of children.
- * @param x is the unary operator that nodeType is set to.
- * @param child is the child of the UnaryNode
- */
-UnaryNode::UnaryNode(int x, ASTNode *child) {
-    list <ASTNode*> tempList;
-    tempList.push_back(child);
-    nodeType = x;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for unary node
- * @param os is the stream to be printed to
- */
-void UnaryNode::printNode(std::ostream &os) const {
-    os << "UNARY_" << tokenToString2(nodeType);
-}
-
-int UnaryNode::getNodeType() {
-    return UNARYNODE;
-}
-
-/**
- * @brief Bitwise Node constructor
- * @details uses compareForCast to check if either child needs to be cast.
- *          If needed, creates a CastNode accordingly.
- *          makes a temporary list of the children and sets childrenNodes equal to it.
- * @param x is the bitwise operation
- * @param left is the left child of the operator
- * @param right is the right child of the operator
- */
-BitwiseNode::BitwiseNode(int x, ASTNode *left, ASTNode *right) {
-    nodeType = x;
-    list<ASTNode*> tmplist;
-
-    ASTNode * newLeft;
-    ASTNode * newRight;
-
-    set<int> leftSet = left->getTypes();
-    set<int> rightSet = right->getTypes();
-    int ret = compareForCast(leftSet, rightSet);
-    if (ret < 0) {
-        //Cast the node on the left to the type of the right node
-        ASTNode * newtype = new TypeNode(rightSet);
-        newLeft = new CastNode(newtype, left);
-        newRight = right;
-        tmplist.push_back(newLeft);
-        tmplist.push_back(newRight);
-        types = rightSet;
-    } else if (ret > 0) {
-        //Cast the node on the right to the type of the left node
-        ASTNode * newtype = new TypeNode(leftSet);
-        newRight = new CastNode(newtype, right);
-        newLeft = left;
-        tmplist.push_back(newLeft);
-        tmplist.push_back(newRight);
-        types = leftSet;
-    } else {
-        tmplist.push_back(left);
-        tmplist.push_back(right);
-        types = leftSet;
-    }
-
-    childrenNodes = tmplist;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-int BitwiseNode::getNodeType() {
-    return BITWISENODE;
-}
-
-void BitwiseNode::printNode(std::ostream &os) const {
-    os << "BITWISE_" << tokenToString2(nodeType);
-}
-
-/**
- * @brief LogicalNode constructor. Creates a temporary list of child nodes
- * @param x is the type of logical operator that nodeType is set to.
- * @param left is the left child of the operator
- * @param right is the right child of the operator
- */
-LogicalNode::LogicalNode(int x, ASTNode *left, ASTNode *right) {
-    list <ASTNode*> tempList;
-    tempList.push_back(left);
-    tempList.push_back(right);
-    childrenNodes = tempList;
-    nodeType = x;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for logicalNode
- * @param os is the stream to be printed to
- */
-void LogicalNode::printNode(std::ostream &os) const {
-    os << "LOGICAL_" << nodeType;
-}
-
-int LogicalNode::getNodeType() {
-    return LOGICALNODE;
-}
-
-string LogicalNode::walk() {
-    string s1 = tokenToString2(nodeType);
-    string s2 = getChildren().front()->walk();
-    string s3 = getChildren().back()->walk();
-    string s4 = "t" + to_string(registerCnt++);
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << endl;
-    vector<string> v = {s1, s2, s3, s4};
-    main3ac.push_back(v);
-    return s4;
-}
-
-/**
- * @brief NoneNode constructor
- */
-NoneNode::NoneNode() {
-}
-
-/**
- * @brief NoneNode prints none
- * @param os is the stream to be printed to
- */
-void NoneNode::printNode(std::ostream &os) const {
-    os << "NONE";
-}
-
-int NoneNode::getNodeType() {
-    return NONENODE;
-}
-
-string NoneNode::walk() {
-    //cout << PURE NONENODE
-    return "";
-}
-
-/**
- * @brief DeclNode constructor. Creates a temp list of children
- * @param first is the first child node
- * @param second is the second child node
- */
-DeclNode::DeclNode(ASTNode *first, ASTNode *second) {
-    list<ASTNode*> tmpList;
-    tmpList.push_back(first);
-    tmpList.push_back(second);
-    childrenNodes = tmpList;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print DeclNode
- * @param os is the stream to be printed to
- */
-void DeclNode::printNode(std::ostream &os) const {
-    os << "DECLARATION";
-}
-
-int DeclNode::getNodeType() {
-    return DECLNODE;
-}
-
-string DeclNode::walk() {
-    if (getChildren().back()->getNodeType() == ARRAYNODE) {
-        cout << "ARRAYNODE DECL GOES HERE" << endl;
-        return "";
-    }
-    auto type = getChildren().front()->getTypes();
-    int offset = getByteSize(type);
-    SymbolTableNode2 * s = new SymbolTableNode2();
-    s->offset = offset;
-    //s->tempreg = todo maybe later will we need to assign a temporary register? arrays need a pointer?
-    table3ac.insert(make_pair(getChildren().back()->getName(), *s));
-
-    return "";
-}
-
-/**
- * @brief SeqNode constructor. Creates a temp list of children
- * @param seq is the type of SeqNode
- * @param first is the first child
- * @param second is the second chile
- */
-SeqNode::SeqNode(char seq, ASTNode *first, ASTNode *second) {
-    list<ASTNode*> tmpList;
-    tmpList.push_back(first);
-    tmpList.push_back(second);
-    childrenNodes = tmpList;
-
-    seqType = seq;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief SeqNode print function. prints a string based on what kind of seqnode it is
- * @param os is the stream to be printed to
- */
-void SeqNode::printNode(std::ostream &os) const {
-    switch(seqType) {
-        case 's':
-            os << "STATEMENTS";
-            break;
-        case 'd':
-            os << "DECLARATIONS";
-            break;
-        case 'c':
-            os << "COMPOUND";
-            break;
-        case 'a':
-            os << "ARGUMENTS";
-            break;
-        case 'g':
-            os << "GLOBAL";
-            break;
-        case 't':
-            os << "STRUCT_LIST";
-            break;
-        case 'q':
-            os << "INIT_DECL_LIST";
-            break;
-        case 'e':
-            os << "ENUM_LIST";
-            break;
-        case 'i':
-            os << "IDENTIFIER_LIST";
-            break;
-        default:
-            os << "UNDEFINED_SEQUENCE";
-            break;
-    }
-}
-
-/**
- * @brief SeqNode constructor
- * @param seq is the type of seqNode
- * @param statementList is the list of ASTNode pointers
- */
-SeqNode::SeqNode(char seq, list<ASTNode *> statementList) {
-    childrenNodes = statementList;
-
-    seqType = seq;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-int SeqNode::getNodeType() {
-    return SEQNODE;
-}
-
-char SeqNode::getSeqType() {
-    return seqType;
-}
-
-string SeqNode::walk() {
-    switch(seqType) {
-        case 'g': {
-            cout << "TODO- MUST ALLOCATE LOCALS FOR MAIN" << endl;
-            cout << "CALL" << " " << "main" << endl;
-            vector<string> v = {"CALL", "main", "---", "---"};
-            main3ac.push_back(v);
-
-
-
-            cout << "HALT" << endl;
-            vector<string> v2 = {"HALT", "---", "---", "---"};
-            main3ac.push_back(v2);
-            cout << "TODO- MUST DEALLOCATE LOCALS FOR MAIN" << endl;
-            break;
-        }
-        default: {
-            //cout << "OTHER SEQ NODE" << endl;
-            break;
-        }
-    }
-    for (auto x : getChildren()) {
-        x->walk();
-    }
-    return "";
-}
-
-/**
- * @brief IDNode constructor
- * @param name is the name of the identifier
- */
-IdentifierNode::IdentifierNode(string *name) {
-    identifier = *name;
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-int IdentifierNode::getDimensions() {
-    return sizeList.size();
-}
-
-/**
- * @brief IDNode function to get the identifier name
- * @return returns a string that is the identifier name
- */
-string IdentifierNode::getName() {
-    return identifier;
-}
-
-/**
- * @brief sets symbol table node from an identifier node. copies types and size set
- * @param symtblnd2 is the symboltablenode to be set
- */
-void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
-    symbolTableNode2 = symtblnd2;
-    types = symbolTableNode2->types;
-    checkType();
-    sizeList = symbolTableNode2->sizeList;
-    //cout << sizeList.size();
-}
-
-/*void FuncNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
-    symbolTableNode2 = symtblnd2;
-    types = symbolTableNode2->types;
-    checkType();
-    //sizeList = symbolTableNode2->sizeList;
-    //cout << sizeList.size();
-}*/
-
-/**
- * @brief Identifier node print function
- * @param os is the stream to be printed to
- */
-void IdentifierNode::printNode(std::ostream &os) const {
-    os << "VARIABLE_" << identifier;
-    for (auto item : types) {
-        os << "_" << tokenToString2(item);
-    }
-    int dimensions = sizeList.size();
-    if (dimensions > 0) {
-        os << "_ARR_";
-        int i = 1;
-        for (auto dim_size : symbolTableNode2->sizeList) {
-            os << "DIM" << i << "_" << dim_size;
-            i++;
-        }
-    }
-}
-
-IdentifierNode::~IdentifierNode() {
-    delete symbolTableNode2;
-}
-
-int IdentifierNode::getNodeType() {
-    return IDENTIFIERNODE;
-}
-
-string IdentifierNode::walk() {
-    return identifier;
-}
-
-/**
- * @brief print function for IntNode
- * @param os is the stream to be printed to
- */
-void IntNode::printNode(std::ostream &os) const {
-    os << "INT_" << nodeVal;
-}
-
-/**
- * @brief IntNode constructor. inserts type INT into set of types.
- * @param val is the value of the integer
- */
-IntNode::IntNode(int val) {
-    nodeVal = val;
-    types.insert(INT);
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-int IntNode::getVal() {
-    return nodeVal;
-}
-
-int IntNode::getNodeType() {
-    return INTNODE;
-}
-
-string IntNode::walk() {
-    return to_string(nodeVal);
-}
-
-/**
- * @brief CharNode constructor. inserts type CHAR into set of types.
- * @param val is the value of the char
- */
-CharNode::CharNode(char val) {
-    types.insert(CHAR);
-    nodeVal = val;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for charnode that prints the value of the char
- * @param os is the stream to be printed to
- */
-void CharNode::printNode(std::ostream &os) const {
-    os << "CHAR_" << nodeVal;
-}
-
-int CharNode::getNodeType() {
-    return CHARNODE;
-}
-
-string CharNode::walk() {
-    return to_string(nodeVal);
-}
-
-/**
- * @brief FloatNode constructor. inserts type FLOAT into set of types.
- * @param val is the value of the float.
- */
-FloatNode::FloatNode(float val) {
-    types.insert(FLOAT);
-    nodeVal = val;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-string FloatNode::walk() {
-    return to_string(nodeVal);
-}
-
-/**
- * @brief printer function for floatNode
- * @param os is the stream to be printed to
- */
-void FloatNode::printNode(std::ostream &os) const {
-    os << "FLOAT_" << nodeVal;
-}
-
-int FloatNode::getNodeType() {
-    return FLOATNODE;
-}
-
-/**
- * @brief StringNode constructor
- * @param val is the string to be copied into nodeVal
- */
-StringNode::StringNode(string *val) {
-    nodeVal = *val;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for StringNode
- * @param os is the stream to be printed to
- */
-void StringNode::printNode(std::ostream &os) const {
-    os << "STRING_" << nodeVal;
-}
-
-int StringNode::getNodeType() {
-    return STRINGNODE;
-}
-
-string StringNode::walk() {
-    cout << "TODO STRING NODES SCARY" << endl;
-    return "";
-}
-
-/**
- * @brief CastNode constructor. Creates a temporary list of child nodes
- * @param type is the type that the right child should be cast to
- * @param nodeToCast is the node that should be cast to a different type
- */
-CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
-    list<ASTNode *> tmplist;
-    tmplist.push_back(type);
-    tmplist.push_back(nodeToCast);
-    childrenNodes = tmplist;
-    types = type->getTypes();
-    checkType();
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for castNode
- * @param os is the stream to be printed to
- */
-void CastNode::printNode(std::ostream &os) const {
-    os << "CAST";
-}
-
-int CastNode::getNodeType() {
-    return CASTNODE;
-}
-
-string CastNode::walk(){//only need to cast in 3ac if between double/float and anything else
-    string s1;
-    string s2;
-    vector<string> v;
-    if(*(getChildren().front()->getTypes().begin()) == 298 || *(getChildren().front()->getTypes().begin()) == 299){
-        s1 = getChildren().back()->walk();
-        s2 = "f" + to_string(floatRegisterCnt++);
-        cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
-        v = {"ASSIGN", s1, "---", s2};
-    }
-    else{
-        s1 = getChildren().back()->walk();
-        s2 = "t" + to_string(registerCnt++);
-        cout << "ASSIGN " << s1 << " " << s2 << "     #" << getFileLine(lineNum) << endl;
-        v = {"ASSIGN", s1, "---", s2};
-    }
-    vector<string> v2;
-    v2 = {"COMMENT: ", getFileLine(lineNum)};
-    main3ac.push_back(v2);
-    main3ac.push_back(v);
-    return s2;
-}
-
-/**
- * @brief RelationalNode constructor. creates a temporary list of child nodes
- * @param type is the type of relational operator
- * @param left is the left child
- * @param right is the right child
- */
-RelationalNode::RelationalNode(int type, ASTNode *left, ASTNode *right) {
-    operationType = type;
-    list<ASTNode*> tmplist;
-    tmplist.push_back(left);
-    tmplist.push_back(right);
-    childrenNodes = tmplist;
-
-    lineNum = yylineno;
-    colNum = columnQueue.size() - yyleng + 1;
-}
-
-/**
- * @brief print function for relationalNode
- * @param os is the stream to be printed to
- */
-void RelationalNode::printNode(std::ostream &os) const {
-    os << "RELATIONAL_" << tokenToString2(operationType);
-}
-
-int RelationalNode::getNodeType() {
-    return RELATIONALNODE;
-}
-
-int RelationalNode::getOpType() {
-    return operationType;
-}
-
-string RelationalNode::walk() {
-    string s1 = tokenToString2(operationType);
-    auto it = getChildren().begin();
-    string s2 = (*it)->walk();
-    it++;
-    string s3 = (*it)->walk();
-    string s4 = "t" + to_string(registerCnt++);
-    string s5;
-    s5 = getFileLine(lineNum);
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "     #" << s5 << endl;
-    vector<string> v2 = {"COMMENT: ", s5};
-    vector<string> v = {s1, s2, s3, s4};
-    main3ac.push_back(v2);
-    main3ac.push_back(v);
-    return s4;
 }
 
 /**
@@ -1345,10 +615,6 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     colNum = columnQueue.size() - yyleng + 1;
 }
 
-int BinaryMathNode::getOpType() {
-    return operationType;
-}
-
 /**
  * @brief binaryMathNode print function
  * @param os is the stream to be printed to
@@ -1360,10 +626,18 @@ void BinaryMathNode::printNode(std::ostream &os) const {
     }
 }
 
+/**
+ *
+ * @return
+ */
 int BinaryMathNode::getNodeType() {
     return BINARYMATHNODE;
 }
 
+/**
+ *
+ * @return
+ */
 string BinaryMathNode::walk() {
     string s1 = tokenToString2(operationType);
 
@@ -1378,17 +652,624 @@ string BinaryMathNode::walk() {
     }
 
     string s4;
-    if(s2.find('.') == std::string::npos && s3.find('.') == std::string::npos) // checks if there is a '.' in either string, means need float register
-        s4 = "t" + to_string(registerCnt++);
+    if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299) ||
+            getChildren().back()->getTypes().count(298) || getChildren().back()->getTypes().count(299))
+        s4 = "$f" + to_string(floatRegisterCnt++);
     else
-        s4 = "f" + to_string(floatRegisterCnt++);
+        s4 = "$t" + to_string(registerCnt++);
 
     string s5;
 
     s5 = getFileLine(lineNum);
 
-    cout << s1 << " " << s2 << " " << s3 << " " << s4 << "    #" << s5 << endl;
-    vector<string> v2 = {"COMMENT: ", s5};
+    vector<string> v2 = {"COMMENT", s5};
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v2);
+    main3ac.push_back(v);
+    return s4;
+}
+
+/**
+ * @brief Bitwise Node constructor
+ * @details uses compareForCast to check if either child needs to be cast.
+ *          If needed, creates a CastNode accordingly.
+ *          makes a temporary list of the children and sets childrenNodes equal to it.
+ * @param x is the bitwise operation
+ * @param left is the left child of the operator
+ * @param right is the right child of the operator
+ */
+BitwiseNode::BitwiseNode(int x, ASTNode *left, ASTNode *right) {
+    nodeType = x;
+    list<ASTNode*> tmplist;
+
+    ASTNode * newLeft;
+    ASTNode * newRight;
+
+    set<int> leftSet = left->getTypes();
+    set<int> rightSet = right->getTypes();
+    int ret = compareForCast(leftSet, rightSet);
+    if (ret < 0) {
+        //Cast the node on the left to the type of the right node
+        ASTNode * newtype = new TypeNode(rightSet);
+        newLeft = new CastNode(newtype, left);
+        newRight = right;
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        types = rightSet;
+    } else if (ret > 0) {
+        //Cast the node on the right to the type of the left node
+        ASTNode * newtype = new TypeNode(leftSet);
+        newRight = new CastNode(newtype, right);
+        newLeft = left;
+        tmplist.push_back(newLeft);
+        tmplist.push_back(newRight);
+        types = leftSet;
+    } else {
+        tmplist.push_back(left);
+        tmplist.push_back(right);
+        types = leftSet;
+    }
+
+    childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ *
+ * @return
+ */
+int BitwiseNode::getNodeType() {
+    return BITWISENODE;
+}
+
+/**
+ *
+ * @param os
+ */
+void BitwiseNode::printNode(std::ostream &os) const {
+    os << "BITWISE_" << tokenToString2(nodeType);
+}
+
+/**
+ * @brief CastNode constructor. Creates a temporary list of child nodes
+ * @param type is the type that the right child should be cast to
+ * @param nodeToCast is the node that should be cast to a different type
+ */
+CastNode::CastNode(ASTNode *type, ASTNode *nodeToCast) {
+    list<ASTNode *> tmplist;
+    tmplist.push_back(type);
+    tmplist.push_back(nodeToCast);
+    childrenNodes = tmplist;
+    types = type->getTypes();
+    checkType();
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for castNode
+ * @param os is the stream to be printed to
+ */
+void CastNode::printNode(std::ostream &os) const {
+    os << "CAST";
+}
+
+/**
+ *
+ * @return
+ */
+int CastNode::getNodeType() {
+    return CASTNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string CastNode::walk(){//only need to cast in 3ac if between double/float and anything else
+    string s1;
+    string s2;
+    vector<string> v;
+    if(getChildren().front()->getTypes().count(298) || getChildren().front()->getTypes().count(299)){
+        s1 = getChildren().back()->walk();
+        s2 = "$f" + to_string(floatRegisterCnt++);
+        v = {"ASSIGN", s1, "---", s2};
+    }
+    else{
+        s1 = getChildren().back()->walk();
+        s2 = "$t" + to_string(registerCnt++);
+        v = {"ASSIGN", s1, "---", s2};
+    }
+    vector<string> v2;
+    v2 = {"COMMENT", getFileLine(lineNum)};
+    main3ac.push_back(v2);
+    main3ac.push_back(v);
+    return s2;
+}
+
+/**
+ * @brief DeclNode constructor. Creates a temp list of children
+ * @param first is the first child node
+ * @param second is the second child node
+ */
+DeclNode::DeclNode(ASTNode *first, ASTNode *second) {
+    list<ASTNode*> tmpList;
+    tmpList.push_back(first);
+    tmpList.push_back(second);
+    childrenNodes = tmpList;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print DeclNode
+ * @param os is the stream to be printed to
+ */
+void DeclNode::printNode(std::ostream &os) const {
+    os << "DECLARATION";
+}
+
+/**
+ *
+ * @return
+ */
+int DeclNode::getNodeType() {
+    return DECLNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string DeclNode::walk() {
+    if (getChildren().back()->getNodeType() == ARRAYNODE) {
+        currentFuncOffsets.emplace(getChildren().back()->getChildren().front()->getName(), stackCnt);
+        int k = 1;
+        for (auto i : getChildren().back()->getSizes()) {
+            k *= i->getVal();
+        }
+        stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        return "";
+    } else {
+        currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
+        stackCnt += getByteSize(getChildren().back()->getTypes());
+    }
+    return "";
+}
+
+
+/**
+ * @brief ForNode constructor. Stores a ASTNode* list of the expressions and an bool array
+ *        with values corresponding to which expressions are written
+ * @param ptrList is the list of expressions
+ * @param arr is the bool array denoting which expressions are written
+ * @param stmt is the statement or the body of the loop
+ */
+ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
+    childrenNodes = move(ptrList);
+    childrenNodes.push_back(stmt);
+    for(int i = 0; i < 3; ++i)
+        stmtWritten[i] = arr[i];
+}
+
+void ForNode::printNode(std::ostream &os) const{
+    os << "FOR";
+}
+
+/**
+ *
+ * @return
+ */
+string ForNode::walk() {
+    if (stmtWritten[0]) {
+        getChildren().front()->walk();
+    }
+    string s5;
+    s5 = getFileLine(getChildren().front()->getLineNum());
+    string initLabel = "l" + to_string(labelCnt++);
+    vector<string> v = {"LABEL", initLabel, "---", "---"};
+    vector<string> v4 = {"COMMENT", s5};
+    main3ac.push_back(v4);
+    main3ac.push_back(v);
+
+    string endLabel = "l" + to_string(labelCnt++);
+
+    if (stmtWritten[1]) {
+        auto list_copy = getChildren();
+        if (stmtWritten[0])
+            list_copy.pop_front();
+        string s1 = "BREQ";
+        string s2 = list_copy.front()->walk();
+        string s3 = "0";
+        vector<string> v5 = {s1, s2, s3, endLabel};
+        main3ac.push_back(v5);
+    }
+    if (stmtWritten[2]) {
+        auto list_copy = getChildren();
+        if (stmtWritten[0])
+            list_copy.pop_front();
+        if (stmtWritten[1])
+            list_copy.pop_front();
+        list_copy.front()->walk();
+    }
+    getChildren().back()->walk();
+    vector<string> v2 = {"BR", "---", "---", initLabel};
+    main3ac.push_back(v2);
+    vector<string> v3 = {"LABEL", endLabel, "---", "---"};
+    main3ac.push_back(v3);
+
+    return "";
+}
+
+
+/**
+ * @brief FuncNode constructor. Uses a switch statement to construct appropriate member fields.
+ *        If function prototype, sets name and param types.
+ *        If function definition, sets name, return type, name and type of parameters, and children nodes (what is inside curly braces)
+ *        Additionally makes a TypeNode as a child denoting return type.
+ *        If function call, sets given arguments as children nodes.
+ * @param name is the function name
+ * @param typef
+ * @param params
+ */
+FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type)
+{
+    funcName = move(name);
+    funcType = type;
+    switch(type)
+    {
+        case 0: {
+            paramTypes = types;
+            break;
+        }
+        case 1: {
+            paramTypes = types;
+            args = move(arguments);
+            childrenNodes = children;
+            auto tempIt = types.begin();
+            childrenNodes.push_front(new TypeNode(*tempIt));
+            break;
+        }
+        case 2: {
+            paramTypes = types;
+            childrenNodes = children;
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+/**
+ * @brief function to print funcnodes. Uses a switch statement to print different types of funcnodes.
+ *        If function prototype, prints name and param types.
+ *        If function definition, prints name and param names and types.
+ *        If function call, prints name and args if they are given.
+ * @param os is the stream to be printed to
+ */
+void FuncNode::printNode(std::ostream &os) const{
+    switch(funcType)
+    {
+        case 0: {
+            os << "FUNCTION_PROTOTYPE_" << funcName;
+            for (const auto &paramType : paramTypes) {
+                os << "_";
+                for (int ite : paramType)
+                    os << tokenToString2(ite);
+            }
+            break;
+        }
+        case 1: {
+            os << "FUNCTION_DEFINITION_" << funcName;
+            for (const auto &arg : args) {
+                os << "_";
+                os << arg.first << "_";
+                for (int ite : arg.second)
+                    os << tokenToString2(ite);
+            }
+            break;
+        }
+        case 2: {
+            os << "FUNCTION_CALL_" << funcName;
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+/**
+ * @brief function that returns the name of a funcnode
+ *
+ */
+string FuncNode:: getName(){
+    return funcName;
+}
+
+/**
+ *
+ * @return
+ */
+int FuncNode::getNodeType() {
+    return FUNCNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string FuncNode::walk() {
+    switch (funcType) {
+        case 0: {
+            break;
+        }
+        case 1: {
+            stackCnt = 0;
+            currentFuncOffsets.clear();
+            vector<string> v = {"LABEL", funcName, "---", "---"};
+            main3ac.push_back(v);
+
+            currentFuncOffsets.emplace("_RETURN_ADDRESS_", stackCnt);
+            stackCnt += 4; //todo I'm assuming each address is 4 bytes
+
+            for (auto arg : args) {
+                currentFuncOffsets.emplace(arg.first, stackCnt);
+                stackCnt += getByteSize(arg.second);
+            }
+            for (auto a : getChildren()) {
+                a->walk();
+            }
+            vector<string> v2 = {"RETURN", "---", "---", "---"};
+            main3ac.push_back(v2);
+
+            currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+            allFuncOffsets.emplace(funcName, currentFuncOffsets);
+            break;
+        }
+            //num local variables known after doing a walk, based on offset symbol table
+        case 2: {
+            int stackSpace = 0;
+            for (const auto &item : paramTypes) {
+                stackSpace += getByteSize(item);
+            }
+            stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
+            vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
+            main3ac.push_back(v);
+
+            vector<string> v7 = {"PUSHRA", "---", "---", "---"}; //pushes the return address on the stack
+            //doing this allows for nested function calls/recursion so each stack frame saves the location
+            //of its caller on the stack. This is at the top of the stack, and must be loaded whenever
+            //returning from a function
+            main3ac.push_back(v7);
+
+            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
+                string ret = a->walk();
+                //todo should the pushparam instruction know the type?
+                vector<string> v2 = {"PUSHPARAM", ret, "---", "---"};
+                main3ac.push_back(v2);
+            }
+            vector<string> v2 = {"CALL", funcName, "---", "---"};
+            main3ac.push_back(v2);
+
+            string s = "$t" + to_string(registerCnt++);
+            string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
+            vector<string> v3 = {"ASSIGN", s2 + "($fp)", "---", s};
+            main3ac.push_back(v3);
+            vector<string> v4 = {"DEALLOCATE", to_string(stackSpace), "---", "---"};
+            main3ac.push_back(v4);
+            return s;
+        }
+        default:
+            break;
+    }
+    return "";
+}
+
+/**
+ * @brief IfNode constructor for if statement.
+ *        Creates a temporary list of child nodes and sets childrenNodes equal to it.
+ * @param expr is the expression to be checked
+ * @param stmt is the body of the if statement
+ */
+IfNode::IfNode(ASTNode *expr, ASTNode *stmt) {
+    list<ASTNode*> tempList;
+    tempList.push_back(expr);
+    tempList.push_back(stmt);
+    childrenNodes = tempList;
+    flag = true;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief IfNode constructor for if-else statement
+ *        Creates a temporary list of child nodes and sets childrenNodes equal to it.
+ * @param expr is the expression to be checked
+ * @param stmt is the body of the if statement
+ * @param stmt2 is the body of the else statement
+ */
+IfNode::IfNode(ASTNode *expr, ASTNode *stmt, ASTNode *stmt2) {
+    list<ASTNode*> tempList;
+    tempList.push_back(expr);
+    tempList.push_back(stmt);
+    tempList.push_back(stmt2);
+    childrenNodes = tempList;
+    flag = false;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for IfNode. Checks if it is an if statement or an if-else statement.
+ * @param os is the stream to be printed to
+ */
+void IfNode::printNode(std::ostream &os) const {
+    if(flag){
+        os << "IF_NODE";
+    }
+    else{
+        os << "IF_ELSE_NODE";
+    }
+}
+
+/**
+ *
+ * @return
+ */
+int IfNode::getNodeType() {
+    return IFNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string IfNode::walk() {
+    string s1 = "BREQ";
+    string s2 = getChildren().front()->walk();
+    string s3 = "0";
+    string s4 = "l" + to_string(labelCnt++);
+    string s5;
+    s5 = getFileLine(getChildren().front()->getLineNum());
+    vector<string> v3 = {"COMMENT", s5};
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
+    getChildren().back()->walk();
+    vector<string> v2 = {"LABEL", s4, "---", "---"};
+    main3ac.push_back(v2);
+    //todo handle else statement (flag == 0)
+    return "";
+}
+
+/**
+ * @brief LogicalNode constructor. Creates a temporary list of child nodes
+ * @param x is the type of logical operator that nodeType is set to.
+ * @param left is the left child of the operator
+ * @param right is the right child of the operator
+ */
+LogicalNode::LogicalNode(int x, ASTNode *left, ASTNode *right) {
+    list <ASTNode*> tempList;
+    tempList.push_back(left);
+    tempList.push_back(right);
+    childrenNodes = tempList;
+    nodeType = x;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for logicalNode
+ * @param os is the stream to be printed to
+ */
+void LogicalNode::printNode(std::ostream &os) const {
+    os << "LOGICAL_" << nodeType;
+}
+
+/**
+ *
+ * @return
+ */
+int LogicalNode::getNodeType() {
+    return LOGICALNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string LogicalNode::walk() {
+    string s1 = tokenToString2(nodeType);
+    string s2 = getChildren().front()->walk();
+    string s3 = getChildren().back()->walk();
+    string s4 = "$t" + to_string(registerCnt++);
+    vector<string> v = {s1, s2, s3, s4};
+    main3ac.push_back(v);
+    return s4;
+}
+
+/**
+ * @brief NoneNode constructor
+ */
+NoneNode::NoneNode() = default;
+
+/**
+ * @brief NoneNode prints none
+ * @param os is the stream to be printed to
+ */
+void NoneNode::printNode(std::ostream &os) const {
+    os << "NONE";
+}
+
+/**
+ *
+ * @return
+ */
+int NoneNode::getNodeType() {
+    return NONENODE;
+}
+
+/**
+ *
+ * @return
+ */
+string NoneNode::walk() {
+    return "";
+}
+
+/**
+ * @brief RelationalNode constructor. creates a temporary list of child nodes
+ * @param type is the type of relational operator
+ * @param left is the left child
+ * @param right is the right child
+ */
+RelationalNode::RelationalNode(int type, ASTNode *left, ASTNode *right) {
+    operationType = type;
+    list<ASTNode*> tmplist;
+    tmplist.push_back(left);
+    tmplist.push_back(right);
+    childrenNodes = tmplist;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for relationalNode
+ * @param os is the stream to be printed to
+ */
+void RelationalNode::printNode(std::ostream &os) const {
+    os << "RELATIONAL_" << tokenToString2(operationType);
+}
+
+/**
+ *
+ * @return
+ */
+int RelationalNode::getNodeType() {
+    return RELATIONALNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string RelationalNode::walk() {
+    string s1 = tokenToString2(operationType);
+    auto list_copy = getChildren();
+    string s2 = list_copy.front()->walk();
+    list_copy.pop_front();
+    string s3 = list_copy.front()->walk();
+    string s4 = "$t" + to_string(registerCnt++);
+    string s5;
+    s5 = getFileLine(lineNum);
+    vector<string> v2 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v2);
     main3ac.push_back(v);
@@ -1400,7 +1281,7 @@ string BinaryMathNode::walk() {
  * @param child is the child ASTNode pointer
  */
 ReturnNode::ReturnNode(ASTNode *child) {
-    if (child == NULL) {
+    if (child == nullptr) {
         list<ASTNode*> emptyList;
         childrenNodes = emptyList;
     } else {
@@ -1421,307 +1302,512 @@ void ReturnNode::printNode(std::ostream &os) const {
     os << "RETURN";
 }
 
+/**
+ *
+ * @return
+ */
 int ReturnNode::getNodeType() {
     return RETURNNODE;
 }
 
+/**
+ *
+ * @return
+ */
 string ReturnNode::walk() {
-    string ret = getChildren().front()->walk();
-    cout << "RETURN " << ret << endl;
-    vector<string> v2 = {"COMMENT: ", getFileLine(lineNum)};
-    vector<string> v = {"RETURN", "---", "---", "---"};
-    //todo what should the return value be?
+
+    if (getChildren().front()->getNodeType() != NONENODE) {
+        string ret = getChildren().front()->walk();
+        vector<string> v = {"PUSHRETURN", ret, "---", "---"};
+        main3ac.push_back(v);
+        currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
+        stackCnt += getByteSize(getChildren().front()->getTypes());
+    }
+    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
     main3ac.push_back(v2);
-    main3ac.push_back(v);
+
     return "";
 }
 
 /**
- * @brief ArrayNode constructor creates a templist with the identifier and the dimensions
- * @param var is the identifier along with the type
- * @param sizes is the dimensions of the array
+ * @brief SeqNode constructor. Creates a temp list of children
+ * @param seq is the type of SeqNode
+ * @param first is the first child
+ * @param second is the second chile
  */
-ArrayNode::ArrayNode(ASTNode *var, list<ASTNode *> sizes) {
-    list<ASTNode*> tmplist;
-    tmplist = sizes;
-    tmplist.push_front(var);
-    sizeList = sizes;
-    childrenNodes = tmplist;
+SeqNode::SeqNode(char seq, ASTNode *first, ASTNode *second) {
+    list<ASTNode*> tmpList;
+    tmpList.push_back(first);
+    tmpList.push_back(second);
+    childrenNodes = tmpList;
+
+    seqType = seq;
 
     lineNum = yylineno;
     colNum = columnQueue.size() - yyleng + 1;
-    types = var->getTypes();
-    checkType();
-}
-
-int ArrayNode::getDimensions() {
-    int arrSize = getChildren().front()->getDimensions();
-    int derefs = sizeList.size();
-    return arrSize - derefs;
 }
 
 /**
- * @brief function to get dimensions of an arrayNode
- * @return list of ASTNode pointers that are the dimensions
- */
-list<ASTNode*> ArrayNode::getSizes() {
-    return sizeList;
-}
-
-/**
- * @brief print function for arrayNode
+ * @brief SeqNode print function. prints a string based on what kind of seqnode it is
  * @param os is the stream to be printed to
  */
-void ArrayNode::printNode(std::ostream &os) const {
-    os << "ARRAY"; //todo maybe provide more info about the array?
-}
-
-int ArrayNode::getNodeType() {
-    return ARRAYNODE;
-}
-
-string ArrayNode::walk() {
-    if(sizeList.empty()) //if one dimensional array
-    {
-        string s4 = getFileLine(lineNum);
-        string s1 = "t" + to_string(registerCnt++);
-        string name = getChildren().front()->getName();
-        cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
-        vector<string> v = {"ADDR", name, "---", s1};
-        vector<string> v4 = {"COMMENT: ", s4};
-        main3ac.push_back(v4);
-        main3ac.push_back(v);
-        //s1 is the base address
-        string s2 = "t" + to_string(registerCnt++);
-        string index_offset = to_string(getChildren().back()->getVal());
-        string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
-        cout << "STAR " << index_offset << " " << size_of << " " << s2 << "     #" << s4 << endl;
-        vector<string> v2 = {"STAR", index_offset, size_of, s2};
-        main3ac.push_back(v4);
-        main3ac.push_back(v2);
-        //s2 is the offset
-        string s3 = "t" + to_string(registerCnt++);
-        cout << "PLUS " << s1 << " " << s2 << " " << s3 << "     #" << s4 << endl;
-        vector<string> v3 = {"PLUS", s1, s2, s3};
-        main3ac.push_back(v4);
-        main3ac.push_back(v3);
-        return s3;
-    }
-    else { //if not one dimensional array
-        string s1 = "t" + to_string(registerCnt++); //temp register
-        string name = getChildren().front()->getName(); //name of array
-        string s2 = getFileLine(lineNum);
-        cout << "ADDR " << name << " " << s1 << "     #" << s2 << endl;
-        vector<string> v = {"ADDR", name, "---", s1};
-        vector<string> v4 = {"COMMENT: ", s2};
-
-
-    }
-    /* todo multidimensional arrays
-    string s2;
-    string s3;
-    for (auto x : sizeList) {
-        s2 = "t" + to_string(registerCnt++);
-        cout << "MUL " << x->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
-        //s2 is the offset
-        s3 = "t" + to_string(registerCnt++);
-        cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
-    }
-    */
-}
-
-/**
- * @brief FuncNode constructor. Uses a switch statement to construct appropriate member fields.
- *        If function prototype, sets name and param types.
- *        If function definition, sets name, return type, name and type of parameters, and children nodes (what is inside curly braces)
- *        Additionally makes a TypeNode as a child denoting return type.
- *        If function call, sets given arguments as children nodes.
- * @param name is the function name
- * @param typef
- * @param params
- */
-FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type)
-{
-    funcName = name;
-    funcType = type;
-    switch(type)
-    {
-        case 0: {
-            paramTypes = types;
+void SeqNode::printNode(std::ostream &os) const {
+    switch(seqType) {
+        case 's':
+            os << "STATEMENTS";
             break;
-        }
-        case 1: {
-            paramTypes = types;
-            args = arguments;
-            childrenNodes = children;
-            auto tempIt = types.begin();
-            childrenNodes.push_front(new TypeNode(*tempIt));
+        case 'd':
+            os << "DECLARATIONS";
             break;
-        }
-        case 2: {
-            childrenNodes = children;
+        case 'c':
+            os << "COMPOUND";
             break;
-        }
+        case 'a':
+            os << "ARGUMENTS";
+            break;
+        case 'g':
+            os << "GLOBAL";
+            break;
+        case 't':
+            os << "STRUCT_LIST";
+            break;
+        case 'q':
+            os << "INIT_DECL_LIST";
+            break;
+        case 'e':
+            os << "ENUM_LIST";
+            break;
+        case 'i':
+            os << "IDENTIFIER_LIST";
+            break;
+        case 'p':
+            os << "PARAMETER_LIST";
+            break;
+        case 'x':
+            os << "EXPRESSION_LIST";
+            break;
         default:
+            os << "UNDEFINED_SEQUENCE";
             break;
     }
 }
 
 /**
- * @brief function to print funcnodes. Uses a switch statement to print different types of funcnodes.
- *        If function prototype, prints name and param types.
- *        If function definition, prints name and param names and types.
- *        If function call, prints name and args if they are given.
- * @param os is the stream to be printed to
+ * @brief SeqNode constructor
+ * @param seq is the type of seqNode
+ * @param statementList is the list of ASTNode pointers
  */
- //todo check if already in sym table for function call
-void FuncNode:: printNode(std::ostream &os) const{
-     switch(funcType)
-     {
-         case 0: {
-             os << "FUNCTION_PROTOTYPE_" << funcName;
-             for(auto it = paramTypes.begin(); it != paramTypes.end(); ++it)
-             {
-                 os << "_";
-                 for(auto ite = it->begin(); ite != it->end(); ++ite)
-                     os << *ite;
-             }
-             break;
-         }
-         case 1: {
-             os << "FUNCTION_DEFINITION_" << funcName;
-             for(auto it = args.begin(); it != args.end(); ++it)
-             {
-                 os << "_";
-                 os << it->first << "_";
-                 for(auto ite = it->second.begin(); ite != it->second.end(); ++ite)
-                    os << *ite;
-             }
-             break;
-         }
-         case 2: {
-             os << "FUNCTION_CALL_" << funcName;
-             break;
-         }
-         default:
-             break;
-     }
+SeqNode::SeqNode(char seq, list<ASTNode *> statementList) {
+    childrenNodes = move(statementList);
+
+    seqType = seq;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
 /**
- * @brief function that returns the name of a funcnode
  *
+ * @return
  */
-string FuncNode:: getName(){
-    return funcName;
+int SeqNode::getNodeType() {
+    return SEQNODE;
 }
 
-int FuncNode::getNodeType() {
-    return FUNCNODE;
-}
-
-string FuncNode::walk() {
-    switch (funcType) {
-        case 0: {
-            cout << "PROTOTYPE- DO NOTHING" << endl;
-            break;
-        }
-        case 1: {
-            cout << funcName << ": " << endl;
-            for (auto a : getChildren()) {
-                a->walk();
-            }
-            cout << "RETURN" << endl;
-            vector<string> v = {"RETURN", "---", "---", "---"};
+/**
+ *
+ * @return
+ */
+string SeqNode::walk() {
+    switch(seqType) {
+        case 'g': {
+            vector<string> v0 = {"ALLOCATE", "TODO", "---", "---"};
+            main3ac.push_back(v0);
+            int allocateLine = main3ac.size()-1;
+            vector<string> v = {"CALL", "main", "---", "---"};
             main3ac.push_back(v);
+            vector<string> v2 = {"HALT", "---", "---", "---"};
+            main3ac.push_back(v2);
+            vector<string> v3 = {"DEALLOCATE", "TODO", "---", "---"};
+            main3ac.push_back(v3);
+            int deallocateLine = main3ac.size()-1;
+            for (auto x : getChildren()) {
+                x->walk();
+            }
+            int stackSize = allFuncOffsets.at("main").at("_TOTAL_STACK_SIZE_");
+            main3ac[allocateLine][1] = to_string(stackSize);
+            main3ac[deallocateLine][1] = to_string(stackSize);
             break;
         }
-            //num local variables known after doing a walk, based on offset symbol table
-        case 2: {
-            int stackSpace = 0;
-            for (auto item : paramTypes) {
-                stackSpace += getByteSize(item);
+        default: {
+            for (auto x : getChildren()) {
+                x->walk();
             }
-            cout << "Allocate stack space (params, locals, return) - todo" << endl; //todo
-            cout << "ALLOCATE " << stackSpace << endl;
-            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
-                string ret = a->walk();
-                cout << "PUSHPARAM " << ret << endl;
-            }
-            cout << "CALL " << funcName << endl;
-            cout << "Deallocate stack space (params, locals, return) - todo" << endl; //todo
-            cout << "DEALLOCATE " << stackSpace << endl;
             break;
         }
-        default:
-            break;
     }
     return "";
 }
 
 /**
- * @brief ForNode constructor. Stores a ASTNode* list of the expressions and an bool array
- *        with values corresponding to which expressions are written
- * @param ptrList is the list of expressions
- * @param arr is the bool array denoting which expressions are written
- * @param stmt is the statement or the body of the loop
+ * @brief UnaryNode constructor. Creates a temporary list of children.
+ * @param x is the unary operator that nodeType is set to.
+ * @param child is the child of the UnaryNode
  */
-ForNode::ForNode(list<ASTNode *> ptrList, bool *arr, ASTNode * stmt) {
-    childrenNodes = ptrList;
-    childrenNodes.push_back(stmt);
-    for(int i = 0; i < 3; ++i)
-        stmtWritten[i] = arr[i];
+UnaryNode::UnaryNode(int x, ASTNode *child) {
+    list <ASTNode*> tempList;
+    tempList.push_back(child);
+    nodeType = x;
+    types = child->getTypes();
+    childrenNodes = tempList;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
 }
 
-void ForNode::printNode(std::ostream &os) const{
-    os << "FOR";
+/**
+ * @brief print function for unary node
+ * @param os is the stream to be printed to
+ */
+void UnaryNode::printNode(std::ostream &os) const {
+    os << "UNARY_" << tokenToString2(nodeType);
 }
 
-string ForNode::walk() {
-    if (stmtWritten[0]) {
-        getChildren().front()->walk();
+/**
+ *
+ * @return
+ */
+int UnaryNode::getNodeType() {
+    return UNARYNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string UnaryNode::walk() {
+    string s = getChildren().front()->walk();
+    string s2 = "l" + to_string(labelCnt++);
+    switch (nodeType) {
+        case MINUS: {
+            vector<string> v2 = {"NEG", s, "---", s2};
+            main3ac.push_back(v2);
+            return s2;
+        }
+        case PLUS: {
+            //do nothing
+            return "";
+        }
+        case BANG: {
+            vector<string> v = {"NOT", s, "---", s2};
+            main3ac.push_back(v);
+            return s2;
+        }
+        default: {
+            //pointers, address, and bitwise complement
+            cerr << "UNARY NOT IMPLEMENTED" << endl;
+            return "";
+        }
     }
+}
+
+
+/**
+ * @brief WhileNode constructor. Makes a temporary list of the
+ *        children ASTNodes and sets childrenNodes equal to it.
+ * @param expr is the while loop expression to be checked
+ * @param stmt is the body of the while loop
+ * @param dooo is a bool denoting whether this is a while or do-while loop
+ */
+WhileNode::WhileNode(ASTNode *expr, ASTNode *stmt, bool dooo) {
+    list<ASTNode*> tempList;
+    tempList.push_back(expr);
+    tempList.push_back(stmt);
+    childrenNodes = tempList;
+    doo = dooo;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for WhileNode, checks if it is a while or a do-while loop.
+ * @param os is the stream to be printed to
+ */
+void WhileNode::printNode(std::ostream &os) const {
+    if(doo){
+        os << "DO_WHILE";
+    }
+    else{
+        os << "WHILE";
+    }
+}
+
+/**
+ *
+ * @return
+ */
+int WhileNode::getNodeType() {
+    return WHILENODE;
+}
+
+/**
+ *
+ * @return
+ */
+string WhileNode::walk() {
     string s5;
     s5 = getFileLine(getChildren().front()->getLineNum());
-
-
     string initLabel = "l" + to_string(labelCnt++);
-    cout << initLabel << ":     #" << s5 << endl;
+    vector<string> v4 = {"COMMENT", s5};
     vector<string> v = {"LABEL", initLabel, "---", "---"};
-    vector<string> v4 = {"COMMENT: ", s5};
-    main3ac.push_back(v4);
     main3ac.push_back(v);
 
-    string endLabel = "l" + to_string(labelCnt++);
+    string s1 = "BREQ";
+    string s2;
+    string s3 = "0";
+    string s4;
 
-    if (stmtWritten[1]) {
-        auto it = getChildren().begin();
-        if (stmtWritten[0])
-            it++;
-        string s1 = "BREQ";
-        string s2 = (*it)->walk();
-        string s3 = "0";
-        cout << s1 << " " << s2 << " " << s3 << " " << endLabel << endl;
-        vector<string> v = {s1, s2, s3, endLabel};
-        main3ac.push_back(v);
+    if (!doo) {
+        //while condition
+        s2 = getChildren().front()->walk();
 
+        s4  = "l" + to_string(labelCnt++);
+        vector<string> v6 = {s1, s2, s3, s4};
+        main3ac.push_back(v6);
+        //then do
+        getChildren().back()->walk();
+    } else {
+        //do
+        getChildren().back()->walk();
+        //then while
+        s2 = getChildren().front()->walk();
+        s4  = "l" + to_string(labelCnt++);
+        vector<string> v5 = {s1, s2, s3, s4};
+        main3ac.push_back(v5);
     }
-
-    if (stmtWritten[2]) {
-        auto it = getChildren().begin();
-        if (stmtWritten[0])
-            it++;
-        if (stmtWritten[1])
-            it++;
-        (*it)->walk();
-    }
-    getChildren().back()->walk();
-    cout << "BR" << " " << initLabel << endl;
     vector<string> v2 = {"BR", "---", "---", initLabel};
     main3ac.push_back(v2);
-    cout << endLabel << ":" << endl;
-    vector<string> v3 = {"LABEL", endLabel, "---", "---"};
+    vector<string> v3 = {"LABEL", s4, "---", "---"};
     main3ac.push_back(v3);
 
     return "";
+}
+
+
+/**
+ * @brief IDNode constructor
+ * @param name is the name of the identifier
+ */
+IdentifierNode::IdentifierNode(string *name) {
+    identifier = *name;
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+int IdentifierNode::getDimensions() {
+    return static_cast<int>(sizeList.size());
+}
+
+/**
+ * @brief IDNode function to get the identifier name
+ * @return returns a string that is the identifier name
+ */
+string IdentifierNode::getName() {
+    return identifier;
+}
+
+/**
+ * @brief sets symbol table node from an identifier node. copies types and size set
+ * @param symtblnd2 is the symboltablenode to be set
+ */
+void IdentifierNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
+    symbolTableNode2 = symtblnd2;
+    types = symbolTableNode2->types;
+    checkType();
+    sizeList = symbolTableNode2->sizeList;
+}
+
+/**
+ * @brief Identifier node print function
+ * @param os is the stream to be printed to
+ */
+void IdentifierNode::printNode(std::ostream &os) const {
+    os << "VARIABLE_" << identifier;
+    for (auto item : types) {
+        os << "_" << tokenToString2(item);
+    }
+    int dimensions = static_cast<int>(sizeList.size());
+    if (dimensions > 0) {
+        os << "_ARR_";
+        int i = 1;
+        for (auto dim_size : symbolTableNode2->sizeList) {
+            os << "DIM" << i << "_" << dim_size;
+            i++;
+        }
+    }
+}
+
+IdentifierNode::~IdentifierNode() {
+    delete symbolTableNode2;
+}
+
+int IdentifierNode::getNodeType() {
+    return IDENTIFIERNODE;
+}
+
+string IdentifierNode::walk() {
+    string s = to_string(currentFuncOffsets[identifier]);
+    return s + "($fp)";
+}
+
+/**
+ * @brief print function for IntNode
+ * @param os is the stream to be printed to
+ */
+void IntNode::printNode(std::ostream &os) const {
+    os << "INT_" << nodeVal;
+}
+
+/**
+ * @brief IntNode constructor. inserts type INT into set of types.
+ * @param val is the value of the integer
+ */
+IntNode::IntNode(int val) {
+    nodeVal = val;
+    types.insert(INT);
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ *
+ * @return
+ */
+int IntNode::getVal() {
+    return nodeVal;
+}
+
+/**
+ *
+ * @return
+ */
+int IntNode::getNodeType() {
+    return INTNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string IntNode::walk() {
+    return to_string(nodeVal);
+}
+
+/**
+ * @brief CharNode constructor. inserts type CHAR into set of types.
+ * @param val is the value of the char
+ */
+CharNode::CharNode(char val) {
+    types.insert(CHAR);
+    nodeVal = val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for charnode that prints the value of the char
+ * @param os is the stream to be printed to
+ */
+void CharNode::printNode(std::ostream &os) const {
+    os << "CHAR_" << nodeVal;
+}
+
+/**
+ *
+ * @return
+ */
+int CharNode::getNodeType() {
+    return CHARNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string CharNode::walk() {
+    return to_string(nodeVal);
+}
+
+/**
+ * @brief FloatNode constructor. inserts type FLOAT into set of types.
+ * @param val is the value of the float.
+ */
+FloatNode::FloatNode(float val) {
+    types.insert(FLOAT);
+    nodeVal = val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ *
+ * @return
+ */
+string FloatNode::walk() {
+    return to_string(nodeVal);
+}
+
+/**
+ * @brief printer function for floatNode
+ * @param os is the stream to be printed to
+ */
+void FloatNode::printNode(std::ostream &os) const {
+    os << "FLOAT_" << nodeVal;
+}
+
+/**
+ *
+ * @return
+ */
+int FloatNode::getNodeType() {
+    return FLOATNODE;
+}
+
+/**
+ * @brief StringNode constructor
+ * @param val is the string to be copied into nodeVal
+ */
+StringNode::StringNode(string *val) {
+    nodeVal = *val;
+
+    lineNum = yylineno;
+    colNum = columnQueue.size() - yyleng + 1;
+}
+
+/**
+ * @brief print function for StringNode
+ * @param os is the stream to be printed to
+ */
+void StringNode::printNode(std::ostream &os) const {
+    os << "STRING_" << nodeVal;
+}
+
+/**
+ *
+ * @return
+ */
+int StringNode::getNodeType() {
+    return STRINGNODE;
+}
+
+/**
+ *
+ * @return
+ */
+string StringNode::walk() {
+    return nodeVal;
 }

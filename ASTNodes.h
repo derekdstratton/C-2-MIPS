@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <iomanip>
 
 #include "include/tree.hh"
 #include "SymbolTable.h"
@@ -18,7 +19,6 @@ using namespace std;
 
 //Helper Functions
 
-string tokenToString2(int token);
 int getByteSize(set<int> typeSet);
 int computeTypeOrder(set<int>& typeSet);
 int compareForCast(set<int>& left, set<int>& right);
@@ -39,24 +39,25 @@ public:
     virtual int getDimensions();
     virtual list<ASTNode*> getSizes();
     virtual int getVal();
-    virtual char getSeqType();
-    virtual int getOpType();
     virtual string walk();
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
     static void output3ac();
+    static vector<vector<string>> get3ac();
 protected:
     int lineNum;
-    int colNum;
+    unsigned long long int colNum;
     list<ASTNode *> childrenNodes;
     //source code?
     static int registerCnt;
     static int labelCnt;
     static int floatRegisterCnt;
-    static SymbolTable table3ac;
     static vector<vector<string>> main3ac;
     //private helper functions
     virtual void printNode(std::ostream& os) const;
     static void copyTreeHelper(ASTNode*& src_node, tree<ASTNode*> & ast, typename tree<ASTNode*>::iterator iRoot);
+    static int stackCnt;
+    static map<string, map<string, int>> allFuncOffsets;
+    static map<string, int> currentFuncOffsets;
 };
 
 /**
@@ -105,7 +106,6 @@ public:
     AssignNode(ASTNode * lvalue, ASTNode * rvalue);
     int getNodeType() override;
 private:
-    int nodeVal;
     void printNode(std::ostream& os) const override;
     string walk() override;
 };
@@ -119,7 +119,6 @@ class BinaryMathNode : public TypeNode {
 public:
     BinaryMathNode(int type, ASTNode * left, ASTNode * right);
     int getNodeType() override;
-    int getOpType() override;
 private:
     int operationType;
     void printNode(std::ostream& os) const override;
@@ -231,7 +230,6 @@ class RelationalNode : public ASTNode {
 public:
     RelationalNode(int type, ASTNode * left, ASTNode * right);
     int getNodeType() override;
-    int getOpType() override;
 private:
     int operationType;
     void printNode(std::ostream& os) const override;
@@ -259,7 +257,6 @@ public:
     SeqNode(char seq, ASTNode * first, ASTNode * second);
     SeqNode(char seq, list<ASTNode*> statementList);
     int getNodeType() override;
-    char getSeqType() override;
 private:
     char seqType;
     void printNode(std::ostream& os) const override;
@@ -276,6 +273,7 @@ public:
 private:
     int nodeType;
     void printNode(std:: ostream& os) const override;
+    string walk() override;
 };
 
 /**

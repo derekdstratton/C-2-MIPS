@@ -88,9 +88,8 @@ tuple<SymbolTableNode2*, string> SymbolTable::search(const string &key, bool top
     SymbolTableNode2*s;
     if (status != "not") {
         s = new SymbolTableNode2(node_iterator->second);
-        //todo this is a memory leak but what else is new
     } else {
-        s = NULL;
+        s = nullptr;
     }
 
     return make_tuple(s, status);

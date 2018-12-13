@@ -1,5 +1,7 @@
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
+
+#include <string>
 enum yytokentype
 {
     IDENTIFIER = 258,
@@ -91,4 +93,93 @@ enum yytokentype
     PERIOD = 344,
     NEWLINE = 345
 };
+
+
+/**
+ * @brief converts a defined token into a string
+ * @param token is the token to be converted
+ * @return returns a string based on which token was passed
+ */
+inline std::string tokenToString2(int token) {
+    std::string str;
+    switch (token) {
+        case AND:
+            str = "AND";
+            break;
+        case STAR:
+            str = "STAR";
+            break;
+        case PLUS:
+            str = "PLUS";
+            break;
+        case MINUS:
+            str = "MINUS";
+            break;
+        case TILDE:
+            str = "TILDE";
+            break;
+        case BANG:
+            str = "BANG";
+            break;
+        case BAR:
+            str = "BAR";
+            break;
+        case XOR:
+            str = "XOR";
+            break;
+        case LESSTH:
+            str = "LESSTH";
+            break;
+        case GREATH:
+            str = "GREATH";
+            break;
+        case LE_OP:
+            str = "LE_OP";
+            break;
+        case GE_OP:
+            str = "GE_OP";
+            break;
+        case EQ_OP:
+            str = "EQ_OP";
+            break;
+        case NE_OP:
+            str = "NE_OP";
+            break;
+        case SLASH:
+            str = "DIV";
+            break;
+        case MODULO:
+            str = "MODULO";
+            break;
+        case INT:
+            str = "INT";
+            break;
+        case FLOAT:
+            str = "FLOAT";
+            break;
+        case DOUBLE:
+            str = "DOUBLE";
+            break;
+        case SHORT:
+            str = "SHORT";
+            break;
+        case LONG:
+            str = "LONG";
+            break;
+        case SIGNED:
+            str = "SIGNED";
+            break;
+        case UNSIGNED:
+            str = "UNSIGNED";
+            break;
+        case CHAR:
+            str = "CHAR";
+            break;
+        default:
+            str = "TOKENSTRINGNOTDEFINED";
+            break;
+    }
+    return str;
+}
+
 #endif

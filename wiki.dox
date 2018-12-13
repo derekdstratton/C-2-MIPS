@@ -22,8 +22,8 @@
  *
  * Some assumptions for the compiler include that the compiler does not process structs, unions,
  * typedefs, enums, array initializer lists, and multiple variable declarations in one line. It is
- * also restricted from processing octal, hexadecimal, and unicode escape characters. The Symbol Table
- * cannot handle declaration and assignment on one line.
+ * also restricted from processing octal, hexadecimal, and unicode escape characters. Can't handle elipsis,
+ * or sizeof.
  *
  * \section module Modules
  *
@@ -43,7 +43,7 @@
  *
  * `git clone https://github.com/derekdstratton/C-2-MIPS`
  *
-    `cmake Best-C-Compiler`
+    `cmake C-2-MIPS`
 
     `make`
 
