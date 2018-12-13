@@ -273,6 +273,11 @@ int ASTNode::getNodeType() {
     return ASTNODE;
 }
 
+list<pair<string, set<int>>> ASTNode::getArgs() {
+    cerr << "HOLY ROLI THE RIGALONI" << endl;
+    list<pair<string, set<int>>> a;
+    return a;
+}
 /**
  *
  * @return
@@ -924,6 +929,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
     {
         case 0: {
             paramTypes = types;
+            args = move(arguments);
             break;
         }
         case 1: {
@@ -942,6 +948,10 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
         default:
             break;
     }
+}
+
+list<pair<string, set<int>>> FuncNode::getArgs(){
+    return args;
 }
 
 /**
@@ -986,7 +996,7 @@ void FuncNode::printNode(std::ostream &os) const{
  * @brief function that returns the name of a funcnode
  *
  */
-string FuncNode:: getName(){
+string FuncNode::getName(){
     return funcName;
 }
 
