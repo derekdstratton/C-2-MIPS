@@ -259,27 +259,38 @@ declaration
 	| declaration_specifiers init_declarator_list SEMI {
 	//types = $1->getTypes();
 	string name = idNode->getName();
+	auto x = getTable()->search(name);
 	cout << "NAME IS " << name << endl;
-    set<int> x = $1->getTypes();
-    SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
-    idNode->setSymbolNode(s);
-    //now insert it into the symbol table
-    pair<string, SymbolTableNode2> entry = make_pair(name,*s);
-    tuple<bool, bool> result = getTable()->insert(entry);
-    //now you also need to make sure the identifier node has the symbol table node stuff
-	$$ = new DeclNode($1, $2);
-	size_decl_list.clear(); //reset this too
-	paramList.clear();
-	isFunction = false;
 
-    bool insertSuccess, notShadowing;
-    tie(insertSuccess, notShadowing) = result;
-    if (!insertSuccess) {
-        outputError("Already exists", "Variable already exists on this scope.", false);
-    } else if (!notShadowing) {
-        outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+	tuple<SymbolTableNode2*, string> result = getTable()->search(name);
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = result;
+	if (it->isFunction) {
+	    cout << "DSJLKFJ" << endl;
+	    $$ = new DeclNode($1, $2);
+	}
+	else {
+        set<int> x = $1->getTypes();
+        SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
+        idNode->setSymbolNode(s);
+        //now insert it into the symbol table
+        pair<string, SymbolTableNode2> entry = make_pair(name,*s);
+        tuple<bool, bool> result = getTable()->insert(entry);
+        //now you also need to make sure the identifier node has the symbol table node stuff
+        $$ = new DeclNode($1, $2);
+        size_decl_list.clear(); //reset this too
+        paramList.clear();
+        isFunction = false;
+
+        bool insertSuccess, notShadowing;
+        tie(insertSuccess, notShadowing) = result;
+        if (!insertSuccess && !s->isFunction) {
+            outputError("Already exists", "Variable already exists on this scope.", false);
+        } else if (!notShadowing) {
+            outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+        }
     }
-
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 

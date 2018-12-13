@@ -1481,28 +1481,42 @@ int ArrayNode::getNodeType() {
 }
 
 string ArrayNode::walk() {
-    string s4 = getFileLine(lineNum);
-    string s1 = "t" + to_string(registerCnt++);
-    string name = getChildren().front()->getName();
-    cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
-    vector<string> v = {"ADDR", name, "---", s1};
-    vector<string> v4 = {"COMMENT: ", s4};
-    main3ac.push_back(v4);
-    main3ac.push_back(v);
-    //s1 is the base address
-    string s2 = "t" + to_string(registerCnt++);
-    string index_offset = to_string(getChildren().back()->getVal());
-    string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
-    cout << "STAR " << index_offset << " " << size_of << " " << s2 << "     #" << s4 << endl;
-    vector<string> v2 = {"STAR", index_offset, size_of, s2};
-    main3ac.push_back(v4);
-    main3ac.push_back(v2);
-    //s2 is the offset
-    string s3 = "t" + to_string(registerCnt++);
-    cout << "PLUS " << s1 << " " << s2 << " " << s3 << "     #" << s4 << endl;
-    vector<string> v3 = {"PLUS", s1, s2, s3};
-    main3ac.push_back(v4);
-    main3ac.push_back(v3);
+    if(sizeList.empty()) //if one dimensional array
+    {
+        string s4 = getFileLine(lineNum);
+        string s1 = "t" + to_string(registerCnt++);
+        string name = getChildren().front()->getName();
+        cout << "ADDR " << name << " " << s1 << "     #" << s4 << endl;
+        vector<string> v = {"ADDR", name, "---", s1};
+        vector<string> v4 = {"COMMENT: ", s4};
+        main3ac.push_back(v4);
+        main3ac.push_back(v);
+        //s1 is the base address
+        string s2 = "t" + to_string(registerCnt++);
+        string index_offset = to_string(getChildren().back()->getVal());
+        string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
+        cout << "STAR " << index_offset << " " << size_of << " " << s2 << "     #" << s4 << endl;
+        vector<string> v2 = {"STAR", index_offset, size_of, s2};
+        main3ac.push_back(v4);
+        main3ac.push_back(v2);
+        //s2 is the offset
+        string s3 = "t" + to_string(registerCnt++);
+        cout << "PLUS " << s1 << " " << s2 << " " << s3 << "     #" << s4 << endl;
+        vector<string> v3 = {"PLUS", s1, s2, s3};
+        main3ac.push_back(v4);
+        main3ac.push_back(v3);
+        return s3;
+    }
+    else { //if not one dimensional array
+        string s1 = "t" + to_string(registerCnt++); //temp register
+        string name = getChildren().front()->getName(); //name of array
+        string s2 = getFileLine(lineNum);
+        cout << "ADDR " << name << " " << s1 << "     #" << s2 << endl;
+        vector<string> v = {"ADDR", name, "---", s1};
+        vector<string> v4 = {"COMMENT: ", s2};
+
+
+    }
     /* todo multidimensional arrays
     string s2;
     string s3;
@@ -1514,7 +1528,6 @@ string ArrayNode::walk() {
         cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
     }
     */
-    return s3;
 }
 
 /**
