@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <utility>
 #include <iomanip>
 
 #include "include/tree.hh"
@@ -39,6 +39,7 @@ public:
     virtual int getDimensions();
     virtual list<ASTNode*> getSizes();
     virtual int getVal();
+    virtual list<pair<string, set<int>>> getArgs();
     virtual string walk();
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
     static void output3ac();
@@ -184,6 +185,7 @@ class FuncNode : public TypeNode {
 public:
     FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
     string getName() override;
+    list<pair<string, set<int>>> getArgs() override;
     int getNodeType() override;
 private:
     SymbolTableNode2 * symbolTableNode2;

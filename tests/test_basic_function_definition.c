@@ -4,6 +4,6 @@ int testFunc(int x, char b){
     return 0;
 }
 
-int testFuncc(){
-
+int main() {
+    return 0;
 }
