@@ -1,5 +1,7 @@
-void writechar(char c) { }
-void writeint(int i) { }
+#include <stdio.h>
+
+void writechar(char c) { printf("%c", c);};
+void writeint(int i) { printf("%d", i);};
 
 int main()
 {
