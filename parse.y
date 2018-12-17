@@ -1261,9 +1261,16 @@ postfix_expression
 	//postfix_expression can be a variable or array as far as i care
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
-    //todo testing
-    cout << "NAME NAME NAME" << nodeTypeToString($1->getNodeType()) << endl;
-    $$ = new ArrayNode($1, sizes); //1D case
+    if ($1->getChildren().empty()) {
+    //$1 is an identifier
+    cerr << "THIS HAPPENED" << endl;
+    	$$ = new ArrayNode($1, sizes);
+    } else {
+    //$1 is an array
+    cerr << "HAVALAVA" << endl;
+        $$ = new ArrayNode($1->getChildren().front(), sizes);
+    }
+
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 
 	| postfix_expression OPENPAR CLOSEPAR {
@@ -1388,6 +1395,7 @@ identifier
     tie(it, status) = result;
     if (status != "not") {
         $$->setSymbolNode(it);
+        cerr << "FOUND IN THE SYM TABLE" << endl;
     }
 	handleProd("identifier -> IDENTIFIER\n");}
 	;

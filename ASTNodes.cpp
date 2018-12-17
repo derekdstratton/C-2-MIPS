@@ -299,6 +299,12 @@ int ASTNode::getVal() {
     return -1;
 }
 
+list<int> ASTNode::getSizeList() {
+    cerr << "SIZE LIST SAYS WHAT" << endl;
+    list<int> k;
+    return k;
+}
+
 int IdentifierNode::getVal() {
     return atoi(identifier.c_str());
 }
@@ -456,28 +462,36 @@ string ArrayNode::walk() {
     main3ac.push_back(v4);
     main3ac.push_back(v);
     //s1 is the base address
+
+
     string s2 = "$t" + to_string(registerCnt++ % 10);
-    string index_offset = getChildren().back()->walk();
+    //string index_offset = getChildren().back()->walk();
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
-    vector<string> v2 = {"STAR", index_offset, size_of, s2};
-    main3ac.push_back(v4);
-    main3ac.push_back(v2);
+    //todo WHY ON EARTH DOES THE IDENTIFIER NODE CHILD SOMETIMES HAVE THE SIZE/TYPE DATA AND SOMETIMES NOT
+
+    //vector<string> v2 = {"STAR", index_offset, size_of, s2};
+    //main3ac.push_back(v4);
+    //main3ac.push_back(v2);
     //s2 is the offset
+
+    //s2 to compute the offset
+    int i = getChildren().front()->getDimensions();
+    cerr << "DIMENSIONS: " << i << endl;
+    for (auto sizeIndex : sizeList) {
+        auto reverse_it = getChildren().front()->getSizeList().rend();
+        while (i > 1) {
+            cerr << *reverse_it << " ";
+            i--;
+        }
+        cerr << sizeIndex->walk() << endl;
+    }
+    cerr << "MULTIPLY ALL OF THAT BY " << size_of << endl;
+
+    //base + offset
     string s3 = "$t" + to_string(registerCnt++ % 10);
     vector<string> v3 = {"PLUS", s1, s2, s3};
     main3ac.push_back(v4);
     main3ac.push_back(v3);
-    /* multidimensional arrays should go here, put algorithm here
-    string s2;
-    string s3;
-    for (auto x : sizeList) {
-        s2 = "t" + to_string(registerCnt++);
-        cout << "MUL " << x->getVal() << " " << getByteSize(getChildren().front()->getTypes()) << " " << s2 << endl;
-        //s2 is the offset
-        s3 = "t" + to_string(registerCnt++);
-        cout << "PLUS " << s1 << " " << s2 << " " << s3 << endl;
-    }
-    */
     return s3;
 }
 
@@ -1694,6 +1708,10 @@ int IdentifierNode::getNodeType() {
 string IdentifierNode::walk() {
     string s = to_string(currentFuncOffsets[identifier]);
     return s + "($fp)";
+}
+
+list<int> IdentifierNode::getSizeList() {
+    return sizeList;
 }
 
 /**
