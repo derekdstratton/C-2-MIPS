@@ -1,0 +1,5 @@
+    char x;
+         ^ Already exists
+Error on line 6 (column 10): Variable already exists on this scope.
+
+Process finished with exit code 0

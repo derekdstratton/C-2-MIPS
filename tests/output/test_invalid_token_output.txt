@@ -1,0 +1,5 @@
+    @;
+    ^ Invalid
+Error on line 2 (column 5): Invalid character
+
+Process finished with exit code 0

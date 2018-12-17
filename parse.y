@@ -849,7 +849,8 @@ compound_statement
 	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
-    while (!assignNodes.empty()) {
+    while (!assignNodes.empty()) { //TODO IMPORTANT: THIS PRODUCTION DOES NOT GO HERE. IT MUST GO WITH STATEMENT, NOT COMPOUND ONLY
+        cerr << "THIS NEEDS TO HAPPEN LOL" << endl;
         auto right = assignNodes.top();
         assignNodes.pop();
         auto left = assignNodes.top();
@@ -1189,10 +1190,12 @@ unary_expression
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
-	$$ = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> INC_OP unary_expression\n");}
 	| DEC_OP unary_expression {
-	$$ = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> DEC_OP unary_expression\n");}
 	| unary_operator cast_expression {
 	switch($1) {
@@ -1258,7 +1261,16 @@ postfix_expression
 	//postfix_expression can be a variable or array as far as i care
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
-    $$ = new ArrayNode(idNode, sizes); //1D case
+    if ($1->getChildren().empty()) {
+    //$1 is an identifier
+    cerr << "THIS HAPPENED" << endl;
+    	$$ = new ArrayNode($1, sizes);
+    } else {
+    //$1 is an array
+    cerr << "HAVALAVA" << endl;
+        $$ = new ArrayNode($1->getChildren().front(), sizes);
+    }
+
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 
 	| postfix_expression OPENPAR CLOSEPAR {
@@ -1314,10 +1326,12 @@ postfix_expression
 	$$ = new ASTNode(); //pointers
 	handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
 	| postfix_expression INC_OP {
-	$$ = new BinaryMathNode(PLUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression INC_OP\n");}
 	| postfix_expression DEC_OP {
-	$$ = new BinaryMathNode(MINUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 
@@ -1381,6 +1395,7 @@ identifier
     tie(it, status) = result;
     if (status != "not") {
         $$->setSymbolNode(it);
+        cerr << "FOUND IN THE SYM TABLE" << endl;
     }
 	handleProd("identifier -> IDENTIFIER\n");}
 	;
