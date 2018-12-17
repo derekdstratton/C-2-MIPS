@@ -849,7 +849,8 @@ compound_statement
 	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
-    while (!assignNodes.empty()) {
+    while (!assignNodes.empty()) { //TODO IMPORTANT: THIS PRODUCTION DOES NOT GO HERE. IT MUST GO WITH STATEMENT, NOT COMPOUND ONLY
+        cerr << "THIS NEEDS TO HAPPEN LOL" << endl;
         auto right = assignNodes.top();
         assignNodes.pop();
         auto left = assignNodes.top();
@@ -1260,7 +1261,9 @@ postfix_expression
 	//postfix_expression can be a variable or array as far as i care
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
-    $$ = new ArrayNode(idNode, sizes); //1D case
+    //todo testing
+    cout << "NAME NAME NAME" << nodeTypeToString($1->getNodeType()) << endl;
+    $$ = new ArrayNode($1, sizes); //1D case
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 
 	| postfix_expression OPENPAR CLOSEPAR {

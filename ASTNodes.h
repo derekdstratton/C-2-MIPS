@@ -304,6 +304,7 @@ public:
     void setSymbolNode(SymbolTableNode2* symtblnd2) override;
     int getDimensions() override;
     int getNodeType() override;
+    int getVal() override;
 private:
     SymbolTableNode2 * symbolTableNode2;
     string identifier;
