@@ -1,0 +1,5 @@
+    float x = 1.999999999999999999999999999999999999999999999999;
+              ^ Too long
+Warning on line 2 (column 15): Floating Constant too long.
+
+Process finished with exit code 0

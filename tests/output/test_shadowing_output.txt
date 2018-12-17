@@ -1,0 +1,5 @@
+    float x;
+          ^ Already exists
+Warning on line 3 (column 11): Shadowing an identifier from an outer scope.
+
+Process finished with exit code 0
