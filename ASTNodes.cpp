@@ -1,7 +1,5 @@
 #include <utility>
 
-#include <utility>
-
 //Include statements
 
 #include "ASTNodes.h"
@@ -275,6 +273,11 @@ int ASTNode::getNodeType() {
     return ASTNODE;
 }
 
+list<pair<string, set<int>>> ASTNode::getArgs() {
+    cerr << "HOLY ROLI THE RIGALONI" << endl;
+    list<pair<string, set<int>>> a;
+    return a;
+}
 /**
  *
  * @return
@@ -441,7 +444,7 @@ int ArrayNode::getNodeType() {
  */
 string ArrayNode::walk() {
     string s4 = getFileLine(lineNum);
-    string s1 = "$t" + to_string(registerCnt++);
+    string s1 = "$t" + to_string(registerCnt++ % 10);
     int baseOffset = currentFuncOffsets.at(getChildren().front()->getName());
     string name = to_string(baseOffset) + "($fp)";
     vector<string> v = {"ADDR", name, "---", s1};
@@ -449,7 +452,7 @@ string ArrayNode::walk() {
     main3ac.push_back(v4);
     main3ac.push_back(v);
     //s1 is the base address
-    string s2 = "$t" + to_string(registerCnt++);
+    string s2 = "$t" + to_string(registerCnt++ % 10);
     string index_offset = to_string(getChildren().back()->getVal());
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
     vector<string> v2 = {"STAR", index_offset, size_of, s2};
@@ -541,12 +544,12 @@ int AssignNode::getNodeType() {
  */
 string AssignNode::walk() {
     string s1 = "ASSIGN";
-    if (getChildren().back()->getNodeType() == INTNODE) {
-        s1 = "ASSIGNI"; //load immediately in assembly
-    }
     string s2 = getChildren().back()->walk();
     string s3 = getChildren().front()->walk();
     string s4;
+    if (getChildren().front()->getNodeType() == ARRAYNODE) {
+        s3 = "(" + s3 + ")";
+    }
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         s2 = "(" + s2 + ")";
     }
@@ -658,7 +661,7 @@ string BinaryMathNode::walk() {
             getChildren().back()->getTypes().count(298) || getChildren().back()->getTypes().count(299))
         s4 = "$f" + to_string(floatRegisterCnt++);
     else
-        s4 = "$t" + to_string(registerCnt++);
+        s4 = "$t" + to_string(registerCnt++ % 10);
 
     string s5;
 
@@ -782,7 +785,7 @@ string CastNode::walk(){//only need to cast in 3ac if between double/float and a
     }
     else{
         s1 = getChildren().back()->walk();
-        s2 = "$t" + to_string(registerCnt++);
+        s2 = "$t" + to_string(registerCnt++ % 10);
         v = {"ASSIGN", s1, "---", s2};
     }
     vector<string> v2;
@@ -886,7 +889,7 @@ string ForNode::walk() {
             list_copy.pop_front();
         string s1 = "BREQ";
         string s2 = list_copy.front()->walk();
-        string s3 = "0";
+        string s3 = "$zero";
         vector<string> v5 = {s1, s2, s3, endLabel};
         main3ac.push_back(v5);
     }
@@ -926,6 +929,7 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
     {
         case 0: {
             paramTypes = types;
+            args = move(arguments);
             break;
         }
         case 1: {
@@ -944,6 +948,10 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
         default:
             break;
     }
+}
+
+list<pair<string, set<int>>> FuncNode::getArgs(){
+    return args;
 }
 
 /**
@@ -988,7 +996,7 @@ void FuncNode::printNode(std::ostream &os) const{
  * @brief function that returns the name of a funcnode
  *
  */
-string FuncNode:: getName(){
+string FuncNode::getName(){
     return funcName;
 }
 
@@ -1012,6 +1020,8 @@ string FuncNode::walk() {
         case 1: {
             stackCnt = 0;
             currentFuncOffsets.clear();
+            vector<string> v9 = {"COMMENT", "Function: " + funcName, "---", "---"};
+            main3ac.push_back(v9);
             vector<string> v = {"LABEL", funcName, "---", "---"};
             main3ac.push_back(v);
 
@@ -1057,7 +1067,7 @@ string FuncNode::walk() {
             vector<string> v2 = {"CALL", funcName, "---", "---"};
             main3ac.push_back(v2);
 
-            string s = "$t" + to_string(registerCnt++);
+            string s = "$t" + to_string(registerCnt++ % 10);
             string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
             vector<string> v3 = {"ASSIGN", s2 + "($fp)", "---", s};
             main3ac.push_back(v3);
@@ -1135,7 +1145,7 @@ int IfNode::getNodeType() {
 string IfNode::walk() {
     string s1 = "BREQ";
     string s2 = getChildren().front()->walk();
-    string s3 = "0";
+    string s3 = "$zero";
     string s4 = "l" + to_string(labelCnt++);
     string s5;
     s5 = getFileLine(getChildren().front()->getLineNum());
@@ -1190,7 +1200,7 @@ string LogicalNode::walk() {
     string s1 = tokenToString2(nodeType);
     string s2 = getChildren().front()->walk();
     string s3 = getChildren().back()->walk();
-    string s4 = "$t" + to_string(registerCnt++);
+    string s4 = "$t" + to_string(registerCnt++ % 10);
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
     return s4;
@@ -1268,7 +1278,7 @@ string RelationalNode::walk() {
     string s2 = list_copy.front()->walk();
     list_copy.pop_front();
     string s3 = list_copy.front()->walk();
-    string s4 = "$t" + to_string(registerCnt++);
+    string s4 = "$t" + to_string(registerCnt++ % 10);
     string s5;
     s5 = getFileLine(lineNum);
     vector<string> v2 = {"COMMENT", s5};
@@ -1317,17 +1327,17 @@ int ReturnNode::getNodeType() {
  * @return
  */
 string ReturnNode::walk() {
+    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
+    main3ac.push_back(v2);
 
     if (getChildren().front()->getNodeType() != NONENODE) {
         string ret = getChildren().front()->walk();
-        vector<string> v = {"PUSHRETURN", ret, "---", "---"};
+        string return_address = to_string(stackCnt) + "($fp)";
+        vector<string> v = {"PUSHRETURN", ret, return_address, "---"};
         main3ac.push_back(v);
         currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
         stackCnt += getByteSize(getChildren().front()->getTypes());
     }
-    vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
-    main3ac.push_back(v2);
-
     return "";
 }
 
@@ -1423,16 +1433,21 @@ int SeqNode::getNodeType() {
 string SeqNode::walk() {
     switch(seqType) {
         case 'g': {
+            vector<string> v9 = {"COMMENT", "START OF PROGRAM", "---", "---"};
+            main3ac.push_back(v9);
             vector<string> v0 = {"ALLOCATE", "TODO", "---", "---"};
             main3ac.push_back(v0);
             int allocateLine = main3ac.size()-1;
             vector<string> v = {"CALL", "main", "---", "---"};
             main3ac.push_back(v);
-            vector<string> v2 = {"HALT", "---", "---", "---"};
-            main3ac.push_back(v2);
+            vector<string> v8 = {"COMMENT", "END OF PROGRAM", "---", "---"};
+            main3ac.push_back(v8);
+            //TODO I could put an ASSIGN here to show "process finished with exit code 0 :] :]
             vector<string> v3 = {"DEALLOCATE", "TODO", "---", "---"};
             main3ac.push_back(v3);
             int deallocateLine = main3ac.size()-1;
+            vector<string> v2 = {"HALT", "---", "---", "---"};
+            main3ac.push_back(v2);
             for (auto x : getChildren()) {
                 x->walk();
             }
@@ -1567,7 +1582,7 @@ string WhileNode::walk() {
 
     string s1 = "BREQ";
     string s2;
-    string s3 = "0";
+    string s3 = "$zero";
     string s4;
 
     if (!doo) {

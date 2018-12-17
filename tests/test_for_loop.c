@@ -1,7 +1,8 @@
 int main(){
     int i;
+    int j;
     for(i = 0; i < 3; i++)
     {
-        i = i + 1;
+        j = i + 2;
     }
 }

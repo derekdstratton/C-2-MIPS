@@ -197,21 +197,27 @@ function_definition
 	types.push_back($1->getTypes());
 	list<ASTNode*> tmpList;
 	tmpList.push_back($3);
-	$$ = new FuncNode($2->getName(), types, tmpList, definitionList, 1);
+	$$ = new FuncNode($2->getName(), types, tmpList, $2->getArgs(), 1);
 	isFunction = true;
     tuple<SymbolTableNode2*, string> result = getTable()->search($2->getName());
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-    if(status != "not") //was found, means prototype is in here
+    if(status != "not") //was found, means prototype/defined function is in here
     {
-        if(it->defined == 1)
+        cout << "found another in symbol: " << it->identifier << it->defined << endl;
+        if((it->defined) == true)//function already defined
         {
             cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
             exit(0);
         }
         else
-            it->defined = 1;
+        {
+            cout << "setting " << it->identifier << " to true" << endl;
+            it->defined = true;
+            getTable()->change($2->getName(), *it);
+            //idNode->setSymbolNode(it); //todo
+        }
     }
     else
     {
@@ -220,7 +226,7 @@ function_definition
         SymbolTableNode2* s = new SymbolTableNode2($2->getName(), x, size_decl_list, isFunction, paramList, 1);
         idNode->setSymbolNode(s);
         //now insert it into the symbol table
-        pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
+        pair<string, SymbolTableNode2> entry = make_pair($2->getName(),*s);
         tuple<bool, bool> result = getTable()->insert(entry);
         //now you also need to make sure the identifier node has the symbol table node stuff
         size_decl_list.clear(); //reset this too
@@ -254,6 +260,8 @@ declaration
 
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
+	cout << "Name" << name << endl;
+
     set<int> x = $1->getTypes();
     SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, isFunction, paramList, 0);
     idNode->setSymbolNode(s);
@@ -261,17 +269,19 @@ declaration
     pair<string, SymbolTableNode2> entry = make_pair(name,*s);
     tuple<bool, bool> result = getTable()->insert(entry);
     //now you also need to make sure the identifier node has the symbol table node stuff
-	$$ = new DeclNode($1, $2);
-	size_decl_list.clear(); //reset this too
-	paramList.clear();
-	isFunction = false;
+    $$ = new DeclNode($1, $2);
+
+
     bool insertSuccess, notShadowing;
     tie(insertSuccess, notShadowing) = result;
-    if (!insertSuccess) {
+    if (!insertSuccess && !s->isFunction) {
         outputError("Already exists", "Variable already exists on this scope.", false);
     } else if (!notShadowing) {
         outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
     }
+    size_decl_list.clear(); //reset this too
+    paramList.clear();
+    isFunction = false;
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
@@ -558,7 +568,11 @@ direct_declarator
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 
 	| direct_declarator OPENPAR CLOSEPAR {
+	isFunction = true;
 	list<ASTNode*> empty;
+    list<pair<string, set<int>>> args;
+	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
+	/*list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
 	isFunction = true;
@@ -569,9 +583,14 @@ direct_declarator
     tie(it, status) = result;
     if(status != "not") //another function was found
     {
-        cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-        exit(0);
-        outputError("Bad function", "Function already exists", false);
+        cout << "found another function same as prototype" << endl;
+        if(it->defined == 1)//if the found function has been defined already
+        {
+            cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+            exit(0);
+        }
+        //outputError("Bad function", "Function already exists", false);
+        //cout << "WOAH NELLY" << endl; //todo throw error
     }
     else
     {
@@ -585,13 +604,14 @@ direct_declarator
         size_decl_list.clear(); //reset this too
     }
     paramList.clear();
-    isFunction = false;
+    isFunction = false;*/
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
+	//cout << "PROTOTYPE PROTOTYPE" << endl;
 	list<ASTNode*> empty;
 	list<pair<string, set<int>>> args;
-	$$ = new FuncNode($1->getName(), paramList, empty, args, 0);
+	$$ = new FuncNode($1->getName(), paramList, empty, definitionList, 0);
 	isFunction = true;
 
 	tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
@@ -600,9 +620,12 @@ direct_declarator
     tie(it, status) = result;
         if(status != "not") //another function was found
         {
-            cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-            exit(0);
-            outputError("Bad function", "Function already exists", false);
+            cout << "found another function same as prototype" << endl;
+            if(it->defined == 1)//if the found function has been defined already
+                {
+                        cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+                        exit(0); //todo throw error?
+                }
         }
         else
         {
@@ -617,6 +640,7 @@ direct_declarator
         }
     paramList.clear();
     isFunction = false;
+    definitionList.clear();
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
@@ -1165,10 +1189,12 @@ unary_expression
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
-	$$ = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> INC_OP unary_expression\n");}
 	| DEC_OP unary_expression {
-	$$ = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> DEC_OP unary_expression\n");}
 	| unary_operator cast_expression {
 	switch($1) {
@@ -1242,9 +1268,9 @@ postfix_expression
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-	if(status == "not")
+	if(status == "not") //a function of the same name was not found
 	{
-	    cerr << "FUNCTION NOT FOUND" << endl;
+	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
 	    exit(0);
 	}
 	else if(status != "not")
@@ -1290,10 +1316,12 @@ postfix_expression
 	$$ = new ASTNode(); //pointers
 	handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
 	| postfix_expression INC_OP {
-	$$ = new BinaryMathNode(PLUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression INC_OP\n");}
 	| postfix_expression DEC_OP {
-	$$ = new BinaryMathNode(MINUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 
@@ -1349,6 +1377,7 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode($1);
+	cout << "ID: " << *$1 << endl;
 	idNode = $$;
 	tuple<SymbolTableNode2*, string> result = getTable()->search(*$1);
     SymbolTableNode2* it;
