@@ -107,6 +107,8 @@ void generateMIPS(vector<vector<string>> tac) {
         }
 
         if (line[0] == "RETURN") {
+            string s = to_string(registerCnt++);
+            mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
             mips << "\tjr $ra" << endl;
         }
 
@@ -118,11 +120,11 @@ void generateMIPS(vector<vector<string>> tac) {
         if (line[0] == "PUSHPARAM") { //todo
             string tmp = "$s" + to_string(registerCnt++ % 8);
             mips << "\t" << "li " << tmp << ", " << line[1] << endl;
-            mips << "\tmove " << line[2] << ", " << tmp << endl;
+            mips << "\tsw " << tmp << ", " << line[2] << endl;
         }
 
         if (line[0] == "PUSHRA") {
-            mips << "\tmove " << "($fp)" << ", " << "$ra" << endl;
+            mips << "\tsw " << "$ra" << ", " << "($fp)" << endl;
         }
 
         if (line[0] == "HALT") {

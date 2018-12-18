@@ -197,9 +197,15 @@ function_definition
 	list<set<int>> types;
 	list<ASTNode*> tmpList;
 	types.push_back($1->getTypes());
-
 	tmpList.push_back($3);
 	$$ = new FuncNode($2->getName(), types, tmpList, definitionList, 1);
+	tuple<SymbolTableNode2*, string> searchResult = getTable()->search($2->getName());
+    SymbolTableNode2* it;
+    string status;
+    tie(it, status) = searchResult;
+    it->types = $1->getTypes();
+    //cout << "BIG BOI " << it->identifier << *(it->types.begin()) << endl;
+	getTable()->change($2->getName(), *it);
     paramList.clear();
     definitionList.clear();
     getTable()->popLevel();
@@ -625,7 +631,6 @@ direct_declarator
         }*/
     paramList.clear();
     isFunction = false;
-    definitionList.clear();
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
@@ -1290,6 +1295,7 @@ postfix_expression
 	list<ASTNode*> empty2;
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), empty, empty2, args, 2);
+	$$->setTypes(it->types);
 	handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
 
 	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {
@@ -1326,6 +1332,7 @@ postfix_expression
 	tmpList.push_back($3);
 	list<pair<string, set<int>>> args;
 	$$ = new FuncNode($1->getName(), types, tmpList, args, 2);
+	$$->setTypes(it->types);
 	handleProd("postfix_expression -> postfix_expression OPENPAR argument_expression_list CLOSEPAR\n");}
 
 	| postfix_expression PERIOD identifier {

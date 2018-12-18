@@ -42,6 +42,7 @@ public:
     virtual list<pair<string, set<int>>> getArgs();
     virtual string walk();
     virtual list<int> getSizeList();
+    virtual void setTypes(set<int> copy);
     friend std::ostream& operator<<(std::ostream& os, const ASTNode& node);
     static void output3ac();
     static vector<vector<string>> get3ac();
@@ -188,6 +189,7 @@ public:
     string getName() override;
     list<pair<string, set<int>>> getArgs() override;
     int getNodeType() override;
+    void setTypes(set<int> copy) override;
 private:
     SymbolTableNode2 * symbolTableNode2;
     string funcName;

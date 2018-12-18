@@ -122,6 +122,11 @@ set<int> ASTNode::getTypes() {
     return fail;
 }
 
+void ASTNode::setTypes(set<int> copy){
+    cerr << "IF YOU'RE SEEING THIS TAMALE" << endl;
+    return;
+}
+
 /**
  *
  * @return
@@ -544,6 +549,7 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
 
     set<int> leftSet = lvalue->getTypes();
     set<int> rightSet = rvalue->getTypes();
+        //todo make sure this type works for function call nodes
 
     //Implicit casting
     int ret = compareForCast(leftSet, rightSet);
@@ -1010,7 +1016,7 @@ list<pair<string, set<int>>> FuncNode::getArgs(){
 void FuncNode::printNode(std::ostream &os) const{
     switch(funcType)
     {
-        case 0: {
+        /*case 0: {
             os << "FUNCTION_PROTOTYPE_" << funcName;
             for (const auto &paramType : paramTypes) {
                 os << "_";
@@ -1018,7 +1024,7 @@ void FuncNode::printNode(std::ostream &os) const{
                     os << tokenToString2(ite);
             }
             break;
-        }
+        }*/
         case 1: {
             os << "FUNCTION_DEFINITION_" << funcName;
             for (const auto &arg : args) {
@@ -1052,6 +1058,10 @@ string FuncNode::getName(){
  */
 int FuncNode::getNodeType() {
     return FUNCNODE;
+}
+
+void FuncNode::setTypes(set<int> copy) {
+    types = copy;
 }
 
 /**
@@ -1113,7 +1123,7 @@ string FuncNode::walk() {
                 return reg;
             }
             int stackSpace = 0;
-            for (const auto &item : paramTypes) {
+            for (const auto &item : paramTypes) { //todo this is porbably sketchy
                 stackSpace += getByteSize(item);
             }
             stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
@@ -1127,14 +1137,16 @@ string FuncNode::walk() {
             main3ac.push_back(v7);
 
             int k = 0;
-            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
-                string ret = a->walk();
-                //todo this k thing here is basically assuming all the parameters are word length.
-                //i don't know how we would get the info we need for an array, so array parameters would
-                //need a lot of work right here if we want that
-                k += 4;
-                vector<string> v2 = {"PUSHPARAM", ret, to_string(k) + "($fp)", "---"};
-                main3ac.push_back(v2);
+            if (!getChildren().empty()) {
+                for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
+                    string ret = a->walk();
+                    //todo this k thing here is basically assuming all the parameters are word length.
+                    //i don't know how we would get the info we need for an array, so array parameters would
+                    //need a lot of work right here if we want that
+                    k += 4;
+                    vector<string> v2 = {"PUSHPARAM", ret, to_string(k) + "($fp)", "---"};
+                    main3ac.push_back(v2);
+                }
             }
             vector<string> v2 = {"CALL", funcName, "---", "---"};
             main3ac.push_back(v2);
