@@ -193,53 +193,17 @@ function_definition
 	handleProd("function_definition -> declarator declaration_list compound_statement\n");}
 
 	| declaration_specifiers declarator compound_statement {
+
 	list<set<int>> types;
-	types.push_back($1->getTypes());
 	list<ASTNode*> tmpList;
+	types.push_back($1->getTypes());
+
 	tmpList.push_back($3);
 	$$ = new FuncNode($2->getName(), types, tmpList, definitionList, 1);
-	isFunction = true;
-    tuple<SymbolTableNode2*, string> result = getTable()->search($2->getName());
-    SymbolTableNode2* it;
-    string status;
-    tie(it, status) = result;
-
-    if(status != "not") //was found, means prototype is in here
-    {
-        if(it->defined == 1)
-        {
-            cerr << "Error on line " << yylineno << ": Trying to redeclare a function." << endl;
-            exit(0);
-        }
-        else
-            it->defined = 1;
-    }
-    else
-    {
-        cout << "INSERTING NEW DEFINITION" << endl;
-        set<int> x;
-        cout << "CORRECT INSERT IS " << $2->getName() << endl;
-        SymbolTableNode2* s = new SymbolTableNode2($2->getName(), x, size_decl_list, 1, paramList, 1);
-        idNode->setSymbolNode(s);
-        //now insert it into the symbol table
-        pair<string, SymbolTableNode2> entry = make_pair($2->getName(),*s);
-        tuple<bool, bool> result = getTable()->insert(entry);
-        //cout << *getTable() << endl;
-        //now you also need to make sure the identifier node has the symbol table node stuff
-        size_decl_list.clear(); //reset this too
-
-        bool insertSuccess, notShadowing;
-        tie(insertSuccess, notShadowing) = result;
-        if (!insertSuccess) {
-            outputError("Already exists", "Variable already exists on this scope.", false);
-        } else if (!notShadowing) {
-            outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
-        }
-    }
-    isFunction = false;
     paramList.clear();
     definitionList.clear();
     getTable()->popLevel();
+    //cout << *getTable() << endl;
 	handleProd("function_definition -> declaration_specifiers declarator compound_statement\n");}
 
 	| declaration_specifiers declarator declaration_list compound_statement {
@@ -556,14 +520,28 @@ direct_declarator
 	handleProd("direct_declarator -> direct_declarator OPENSQ constant_expression CLOSSQ\n");}
 
 	| direct_declarator OPENPAR CLOSEPAR {
-	list<ASTNode*> empty;
-	list<set<int>> empty2;
-	set<int> x;
-	list<pair<string, set<int>>> args;
-	$$ = new FuncNode($1->getName(), empty2, empty, args, 0);
 
-	getTable()->pushLevel();
-    SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, isFunction, paramList, 0);
+	tuple<SymbolTableNode2*, string> searchResult = getTable()->search($1->getName());
+	SymbolTableNode2* it;
+	string status;
+	tie(it, status) = searchResult;
+
+	if(status != "not") //was found, means another of the same name is here
+	{
+		cerr << "Duplicate function definition at line " << yylineno << endl;
+		exit(EXIT_FAILURE);
+	}
+
+    list<set<int>> empty;
+	list<ASTNode*> empty2;
+    list<pair<string, set<int>>> empty3;
+	set<int> x;
+	//SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc, list<set<int>> params, bool Defined);
+	//FuncNode(string name, list<set<int>> types, list<ASTNode*> children, list<pair<string, set<int>>> arguments, int type);
+	$$ = new FuncNode($1->getName(), empty, empty2, empty3, 0);
+
+	//getTable()->pushLevel();
+    SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, true, paramList, false);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
     pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
@@ -571,53 +549,42 @@ direct_declarator
     //now you also need to make sure the identifier node has the symbol table node stuff
     size_decl_list.clear(); //reset this too
 
-	/*cout << *getTable() << endl;
-	getTable()->swapLevels();
-	cout << *getTable() << endl;*/
-
-	/*
-    tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
-    SymbolTableNode2* it;
-    string status;
-    tie(it, status) = result;
-    if(status != "not") //another function was found
-    {
-        cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-        exit(0);
-        outputError("Bad function", "Function already exists", false);
-    }
-    else
-    {
-        set<int> x;
-        SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, isFunction, paramList, 0);
-        idNode->setSymbolNode(s);
-        //now insert it into the symbol table
-        pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
-        tuple<bool, bool> result = getTable()->insert(entry);
-        //now you also need to make sure the identifier node has the symbol table node stuff
-        size_decl_list.clear(); //reset this too
-    }*/
     paramList.clear();
     isFunction = false;
 	handleProd("direct_declarator -> direct_declarator OPENPAR CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR parameter_type_list CLOSEPAR {
-	list<ASTNode*> empty;
-	list<pair<string, set<int>>> args;
-	list<set<int>> empty2;
+
+	tuple<SymbolTableNode2*, string> searchResult = getTable()->search($1->getName());
+	SymbolTableNode2* it;
+	string status;
+	tie(it, status) = searchResult;
+
+	if(status != "not") //was found, means another of the same name is here
+	{
+		cerr << "Duplicate function definition at line " << yylineno << endl;
+		exit(EXIT_FAILURE);
+	}
+
+    list<set<int>> empty;
+    list<ASTNode*> empty2;
+    list<pair<string, set<int>>> empty3;
 	set<int> x;
-	$$ = new FuncNode($1->getName(), empty2, empty, args, 0);
+	$$ = new FuncNode($1->getName(), empty, empty2, empty3, 0);
 
 	getTable()->pushLevel();
-    SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, isFunction, paramList, 0);
+    SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, true, paramList, false);
     idNode->setSymbolNode(s);
     //now insert it into the symbol table
     pair<string, SymbolTableNode2> entry = make_pair($1->getName(),*s);
     tuple<bool, bool> result = getTable()->insert(entry);
     //now you also need to make sure the identifier node has the symbol table node stuff
     size_decl_list.clear(); //reset this too
+    //getTable()->swapLevels();
     //cout << *getTable() << endl;
-	//getTable()->swapLevels();
+    //cout << "SWAPPYBOI" << endl << endl;
+    getTable()->swapLevels();
+    //cout << *getTable() << endl;
 	//cout << *getTable() << endl;
 	/*
 	isFunction = true;
@@ -1294,10 +1261,10 @@ postfix_expression
 	    }
 	}
 
-	list<set<int>> types;
-	list<ASTNode*> empty;
+	list<set<int>> empty;
+	list<ASTNode*> empty2;
 	list<pair<string, set<int>>> args;
-	$$ = new FuncNode($1->getName(), types, empty, args, 2);
+	$$ = new FuncNode($1->getName(), empty, empty2, args, 2);
 	handleProd("postfix_expression -> postfix_expression OPENPAR CLOSEPAR\n");}
 
 	| postfix_expression OPENPAR argument_expression_list CLOSEPAR {

@@ -14,11 +14,11 @@ class SymbolTable {
     SymbolTable();
     void swapLevels(){
         auto a = table.front();
-        popLevel();
+        table.pop_front();
         auto b = table.front();
-        popLevel();
-        table.push_front(b);
+        table.pop_front();
         table.push_front(a);
+        table.push_front(b);
     }
     tuple<bool, bool> insert(const pair<string, SymbolTableNode2>& item);
     tuple<SymbolTableNode2*, string> search(const string& key, bool topLevelOnly=false);
