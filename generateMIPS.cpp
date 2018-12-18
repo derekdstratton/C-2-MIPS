@@ -104,11 +104,13 @@ void generateMIPS(vector<vector<string>> tac) {
 
         if (line[0] == "CALL") {
             mips << "\tjal " << line[1] << endl;
+            string s = to_string(registerCnt++);
+            mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
         }
 
         if (line[0] == "RETURN") {
-            string s = to_string(registerCnt++);
-            mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
+            //string s = to_string(registerCnt++);
+            //mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
             mips << "\tjr $ra" << endl;
         }
 
