@@ -536,8 +536,9 @@ direct_declarator
 
 	if(status != "not") //was found, means another of the same name is here
 	{
-		cerr << "Duplicate function definition at line " << yylineno << endl;
-		exit(EXIT_FAILURE);
+        outputError("Already exists", "Trying to redeclare a function", false);
+		/*cerr << "Duplicate function definition at line " << yylineno << endl;
+		exit(EXIT_FAILURE);*/
 	}
 
     list<set<int>> empty;
@@ -570,8 +571,9 @@ direct_declarator
 
 	if(status != "not") //was found, means another of the same name is here
 	{
-		cerr << "Duplicate function definition at line " << yylineno << endl;
-		exit(EXIT_FAILURE);
+        outputError("Already exists", "Trying to redeclare a function", false);
+		/*cerr << "Duplicate function definition at line " << yylineno << endl;
+		exit(EXIT_FAILURE);*/
 	}
 
     list<set<int>> empty;
@@ -1272,14 +1274,16 @@ postfix_expression
 	if(status == "not") //a function of the same name was not found
 	{
 	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
-	    exit(0);
+	    exit(EXIT_FAILURE);
 	}
 	else if(status != "not")
 	{
-	    if(it->defined != 1) {
-	        cerr << "FUNCTION NOT DEFINED AMIGO" << endl;
-	        exit(0);
-	    }
+	    list<set<int>> compareEmpty;
+	    if(compareEmpty != it->paramTypes)
+        {
+	        cerr << "Invalid param types at line " << yylineno << endl;
+	        exit(EXIT_FAILURE);
+        }
 	}
 
 	list<set<int>> empty;
@@ -1293,15 +1297,29 @@ postfix_expression
 
 	list<set<int>> types;
 
-	tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
-    SymbolTableNode2* node;
+    /*for(auto iterator = $3->getChildren().begin(); iterator != $3->getChildren().end(); ++iterator)
+    {
+        types.push_back((*iterator)->getTypes());
+        cout << "ADDING THING TO LIST OF PARAM TYPES: " << *(((*iterator)->getTypes().begin())) << endl;
+    }*/
+    cout << "types size is " << types.size() << endl;
+	//cout << "FIRST ARGUMENT IS " << *($3->getChildren().front()->getTypes().begin()) << endl;
+
+    tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
+    SymbolTableNode2* it;
     string status;
-    tie(node, status) = result;
-    if (status != "not") {
-        types = node->paramTypes;
-    } else {
-        cerr << "FUNCTION NOT FOUND" << endl;
-        exit(0);
+    tie(it, status) = result;
+    if(status == "not") //a function of the same name was not found
+    {
+        cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
+        exit(EXIT_FAILURE);
+    }
+    else if(status != "not")
+    {
+        if(types != it->paramTypes)
+        {
+            //cerr << "Mismatched param types at line " << yylineno << endl;//TODO check function args
+        }
     }
 
 	list<ASTNode*> tmpList;
