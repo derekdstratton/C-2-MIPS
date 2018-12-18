@@ -222,7 +222,6 @@ declaration
 
 	| declaration_specifiers init_declarator_list SEMI {
 	string name = idNode->getName();
-	cout << "NAME IS " << name << endl;
     set<int> x = $1->getTypes();
     SymbolTableNode2* s = new SymbolTableNode2(name, x, size_decl_list, true, paramList, 0);
     idNode->setSymbolNode(s);
@@ -230,10 +229,19 @@ declaration
     pair<string, SymbolTableNode2> entry = make_pair(name,*s);
     tuple<bool, bool> result = getTable()->insert(entry);
     //now you also need to make sure the identifier node has the symbol table node stuff
-	$$ = new DeclNode($1, $2);
-	size_decl_list.clear(); //reset this too
-	paramList.clear();
-	isFunction = false;
+    $$ = new DeclNode($1, $2);
+
+
+    bool insertSuccess, notShadowing;
+    tie(insertSuccess, notShadowing) = result;
+    if (!insertSuccess) { //no need to check if function, function production already checks
+        outputError("Already exists", "Variable already exists on this scope.", false);
+    } else if (!notShadowing) {
+        outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
+    }
+    size_decl_list.clear(); //reset this too
+    paramList.clear();
+    isFunction = false;
 	handleProd("declaration -> declaration_specifiers init_declarator_list SEMI\n");}
 	;
 
@@ -595,9 +603,12 @@ direct_declarator
     tie(it, status) = result;
         if(status != "not") //another function was found
         {
-            cerr << "Error on line " << yylineno << ": Function already exists." << endl;
-            exit(0);
-            outputError("Bad function", "Function already exists", false);
+            cout << "found another function same as prototype" << endl;
+            if(it->defined == 1)//if the found function has been defined already
+                {
+                        cerr << "Error on line " << yylineno << ": Function already defined." << endl;
+                        exit(0); //todo throw error?
+                }
         }
         else
         {
@@ -610,9 +621,9 @@ direct_declarator
             //now you also need to make sure the identifier node has the symbol table node stuff
             size_decl_list.clear(); //reset this too
         }*/
-	//getTable()->swapLevels();
     paramList.clear();
     isFunction = false;
+    definitionList.clear();
 	handleProd("direct_declarator -> direct_declarator OPENPAR parameter_type_list CLOSEPAR\n");}
 
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
@@ -646,7 +657,6 @@ type_qualifier_list
 parameter_type_list
 	: parameter_list {
 	$$ = $1;
-	//getTable()->pushLevel();
 	handleProd("parameter_type_list -> parameter_list\n");}
 	| parameter_list COMMA ELIPSIS {
 	//not handling elipsis
@@ -670,7 +680,6 @@ parameter_declaration
 	paramList.push_back($1->getTypes());
 	list<int> empty;
 	list<set<int>> empty2;
-	auto it = $1->getTypes().begin();
 	pair<string, set<int>> tmpPair ($2->getName(), $1->getTypes());
     definitionList.push_back(tmpPair);
 
@@ -831,7 +840,8 @@ compound_statement
 	$$ = $2;
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
-    while (!assignNodes.empty()) {
+    while (!assignNodes.empty()) { //TODO IMPORTANT: THIS PRODUCTION DOES NOT GO HERE. IT MUST GO WITH STATEMENT, NOT COMPOUND ONLY
+        cerr << "THIS NEEDS TO HAPPEN LOL" << endl;
         auto right = assignNodes.top();
         assignNodes.pop();
         auto left = assignNodes.top();
@@ -1171,10 +1181,12 @@ unary_expression
     $$ = $1;
 	handleProd("unary_expression -> postfix_expression\n");}
 	| INC_OP unary_expression {
-	$$ = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> INC_OP unary_expression\n");}
 	| DEC_OP unary_expression {
-	$$ = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $2, new IntNode(1));
+	$$ = new AssignNode($2, tmp);
 	handleProd("unary_expression -> DEC_OP unary_expression\n");}
 	| unary_operator cast_expression {
 	switch($1) {
@@ -1240,7 +1252,16 @@ postfix_expression
 	//postfix_expression can be a variable or array as far as i care
 	list<ASTNode*> sizes = $1->getSizes();
     sizes.push_back($3);
-    $$ = new ArrayNode(idNode, sizes); //1D case
+    if ($1->getChildren().empty()) {
+    //$1 is an identifier
+    cerr << "THIS HAPPENED" << endl;
+    	$$ = new ArrayNode($1, sizes);
+    } else {
+    //$1 is an array
+    cerr << "HAVALAVA" << endl;
+        $$ = new ArrayNode($1->getChildren().front(), sizes);
+    }
+
 	handleProd("postfix_expression -> postfix_expression OPENSQ expression CLOSSQ\n");}
 
 	| postfix_expression OPENPAR CLOSEPAR {
@@ -1248,9 +1269,9 @@ postfix_expression
     SymbolTableNode2* it;
     string status;
     tie(it, status) = result;
-	if(status == "not")
+	if(status == "not") //a function of the same name was not found
 	{
-	    cerr << "FUNCTION NOT FOUND" << endl;
+	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
 	    exit(0);
 	}
 	else if(status != "not")
@@ -1296,10 +1317,12 @@ postfix_expression
 	$$ = new ASTNode(); //pointers
 	handleProd("postfix_expression -> postfix_expression PTR_OP identifier\n");}
 	| postfix_expression INC_OP {
-	$$ = new BinaryMathNode(PLUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(PLUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression INC_OP\n");}
 	| postfix_expression DEC_OP {
-	$$ = new BinaryMathNode(MINUS, $1, new IntNode(1));
+	auto tmp = new BinaryMathNode(MINUS, $1, new IntNode(1));
+    $$ = new AssignNode($1, tmp);
 	handleProd("postfix_expression -> postfix_expression DEC_OP\n");}
 	;
 
@@ -1355,6 +1378,7 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode($1);
+	cout << "ID: " << *$1 << endl;
 	idNode = $$;
 	tuple<SymbolTableNode2*, string> result = getTable()->search(*$1);
     SymbolTableNode2* it;
@@ -1362,6 +1386,7 @@ identifier
     tie(it, status) = result;
     if (status != "not") {
         $$->setSymbolNode(it);
+        cerr << "FOUND IN THE SYM TABLE" << endl;
     }
 	handleProd("identifier -> IDENTIFIER\n");}
 	;

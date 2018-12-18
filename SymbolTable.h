@@ -12,7 +12,10 @@ using namespace std;
 class SymbolTable {
   public:
     SymbolTable();
-    void swapLevels(){
+    void change(string str, SymbolTableNode2 node) {
+        table.front()[str] = node;
+    }
+    void swapLevels() {
         auto a = table.front();
         table.pop_front();
         auto b = table.front();
