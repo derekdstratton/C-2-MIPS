@@ -1090,6 +1090,28 @@ string FuncNode::walk() {
         }
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
+            if (funcName == "writeint") {
+                vector<string> v = {"WRITEINT", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                main3ac.push_back(v);
+                return "";
+            }
+            if (funcName == "writechar") {
+                vector<string> v = {"WRITECHAR", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                main3ac.push_back(v);
+                return "";
+            }
+            if (funcName == "readint") {
+                string reg = "$t" + to_string(registerCnt++);
+                vector<string> v = {"READINT", reg, "---", "---"};
+                main3ac.push_back(v);
+                return reg;
+            }
+            if (funcName == "readchar") {
+                string reg = "$t" + to_string(registerCnt++);
+                vector<string> v = {"READCHAR", reg, "---", "---"};
+                main3ac.push_back(v);
+                return reg;
+            }
             int stackSpace = 0;
             for (const auto &item : paramTypes) {
                 stackSpace += getByteSize(item);
@@ -1104,10 +1126,14 @@ string FuncNode::walk() {
             //returning from a function
             main3ac.push_back(v7);
 
+            int k = 0;
             for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
                 string ret = a->walk();
-                //todo should the pushparam instruction know the type?
-                vector<string> v2 = {"PUSHPARAM", ret, "---", "---"};
+                //todo this k thing here is basically assuming all the parameters are word length.
+                //i don't know how we would get the info we need for an array, so array parameters would
+                //need a lot of work right here if we want that
+                k += 4;
+                vector<string> v2 = {"PUSHPARAM", ret, to_string(k) + "($fp)", "---"};
                 main3ac.push_back(v2);
             }
             vector<string> v2 = {"CALL", funcName, "---", "---"};

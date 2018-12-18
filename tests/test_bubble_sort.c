@@ -39,6 +39,8 @@ int main()
         }
     }
 
+    !!S
+
     for (i = 0; i < size; i++)
     {
         writeint(arr[i]);

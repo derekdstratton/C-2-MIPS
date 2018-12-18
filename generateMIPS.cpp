@@ -115,6 +115,16 @@ void generateMIPS(vector<vector<string>> tac) {
             mips << "\tsw " << line[1] << ", " << line[2] << endl;
         }
 
+        if (line[0] == "PUSHPARAM") { //todo
+            string tmp = "$s" + to_string(registerCnt++ % 8);
+            mips << "\t" << "li " << tmp << ", " << line[1] << endl;
+            mips << "\tmove " << line[2] << ", " << tmp << endl;
+        }
+
+        if (line[0] == "PUSHRA") {
+            mips << "\tmove " << "($fp)" << ", " << "$ra" << endl;
+        }
+
         if (line[0] == "HALT") {
             mips << "\tli $v0, 10" << endl;
             mips << "\tsyscall" << endl;
@@ -229,6 +239,32 @@ void generateMIPS(vector<vector<string>> tac) {
 
         if (line[0] == "ADDR" ) {
             mips << "\t" << "la " << line[3] << ", " << line[1] << endl;
+        }
+
+        if (line[0] == "WRITEINT" ) {
+            mips << "\t" << "li " << "$v0" << ", " << "1" << endl;
+            line[1] = loadAddress(line[1], mips);
+            mips << "\t" << "move " << "$a0" << ", " << line[1] << endl;
+            mips << "\t" << "syscall" << endl;
+        }
+
+        if (line[0] == "WRITECHAR" ) {
+            mips << "\t" << "li " << "$v0" << ", " << "11" << endl;
+            line[1] = loadAddress(line[1], mips);
+            mips << "\t" << "move " << "$a0" << ", " << line[1] << endl;
+            mips << "\t" << "syscall" << endl;
+        }
+
+        if (line[0] == "READINT" ) {
+            mips << "\t" << "li " << "$v0" << ", " << "5" << endl;
+            mips << "\t" << "syscall" << endl;
+            mips << "\t" << "move " << line[1] << ", " << "$a0" << endl;
+        }
+
+        if (line[0] == "READCHAR" ) {
+            mips << "\t" << "li " << "$v0" << ", " << "12" << endl;
+            mips << "\t" << "syscall" << endl;
+            mips << "\t" << "move " << line[1] << ", " << "$a0" << endl;
         }
     }
 
