@@ -467,10 +467,9 @@ string ArrayNode::walk() {
     //s1 is the base address
 
 
-    string s2 = "$t" + to_string(registerCnt++ % 10);
+    //string s2 = "$t" + to_string(registerCnt++ % 10);
     //string index_offset = getChildren().back()->walk();
     string size_of = to_string(getByteSize(getChildren().front()->getTypes()));
-    //todo WHY ON EARTH DOES THE IDENTIFIER NODE CHILD SOMETIMES HAVE THE SIZE/TYPE DATA AND SOMETIMES NOT
 
     //vector<string> v2 = {"STAR", index_offset, size_of, s2};
     //main3ac.push_back(v4);
@@ -480,19 +479,42 @@ string ArrayNode::walk() {
     //s2 to compute the offset
     int i = getChildren().front()->getDimensions();
     cerr << "DIMENSIONS: " << i << endl;
+    string s5 = "1";
+    string s6;
+    string s7;
+    string s8 = "$zero";
+    string s9;
     for (auto sizeIndex : sizeList) {
-        auto reverse_it = getChildren().front()->getSizeList().rend();
+        s5 = "1";
+        auto list_copy = getChildren().front()->getSizeList();
         while (i > 1) {
-            cerr << *reverse_it << " ";
+            s6 = "$t" + to_string(registerCnt++ % 10);
+            vector<string> v2 = {"STAR", to_string(list_copy.front()), s5, s6};
+            list_copy.pop_front();
+            main3ac.push_back(v2);
+            s5 = s6;
+            //cerr << "THE THING" << to_string(*reverse_it) << " ";
             i--;
+            //reverse_it++;
         }
+        s7 = "$t" + to_string(registerCnt++ % 10);
+        vector<string> v9 = {"STAR", sizeIndex->walk(), s5, s7};
+        main3ac.push_back(v9);
+        s9 = "$t" + to_string(registerCnt++ % 10);
+        vector<string> v10 = {"PLUS", s7, s8, s9};
+        main3ac.push_back(v10);
+        s8 = s9;
         cerr << sizeIndex->walk() << endl;
     }
+    string s10 = "$t" + to_string(registerCnt++ % 10);
+    vector<string> v8 = {"STAR", size_of, s9, s10};
+    main3ac.push_back(v8);
     cerr << "MULTIPLY ALL OF THAT BY " << size_of << endl;
+    //s10 is now that big offset
 
     //base + offset
     string s3 = "$t" + to_string(registerCnt++ % 10);
-    vector<string> v3 = {"PLUS", s1, s2, s3};
+    vector<string> v3 = {"PLUS", s1, s10, s3};
     main3ac.push_back(v4);
     main3ac.push_back(v3);
     return s3;

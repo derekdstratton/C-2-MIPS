@@ -27,7 +27,7 @@ int main()
     while (changed)
     {
         changed = 0;
-        for (i = 0; i < size; i++)
+        for (i = 0; i < size - 1; i++)
         {
             if (arr[i] > arr[i+1])
             {

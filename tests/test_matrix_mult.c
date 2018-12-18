@@ -1,16 +1,29 @@
-void writechar(char c);
-void writein(int i);
+void writechar(char c) { }
+void writeint(int i) { }
 
 int main()
 {
-    int mat1[2][2];
-    int mat2[2][2];
+    int mat_one[2][2];
+    int mat_two[2][2];
     int res[2][2];
-    int i, j, k;
+    int i;
+    int j;
+    int k;
+    int t;
+    int u;
+    int a;
 
-    /* initialize */
+    a = 1;
 
-    /* print */
+    for (i = 0; i < 2; i++)
+    {
+        for (j = 0; j < 2; j++)
+        {
+            mat_one[i][j] = a;
+            mat_two[i][j] = a;
+            a++;
+        }
+    }
 
     for (i = 0; i < 2; i++)
     {
@@ -19,10 +32,12 @@ int main()
             res[i][j] = 0;
             for (k = 0; k < 2; k++)
             {
-                res[i][j] += mat1[i][k] * mat2[k][j];
+                t = mat_one[i][k];
+                u = mat_two[k][j];
+                res[i][j] += t * u;
             }
         }
     }
 
-    /* print */
+    return 0;
 }
