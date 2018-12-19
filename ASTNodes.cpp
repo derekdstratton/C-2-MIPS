@@ -489,7 +489,7 @@ string ArrayNode::walk() {
 
     //s2 to compute the offset
     int i = getChildren().front()->getDimensions();
-    cerr << "DIMENSIONS: " << i << endl;
+    //cerr << "DIMENSIONS: " << i << endl;
     string s5 = "1";
     string s6;
     string s7;
@@ -515,12 +515,12 @@ string ArrayNode::walk() {
         vector<string> v10 = {"PLUS", s7, s8, s9};
         main3ac.push_back(v10);
         s8 = s9;
-        cerr << sizeIndex->walk() << endl;
+        //cerr << sizeIndex->walk() << endl;
     }
     string s10 = "$t" + to_string(registerCnt++ % 10);
     vector<string> v8 = {"STAR", size_of, s9, s10};
     main3ac.push_back(v8);
-    cerr << "MULTIPLY ALL OF THAT BY " << size_of << endl;
+    //cerr << "MULTIPLY ALL OF THAT BY " << size_of << endl;
     //s10 is now that big offset
 
     //base + offset
@@ -546,8 +546,8 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
 
     //Check for type mismatch (arrays)
     if (leftArrDims != rightArrDims) {
-        //outputError("Semantic Error", "Mismatch of types in Array assignment", false); //todo breaks in bubble sort (???)
-        cerr << "oops";
+        outputError("Semantic Error", "Mismatch of types in Array assignment", false); //todo breaks in bubble sort (???)
+        //cerr << "oops";
     }
 
     ASTNode * newLeft;
