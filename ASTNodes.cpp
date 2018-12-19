@@ -1180,16 +1180,16 @@ string FuncNode::walk() {
                     stuff.push_back(regist);
                 }
             }
-
-
-            vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
-            main3ac.push_back(v);
-
             vector<string> v7 = {"PUSHRA", "---", "---", "---"}; //pushes the return address on the stack
             //doing this allows for nested function calls/recursion so each stack frame saves the location
             //of its caller on the stack. This is at the top of the stack, and must be loaded whenever
             //returning from a function
             main3ac.push_back(v7);
+
+            vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
+            main3ac.push_back(v);
+
+
 
             int k = 0;
             int i = 0;
