@@ -601,7 +601,7 @@ direct_declarator
 
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
 	//This is legacy code and bad.
-	outputError("Stop", "This is bad, legacy code");
+	outputError("Stop", "This is bad, legacy code", false);
 	$$ = new ASTNode();
 	handleProd("direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n");}
 	;

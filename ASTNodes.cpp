@@ -75,8 +75,8 @@ int getByteSize(set<int> typeSet) {
     if (typeSet.count(DOUBLE) == 1) {
         return 8;
     }
-    cerr << "SHOULDNT BE HERE BAD TYPE";
-    exit(1);
+    cerr << "Error: getByteSize called on invalid/not found type.";
+    exit(EXIT_FAILURE);
     return -1;
 }
 
@@ -118,14 +118,15 @@ void ASTNode::copyTree(ASTNode *&root, tree<ASTNode *> &ast) {
  * @return returns an empty set that is sad
  */
 set<int> ASTNode::getTypes() {
-    cerr << "IF YOU'RE SEEING THIS DIE" << endl;
+    cerr << "Error: getTypes called on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
     set<int> fail;
     return fail;
 }
 
 void ASTNode::setTypes(set<int> copy){
-    cerr << "IF YOU'RE SEEING THIS TAMALE" << endl;
-    return;
+    cerr << "Error: setTypes called on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -141,9 +142,8 @@ int ASTNode::getDimensions() {
  * @return returns a null pointer
  */
 string ASTNode::getName() {
-    cerr << "IF YOURE SEEING THIS RIP" << endl;
-    cout << "DEAD FROM GETNAME" << endl;
-    exit(1);
+    cerr << "Error: getName called on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
     return nullptr;
 }
 
@@ -161,7 +161,8 @@ list<ASTNode*> ASTNode::getSizes() {
  * @param symtblnd2 is the symbol table node to be inserted
  */
 void ASTNode::setSymbolNode(SymbolTableNode2* symtblnd2) {
-    cerr << "IF YOURE SEEING THIS RAVIOLI" << endl;
+    cerr << "Error: setSymbolNode called on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
 }
 
 /**
@@ -202,7 +203,8 @@ int computeTypeOrder(set<int> &typeSet) {
     if (typeSet.count(DOUBLE) == 1) {
         return 7;
     }
-    cerr << "SHOULDNT BE HERE, TYPE NOT FOUND MAYDAY MAYDAY";
+    cerr << "Error in computeTypeOrder: type not found.";
+    exit(EXIT_FAILURE);
     return -1;
 }
 
@@ -227,7 +229,7 @@ int compareForCast(set<int> &left, set<int> &right) {
  * @param os stream to be printed to
  */
 void ASTNode::printNode(std::ostream &os) const {
-    os << "NOT_PROGRAMMED";
+    os << "Error_trying_to_print_base_node";
 }
 
 /**
@@ -285,17 +287,13 @@ int ASTNode::getNodeType() {
     return ASTNODE;
 }
 
-list<pair<string, set<int>>> ASTNode::getArgs() {
-    cerr << "HOLY ROLI THE RIGALONI" << endl;
-    list<pair<string, set<int>>> a;
-    return a;
-}
 /**
  *
  * @return
  */
 string ASTNode::walk() {
-    cerr << "WALKING UNDEFINED NODE" << endl;
+    cerr << "Error: walking base ASTNode." << endl;
+    exit(EXIT_FAILURE);
     for (auto x : getChildren()) {
         x->walk();
     }
@@ -307,12 +305,14 @@ string ASTNode::walk() {
  * @return
  */
 int ASTNode::getVal() {
-    cerr << "OH NO GOVERNOR MY BLOODY TEA NIGEL" << endl;
+    cerr << "Error: calling getVal on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
     return -1;
 }
 
 list<int> ASTNode::getSizeList() {
-    cerr << "SIZE LIST SAYS WHAT" << endl;
+    cerr << "Error: calling getSizeList on base ASTNode." << endl;
+    exit(EXIT_FAILURE);
     list<int> k;
     return k;
 }
@@ -1006,10 +1006,6 @@ FuncNode::FuncNode(string name, list<set<int>> types, list<ASTNode*> children, l
     }
 }
 
-list<pair<string, set<int>>> FuncNode::getArgs(){
-    return args;
-}
-
 /**
  * @brief function to print funcnodes. Uses a switch statement to print different types of funcnodes.
  *        If function prototype, prints name and param types.
@@ -1020,6 +1016,7 @@ list<pair<string, set<int>>> FuncNode::getArgs(){
 void FuncNode::printNode(std::ostream &os) const{
     switch(funcType)
     {
+        //case 0 should never happen
         /*case 0: {
             os << "FUNCTION_PROTOTYPE_" << funcName;
             for (const auto &paramType : paramTypes) {
