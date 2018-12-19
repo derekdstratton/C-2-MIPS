@@ -117,7 +117,6 @@ void generateMIPS(vector<vector<string>> tac) {
         if (line[0] == "LOAD") {
             if (isAddress(line[1])) {
                 mips << "\t" << "lw " << line[2] << ", " << line[1] << endl;
-                cerr << "PLEASE FROOT LOOPER POOPER" << endl;
             }
             else if (isImmediate(line[1])) {
                 mips << "\t" << "li " << line[2]  << ", " << line[1] << endl;

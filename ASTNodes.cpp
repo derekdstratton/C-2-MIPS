@@ -1171,13 +1171,16 @@ string FuncNode::walk() {
 
             //TODO OOOOO RIGHT HERE. WE NEED TO MAKE SURE RET GOES INTO A REGISTER.
             vector<string> stuff;
-            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
-                string ret = a->walk();
-                string regist = "$t" + to_string(registerCnt++);
-                vector<string> abc = {"LOAD", ret, regist, "---"}; //todo this LOADS it into temp
-                main3ac.push_back(abc);
-                stuff.push_back(regist);
+            if (!getChildren().empty()) {
+                for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
+                    string ret = a->walk();
+                    string regist = "$t" + to_string(registerCnt++);
+                    vector<string> abc = {"LOAD", ret, regist, "---"}; //todo this LOADS it into temp
+                    main3ac.push_back(abc);
+                    stuff.push_back(regist);
+                }
             }
+
 
             vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v);
