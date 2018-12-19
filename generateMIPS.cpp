@@ -5,6 +5,8 @@
 
 using namespace std;
 
+extern string MIPSPATH;
+
 int registerCnt = 0;
 
 /**
@@ -81,7 +83,7 @@ void storeInAddress(const string& addr, const string& reg, ostream& mips) {
 
 void generateMIPS(vector<vector<string>> tac) {
     ofstream mips;
-    mips.open("final.s");
+    mips.open(MIPSPATH);
 
     for (auto line : tac) {
         if (line[0] == "COMMENT") {

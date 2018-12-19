@@ -8,6 +8,7 @@
 extern int yylineno;
 extern deque <char> columnQueue;
 extern int yyleng;
+extern bool debug[7];
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
 extern char* fileName;
 extern string THREEACPATH;
@@ -247,17 +248,20 @@ void ASTNode::copyTreeHelper(ASTNode *&src_node, tree<ASTNode *> &ast, typename 
 
 void ASTNode::output3ac() {
     //Outputs the vector to a file
-    ofstream f;
-    f.open(THREEACPATH);
-    for (auto x : main3ac) {
-        for (const auto &y: x) {
-            cout << setw(18) << left << y;
-            f << setw(18) << left << y;
+    if(debug[6])
+    {
+        ofstream f;
+        f.open(THREEACPATH);
+        for (auto x : main3ac) {
+            for (const auto &y: x) {
+                cout << setw(18) << left << y;
+                f << setw(18) << left << y;
+            }
+            f << endl;
+            cout << endl;
         }
-        f << endl;
-        cout << endl;
+        f.close();
     }
-    f.close();
 }
 
 /**

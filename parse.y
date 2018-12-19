@@ -46,6 +46,7 @@ string PRODPATH;
 string SYMBOLPATH;
 string ASTPATH;
 string THREEACPATH;
+string MIPSPATH;
 extern FILE * yyin;
 bool debug[7]; // -d, -l, -s, productions flag, -o, -a, -3
 // -d enable debugging
@@ -55,6 +56,7 @@ bool debug[7]; // -d, -l, -s, productions flag, -o, -a, -3
 // -o name a file to output interspersed reductions to
 // -a prints AST to a file named ast.dot
 // -3 prints 3AC to a file
+// always prints asm to a file
 char* fileName;
 
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
@@ -1253,7 +1255,7 @@ postfix_expression
 	    list<set<int>> compareEmpty;
 	    if(compareEmpty != it->paramTypes)
         {
-	        cerr << "Invalid param types at line " << yylineno << ". Expected ( " << "), found " << endl; //todo throw error
+	        cerr << "Mismatched param types at line " << yylineno << endl; //todo throw error
 	        exit(EXIT_FAILURE);
         }
 	}
@@ -1273,9 +1275,7 @@ postfix_expression
     for(auto iterator : $3->getChildren())
     {
         types.push_back(iterator->getTypes());
-        //cout << "ADDING THING TO LIST OF PARAM TYPES: " << *(iterator->getTypes().begin()) << endl;
     }
-    //cout << "types size is " << types.size() << endl;
 
     tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
     SymbolTableNode2* it;
@@ -1290,7 +1290,6 @@ postfix_expression
     {
         if(types != it->paramTypes)
         {
-            //cout << printParamError(it->paramTypes).str();
             cerr << "Mismatched param types at line " << yylineno << endl;//TODO check function args
         }
     }
@@ -1540,7 +1539,20 @@ int main(int argc, char **argv)
         ofs.open(SYMBOLPATH, std::ofstream::out | std::ofstream::trunc);
         ofs.close();
     }
+
+    string outputF = argv[argc-1];
+    outputF.erase(0, 11);
+    outputF.erase(outputF.length()-2, 2);
+    outputF = "tests/output_MIPS/MIPS_" + outputF;
+    outputF += ".s";
+    MIPSPATH = outputF;
+
 	yyparse();
+	root_ptr->walk();
+	root_ptr->output3ac();
+    auto tac = root_ptr->get3ac();
+    generateMIPS(tac);
+
     if(printProd)
     {
         string outputF = argv[argc-1];
@@ -1568,7 +1580,6 @@ int main(int argc, char **argv)
     }
     if(debug[6])
     {
-        root_ptr->walk();
         string outputF = argv[argc-1];
         outputF.erase(0, 11);
         outputF.erase(outputF.length()-2, 2);
@@ -1576,13 +1587,8 @@ int main(int argc, char **argv)
         outputF += ".txt";
         THREEACPATH = outputF;
         tree<ASTNode*> ast;
-        ASTNode::copyTree(root_ptr, ast);
-        kptree::print_tree_bracketed(ast);
-        /*ofstream ofs;
-        ofs.open(THREEACPATH, std::ofstream::out | std::ofstream::trunc);*/ // to clear file if wanted
-        root_ptr->output3ac();
-        auto tac = root_ptr->get3ac();
-        generateMIPS(tac);
+        ofstream ofs;
+        ofs.open(THREEACPATH, std::ofstream::out | std::ofstream::trunc);
     }
 	return 0;
 }
