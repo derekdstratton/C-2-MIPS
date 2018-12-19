@@ -7,11 +7,15 @@ int main(){
     int k;
 
     j = 4;
-    k = 5;
+    k = 4;
 
-    if(j > 3)
+    if(j == 4)
     {
         if(k > 4)
+        {
+            writeint(k + 1);
+        }
+        else
         {
             writeint(k);
         }
