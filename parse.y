@@ -238,7 +238,7 @@ declaration
 
     bool insertSuccess, notShadowing;
     tie(insertSuccess, notShadowing) = result;
-    if (!insertSuccess) { //no need to check if function, function production already checks
+    if (!insertSuccess) {
         outputError("Already exists", "Variable already exists on this scope.", false);
     } else if (!notShadowing) {
         outputError("Already exists", "Shadowing an identifier from an outer scope.", true);
@@ -576,9 +576,8 @@ direct_declarator
     list<ASTNode*> empty2;
     list<pair<string, set<int>>> empty3;
 	set<int> x;
-    //cout << *getTable() << endl;
-	$$ = new FuncNode($1->getName(), empty, empty2, empty3, 0);
 
+	$$ = new FuncNode($1->getName(), empty, empty2, empty3, 0);
 
     SymbolTableNode2* s = new SymbolTableNode2($1->getName(), x, size_decl_list, true, paramList, false);
     idNode->setSymbolNode(s);
@@ -602,7 +601,7 @@ direct_declarator
 
 	| direct_declarator OPENPAR identifier_list CLOSEPAR {
 	//This is legacy code and bad.
-	cerr << "Why are you doing that?" << endl;
+	outputError("Stop", "This is bad, legacy code");
 	$$ = new ASTNode();
 	handleProd("direct_declarator -> direct_declarator OPENPAR identifier_list CLOSEPAR\n");}
 	;
@@ -658,12 +657,6 @@ parameter_declaration
 	list<set<int>> empty2;
 	pair<string, set<int>> tmpPair ($2->getName(), $1->getTypes());
     definitionList.push_back(tmpPair);
-
-	/*SymbolTableNode2* s = new SymbolTableNode2($2->getName(), $1->getTypes(), empty, false, empty2, false);
-	idNode->setSymbolNode(s);
-	//now insert it into the symbol table
-	pair<string, SymbolTableNode2> entry = make_pair($2->getName(),*s);
-	tuple<bool, bool> result = getTable()->insert(entry);*/
 
 	$$ = new ASTNode();
 	handleProd("parameter_declaration -> declaration_specifiers declarator\n");}
@@ -1230,11 +1223,9 @@ postfix_expression
     sizes.push_back($3);
     if ($1->getChildren().empty()) {
     //$1 is an identifier
-    cerr << "THIS HAPPENED" << endl;
     	$$ = new ArrayNode($1, sizes);
     } else {
     //$1 is an array
-    cerr << "HAVALAVA" << endl;
         $$ = new ArrayNode($1->getChildren().front(), sizes);
     }
 
@@ -1247,16 +1238,14 @@ postfix_expression
     tie(it, status) = result;
 	if(status == "not") //a function of the same name was not found
 	{
-	    cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
-	    exit(EXIT_FAILURE);
+	    outputError("Not found", "Function not found", false);
 	}
 	else if(status != "not")
 	{
 	    list<set<int>> compareEmpty;
 	    if(compareEmpty != it->paramTypes)
         {
-	        cerr << "Mismatched param types at line " << yylineno << endl; //todo throw error
-	        exit(EXIT_FAILURE);
+	        outputError("Incorrect parameters", "Mismatched parameters", false);
         }
 	}
 
@@ -1283,14 +1272,13 @@ postfix_expression
     tie(it, status) = result;
     if(status == "not") //a function of the same name was not found
     {
-        cerr << "FUNCTION NOT FOUND BUDDY " << endl; //todo throw error
-        exit(EXIT_FAILURE);
+        outputError("Not found", "Function not found", false);
     }
     else if(status != "not")
     {
         if(types != it->paramTypes)
         {
-            cerr << "Mismatched param types at line " << yylineno << endl;//TODO check function args
+            outputError("Incorrect parameters", "Mismatched parameters", false);
         }
     }
 
@@ -1369,7 +1357,6 @@ string
 identifier
 	: IDENTIFIER {
 	$$ = new IdentifierNode($1);
-	//cout << "ID: " << *$1 << endl;
 	idNode = $$;
 	tuple<SymbolTableNode2*, string> result = getTable()->search(*$1);
     SymbolTableNode2* it;
@@ -1377,7 +1364,6 @@ identifier
     tie(it, status) = result;
     if (status != "not") {
         $$->setSymbolNode(it);
-        //cerr << "FOUND IN THE SYM TABLE" << endl;
     }
 	handleProd("identifier -> IDENTIFIER\n");}
 	;
