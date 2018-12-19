@@ -61,7 +61,8 @@ plain_real {integer}"."{integer}
 expreal {integer}"."{integer}[Ee][+-]?{integer}
 real {plain_real}|{expreal}
 
-identifier [a-zA-Z_][a-zA-Z_{digit}]*
+valid_char [a-zA-Z_]
+identifier {valid_char}({valid_char}|{digit})*
 string_literal \"[^\"]*\"
 
 escape_sequence (\\)((\\)|(\")|(\')|(a)|(b)|(f)|(n)|(r)|(t)|(v)|(\?)|([0-9]?[0-9]?[0-9]?)|(x[0-9]?[0-9]?))

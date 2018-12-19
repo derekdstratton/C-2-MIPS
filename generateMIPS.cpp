@@ -106,11 +106,30 @@ void generateMIPS(vector<vector<string>> tac) {
 
         if (line[0] == "CALL") {
             mips << "\tjal " << line[1] << endl;
+            string s = to_string(registerCnt++);
+            //mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
+        }
+
+        if (line[0] == "LOADRA") {
+            mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
+        }
+
+        if (line[0] == "LOAD") {
+            if (isAddress(line[1])) {
+                mips << "\t" << "lw " << line[2] << ", " << line[1] << endl;
+                cerr << "PLEASE FROOT LOOPER POOPER" << endl;
+            }
+            else if (isImmediate(line[1])) {
+                mips << "\t" << "li " << line[2]  << ", " << line[1] << endl;
+            }
+            else {
+                mips << "\t" << "move " << line[2]  << ", " << line[1] << endl;
+            }
         }
 
         if (line[0] == "RETURN") {
-            string s = to_string(registerCnt++);
-            mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
+            //string s = to_string(registerCnt++);
+            //mips << "\t" << "lw " << "$ra" << ", " << "($fp)" << endl;
             mips << "\tjr $ra" << endl;
         }
 
@@ -121,8 +140,11 @@ void generateMIPS(vector<vector<string>> tac) {
 
         if (line[0] == "PUSHPARAM") { //todo
             string tmp = "$s" + to_string(registerCnt++ % 8);
-            mips << "\t" << "li " << tmp << ", " << line[1] << endl;
-            mips << "\tsw " << tmp << ", " << line[2] << endl;
+            string t2 = loadAddress(line[1], mips);
+            //string k = needsStored(line[2]);
+            storeInAddress(line[2], t2, mips);
+            //mips << "\t" << "move " << tmp << ", " << t2 << endl;
+            //mips << "\tsw " << tmp << ", " << line[2] << endl;
         }
 
         if (line[0] == "PUSHRA") {

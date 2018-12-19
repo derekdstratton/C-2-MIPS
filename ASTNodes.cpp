@@ -4,6 +4,8 @@
 
 #include "ASTNodes.h"
 
+string global_func_name;
+
 //Extern variables and functions
 extern int yylineno;
 extern deque <char> columnQueue;
@@ -553,7 +555,9 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
 
     set<int> leftSet = lvalue->getTypes();
     set<int> rightSet = rvalue->getTypes();
-        //todo make sure this type works for function call nodes
+    if (rvalue->getNodeType() == FUNCNODE) {
+        rightSet = leftSet; //todo temporarily here because type isn't in function call nodes used in recursion
+    }
 
     //Implicit casting
     int ret = compareForCast(leftSet, rightSet);
@@ -637,6 +641,9 @@ BinaryMathNode::BinaryMathNode(int type, ASTNode *left, ASTNode *right) {
     int leftArrDims = left->getDimensions();
     set<int> rightSet = right->getTypes();
     int rightArrDims = right->getDimensions();
+    if (right->getNodeType() == FUNCNODE) {
+        rightSet = leftSet; //todo temporarily here because type isn't in function call nodes used in recursion
+    }
 
     //Check for type mismatch (arrays)
     if (leftArrDims != rightArrDims) {
@@ -889,15 +896,23 @@ int DeclNode::getNodeType() {
 string DeclNode::walk() {
     if (getChildren().back()->getNodeType() == ARRAYNODE) {
         currentFuncOffsets.emplace(getChildren().back()->getChildren().front()->getName(), stackCnt);
+        currentFuncOffsets.erase("_TOTAL_STACK_SIZE_");
+        currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+        //allFuncOffsets.emplace(global_func_name, currentFuncOffsets);
         int k = 1;
         for (auto i : getChildren().back()->getSizes()) {
             k *= i->getVal();
         }
-        stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        //stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        stackCnt += 4*k;
         return "";
     } else {
         currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
-        stackCnt += getByteSize(getChildren().back()->getTypes());
+        currentFuncOffsets.erase("_TOTAL_STACK_SIZE_");
+        currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+        //allFuncOffsets.emplace(global_func_name, currentFuncOffsets);
+        //stackCnt += getByteSize(getChildren().back()->getTypes());
+        stackCnt += 4;
     }
     return "";
 }
@@ -1082,32 +1097,55 @@ string FuncNode::walk() {
             vector<string> v = {"LABEL", funcName, "---", "---"};
             main3ac.push_back(v);
 
+            //map<string, int> nope;
+            //allFuncOffsets.emplace(funcName, nope);
+
             currentFuncOffsets.emplace("_RETURN_ADDRESS_", stackCnt);
+            currentFuncOffsets.erase("_TOTAL_STACK_SIZE_");
+            currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+            //allFuncOffsets.emplace(funcName, currentFuncOffsets);
             stackCnt += 4; //todo I'm assuming each address is 4 bytes
 
             for (auto arg : args) {
                 currentFuncOffsets.emplace(arg.first, stackCnt);
-                stackCnt += getByteSize(arg.second);
+                currentFuncOffsets.erase("_TOTAL_STACK_SIZE_");
+                currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+                //allFuncOffsets.emplace(funcName, currentFuncOffsets);
+                //stackCnt += getByteSize(arg.second);
+                stackCnt += 4;
             }
+            global_func_name = funcName;
             for (auto a : getChildren()) {
                 a->walk();
             }
             vector<string> v2 = {"RETURN", "---", "---", "---"};
             main3ac.push_back(v2);
+            //return
+            stackCnt+=4;
 
-            currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt);
+            currentFuncOffsets.erase("_TOTAL_STACK_SIZE_");
+            currentFuncOffsets.emplace("_TOTAL_STACK_SIZE_", stackCnt); //todo these 2 lines may not be necessary
             allFuncOffsets.emplace(funcName, currentFuncOffsets);
             break;
         }
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
             if (funcName == "writeint") {
-                vector<string> v = {"WRITEINT", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                string s = getChildren().front()->getChildren().front()->walk();
+                if (getChildren().front()->getChildren().front()->getNodeType() == ARRAYNODE) {
+                    s = "(" + s + ")";
+                }
+                vector<string> v = {"WRITEINT", s, "---", "---"};
                 main3ac.push_back(v);
+
                 return "";
             }
             if (funcName == "writechar") {
-                vector<string> v = {"WRITECHAR", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                string s = getChildren().front()->getChildren().front()->walk();
+                if (getChildren().front()->getChildren().front()->getNodeType() == ARRAYNODE) {
+                    s = "(" + s + ")";
+                }
+                vector<string> v = {"WRITECHAR", s, "---", "---"};
                 main3ac.push_back(v);
                 return "";
             }
@@ -1124,10 +1162,23 @@ string FuncNode::walk() {
                 return reg;
             }
             int stackSpace = 0;
-            for (const auto &item : paramTypes) { //todo this is porbably sketchy
-                stackSpace += getByteSize(item);
+            if (allFuncOffsets.count(funcName) == 0) {
+                stackSpace = stackCnt + 4; //todo for recursion
+                //adding 4 because the return value not computed
+            } else {
+                stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
             }
-            stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
+
+            //TODO OOOOO RIGHT HERE. WE NEED TO MAKE SURE RET GOES INTO A REGISTER.
+            vector<string> stuff;
+            for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
+                string ret = a->walk();
+                string regist = "$t" + to_string(registerCnt++);
+                vector<string> abc = {"LOAD", ret, regist, "---"}; //todo this LOADS it into temp
+                main3ac.push_back(abc);
+                stuff.push_back(regist);
+            }
+
             vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v);
 
@@ -1138,26 +1189,41 @@ string FuncNode::walk() {
             main3ac.push_back(v7);
 
             int k = 0;
+            int i = 0;
             if (!getChildren().empty()) {
                 for (auto a : getChildren().front()->getChildren()) { //the child is always an "arguments" node, so look at his children
-                    string ret = a->walk();
+                    //string ret = a->walk();
+                    string ret = stuff[i];
                     //todo this k thing here is basically assuming all the parameters are word length.
                     //i don't know how we would get the info we need for an array, so array parameters would
                     //need a lot of work right here if we want that
                     k += 4;
                     vector<string> v2 = {"PUSHPARAM", ret, to_string(k) + "($fp)", "---"};
                     main3ac.push_back(v2);
+                    i++;
                 }
             }
             vector<string> v2 = {"CALL", funcName, "---", "---"};
             main3ac.push_back(v2);
 
             string s = "$t" + to_string(registerCnt++ % 10);
-            string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
+
+            string s2;
+            if (allFuncOffsets.count(funcName) == 0) {
+                s2 = to_string(currentFuncOffsets.at("_RETURN_VALUE_")); //todo for recursion
+            } else {
+                s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
+            }
+
+            //string s2 = to_string(allFuncOffsets.at(funcName).at("_RETURN_VALUE_"));
             vector<string> v3 = {"ASSIGN", s2 + "($fp)", "---", s};
             main3ac.push_back(v3);
+
             vector<string> v4 = {"DEALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v4);
+
+            vector<string> v19 = {"LOADRA", "---", "---", "---"};
+            main3ac.push_back(v19);
             return s;
         }
         default:
@@ -1237,9 +1303,22 @@ string IfNode::walk() {
     vector<string> v3 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
-    getChildren().back()->walk();
+    auto tmp = getChildren();
+    tmp.pop_front();
+    tmp.front()->walk();
+    string s6;
+    if (flag == 0) {
+        s6 = "l" + to_string(labelCnt++);
+        vector<string> v8 = {"BR", "---", "---", s6};
+        main3ac.push_back(v8);
+    }
     vector<string> v2 = {"LABEL", s4, "---", "---"};
     main3ac.push_back(v2);
+    if (flag == 0) {
+        getChildren().back()->walk();
+        vector<string> v9 = {"LABEL", s6, "---", "---"};
+        main3ac.push_back(v9);
+    }
     //todo handle else statement (flag == 0)
     return "";
 }
@@ -1426,13 +1505,21 @@ string ReturnNode::walk() {
     vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
     main3ac.push_back(v2);
 
-    if (getChildren().front()->getNodeType() != NONENODE) {
+    if (!getChildren().empty() && getChildren().front()->getNodeType() != NONENODE) {
         string ret = getChildren().front()->walk();
         string return_address = to_string(stackCnt) + "($fp)";
         vector<string> v = {"PUSHRETURN", ret, return_address, "---"};
         main3ac.push_back(v);
+
+
+        currentFuncOffsets.erase("_RETURN_VALUE_");
         currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
-        stackCnt += getByteSize(getChildren().front()->getTypes());
+
+        //stackCnt += getByteSize(getChildren().front()->getTypes());
+
+
+        vector<string> v3 = {"RETURN", "---", "---", "---"};
+        main3ac.push_back(v3);
     }
     return "";
 }
@@ -1548,6 +1635,11 @@ string SeqNode::walk() {
                 x->walk();
             }
             int stackSize = allFuncOffsets.at("main").at("_TOTAL_STACK_SIZE_");
+            /*if (allFuncOffsets.count(funcName) == 0) {
+                stackSize = currentFuncOffsets.at("_TOTAL_STACK_SIZE_"); //todo for recursion
+            } else {
+                stackSize = allFuncOffsets.at("main").at("_TOTAL_STACK_SIZE_");
+            }*/
             main3ac[allocateLine][1] = to_string(stackSize);
             main3ac[deallocateLine][1] = to_string(stackSize);
             break;
