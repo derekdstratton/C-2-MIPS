@@ -1239,9 +1239,22 @@ string IfNode::walk() {
     vector<string> v3 = {"COMMENT", s5};
     vector<string> v = {s1, s2, s3, s4};
     main3ac.push_back(v);
-    getChildren().back()->walk();
+    auto tmp = getChildren();
+    tmp.pop_front();
+    tmp.front()->walk();
+    string s6;
+    if (flag == 0) {
+        s6 = "l" + to_string(labelCnt++);
+        vector<string> v8 = {"BR", "---", "---", s6};
+        main3ac.push_back(v8);
+    }
     vector<string> v2 = {"LABEL", s4, "---", "---"};
     main3ac.push_back(v2);
+    if (flag == 0) {
+        getChildren().back()->walk();
+        vector<string> v9 = {"LABEL", s6, "---", "---"};
+        main3ac.push_back(v9);
+    }
     //todo handle else statement (flag == 0)
     return "";
 }

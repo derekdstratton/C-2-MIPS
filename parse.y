@@ -881,6 +881,7 @@ selection_statement
 	$$ = new IfNode($3, $5);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement\n");}
 	| IF OPENPAR expression CLOSEPAR statement ELSE statement {
+	cerr << "THIS HAPPENED BOYYYY" << endl;
 	$$ = new IfNode($3, $5, $7);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement ELSE statement\n");}
 	| SWITCH OPENPAR expression CLOSEPAR statement {
