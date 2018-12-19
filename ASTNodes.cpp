@@ -889,11 +889,13 @@ string DeclNode::walk() {
         for (auto i : getChildren().back()->getSizes()) {
             k *= i->getVal();
         }
-        stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        //stackCnt += getByteSize(getChildren().back()->getChildren().front()->getTypes())*k;
+        stackCnt += 4*k;
         return "";
     } else {
         currentFuncOffsets.emplace(getChildren().back()->getName(), stackCnt);
-        stackCnt += getByteSize(getChildren().back()->getTypes());
+        //stackCnt += getByteSize(getChildren().back()->getTypes());
+        stackCnt += 4;
     }
     return "";
 }
@@ -1086,7 +1088,8 @@ string FuncNode::walk() {
 
             for (auto arg : args) {
                 currentFuncOffsets.emplace(arg.first, stackCnt);
-                stackCnt += getByteSize(arg.second);
+                //stackCnt += getByteSize(arg.second);
+                stackCnt += 4;
             }
             for (auto a : getChildren()) {
                 a->walk();
@@ -1123,9 +1126,9 @@ string FuncNode::walk() {
                 return reg;
             }
             int stackSpace = 0;
-            for (const auto &item : paramTypes) { //todo this is porbably sketchy
+            /*for (const auto &item : paramTypes) { //todo this is porbably sketchy
                 stackSpace += getByteSize(item);
-            }
+            }*/
             stackSpace = allFuncOffsets.at(funcName).at("_TOTAL_STACK_SIZE_");
             vector<string> v = {"ALLOCATE", to_string(stackSpace), "---", "---"};
             main3ac.push_back(v);
@@ -1431,7 +1434,8 @@ string ReturnNode::walk() {
         vector<string> v = {"PUSHRETURN", ret, return_address, "---"};
         main3ac.push_back(v);
         currentFuncOffsets.emplace("_RETURN_VALUE_", stackCnt);
-        stackCnt += getByteSize(getChildren().front()->getTypes());
+        //stackCnt += getByteSize(getChildren().front()->getTypes());
+        stackCnt += 4;
     }
     return "";
 }
