@@ -810,7 +810,7 @@ compound_statement
 	handleProd("compound_statement -> OPENCUR declaration_list CLOSCUR\n");}
 	| OPENCUR declaration_list statement_list CLOSCUR {
     while (!assignNodes.empty()) { //TODO IMPORTANT: THIS PRODUCTION DOES NOT GO HERE. IT MUST GO WITH STATEMENT, NOT COMPOUND ONLY
-        cerr << "THIS NEEDS TO HAPPEN LOL" << endl;
+        //cerr << "THIS NEEDS TO HAPPEN LOL" << endl;
         auto right = assignNodes.top();
         assignNodes.pop();
         auto left = assignNodes.top();
@@ -843,7 +843,7 @@ selection_statement
 	$$ = new IfNode($3, $5);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement\n");}
 	| IF OPENPAR expression CLOSEPAR statement ELSE statement {
-	cerr << "THIS HAPPENED BOYYYY" << endl;
+	//cerr << "THIS HAPPENED BOYYYY" << endl;
 	$$ = new IfNode($3, $5, $7);
 	handleProd("selection_statement -> IF OPENPAR expression CLOSEPAR statement ELSE statement\n");}
 	| SWITCH OPENPAR expression CLOSEPAR statement {
