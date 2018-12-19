@@ -15,8 +15,8 @@ class SymbolTable {
     void change(string str, SymbolTableNode2 node) {
         auto it = table.begin();
         while (it != table.end()) {
-            if (table.front().erase(str) > 0) {
-                table.front()[str] = node;
+            if (it->erase(str) > 0) {
+                it->insert(make_pair(str,node));
             }
             it++;
         }
