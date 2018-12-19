@@ -1104,12 +1104,21 @@ string FuncNode::walk() {
             //num local variables known after doing a walk, based on offset symbol table
         case 2: {
             if (funcName == "writeint") {
-                vector<string> v = {"WRITEINT", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                string s = getChildren().front()->getChildren().front()->walk();
+                if (getChildren().front()->getChildren().front()->getNodeType() == ARRAYNODE) {
+                    s = "(" + s + ")";
+                }
+                vector<string> v = {"WRITEINT", s, "---", "---"};
                 main3ac.push_back(v);
+
                 return "";
             }
             if (funcName == "writechar") {
-                vector<string> v = {"WRITECHAR", getChildren().front()->getChildren().front()->walk(), "---", "---"};
+                string s = getChildren().front()->getChildren().front()->walk();
+                if (getChildren().front()->getChildren().front()->getNodeType() == ARRAYNODE) {
+                    s = "(" + s + ")";
+                }
+                vector<string> v = {"WRITECHAR", s, "---", "---"};
                 main3ac.push_back(v);
                 return "";
             }
@@ -1441,7 +1450,7 @@ string ReturnNode::walk() {
     vector<string> v2 = {"COMMENT", getFileLine(lineNum)};
     main3ac.push_back(v2);
 
-    if (getChildren().front()->getNodeType() != NONENODE) {
+    if (!getChildren().empty() && getChildren().front()->getNodeType() != NONENODE) {
         string ret = getChildren().front()->walk();
         string return_address = to_string(stackCnt) + "($fp)";
         vector<string> v = {"PUSHRETURN", ret, return_address, "---"};
