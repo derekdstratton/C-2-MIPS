@@ -15,9 +15,6 @@ using namespace std;
 class SymbolTableNode2 {
 public:
     SymbolTableNode2();
-    void setDefined(){
-        defined = true;
-    }
     SymbolTableNode2(string name, set<int> typeArr, list<int> size_decl_list, bool isFunc, list<set<int>> params, bool defined);
     SymbolTableNode2(SymbolTableNode2 const & other);
     SymbolTableNode2& operator=(SymbolTableNode2 const & other) = default;

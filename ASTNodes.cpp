@@ -535,8 +535,8 @@ AssignNode::AssignNode(ASTNode *lvalue, ASTNode *rvalue) {
 
     int leftArrDims = lvalue->getDimensions();
     int rightArrDims = rvalue->getDimensions();
-    cout << "LEFT arr dims: " << leftArrDims << endl;
-    cout << "RIGHT arr dims: " << rightArrDims << endl;
+    //cout << "LEFT arr dims: " << leftArrDims << endl;
+    //cout << "RIGHT arr dims: " << rightArrDims << endl;
 
     //Check for type mismatch (arrays)
     if (leftArrDims != rightArrDims) {

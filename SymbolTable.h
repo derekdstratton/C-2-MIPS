@@ -13,7 +13,15 @@ class SymbolTable {
   public:
     SymbolTable();
     void change(string str, SymbolTableNode2 node) {
-        table.front()[str] = node;
+        auto it = table.begin();
+        while(it != table.end())
+        {
+            if(table.front().erase(str) > 0)
+            {
+                table.front()[str] = node;
+            }
+            it++;
+        }
     }
     void swapLevels() {
         auto a = table.front();
