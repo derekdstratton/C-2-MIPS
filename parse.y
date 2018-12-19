@@ -60,6 +60,7 @@ char* fileName;
 extern void outputError(string errmsg1, string errmsg2, bool errtype);
 void yyerror (char const *s);
 void handleProd (string prod);
+stringstream& printParamError (list<set<int>> params);
 bool printProd = false;
 extern int yyleng;
 stringstream prodStream;
@@ -1253,7 +1254,7 @@ postfix_expression
 	    list<set<int>> compareEmpty;
 	    if(compareEmpty != it->paramTypes)
         {
-	        cerr << "Invalid param types at line " << yylineno << endl; //todo throw error
+	        cerr << "Invalid param types at line " << yylineno << ". Expected ( " << "), found " << endl; //todo throw error
 	        exit(EXIT_FAILURE);
         }
 	}
@@ -1270,13 +1271,12 @@ postfix_expression
 
 	list<set<int>> types;
 
-    /*for(auto iterator = $3->getChildren().begin(); iterator != $3->getChildren().end(); ++iterator)
+    for(auto iterator : $3->getChildren())
     {
-        types.push_back((*iterator)->getTypes());
-        cout << "ADDING THING TO LIST OF PARAM TYPES: " << *(((*iterator)->getTypes().begin())) << endl;
-    }*/
-    cout << "types size is " << types.size() << endl;
-	//cout << "FIRST ARGUMENT IS " << *($3->getChildren().front()->getTypes().begin()) << endl;
+        types.push_back(iterator->getTypes());
+        //cout << "ADDING THING TO LIST OF PARAM TYPES: " << *(iterator->getTypes().begin()) << endl;
+    }
+    //cout << "types size is " << types.size() << endl;
 
     tuple<SymbolTableNode2*, string> result = getTable()->search($1->getName());
     SymbolTableNode2* it;
@@ -1291,7 +1291,8 @@ postfix_expression
     {
         if(types != it->paramTypes)
         {
-            //cerr << "Mismatched param types at line " << yylineno << endl;//TODO check function args
+            //cout << printParamError(it->paramTypes).str();
+            cerr << "Mismatched param types at line " << yylineno << endl;//TODO check function args
         }
     }
 
